@@ -1,0 +1,12 @@
+:host {
+  display: grid;
+  justify-items: center;
+
+  form {
+    display: grid;
+    grid-auto-flow: row;
+    row-gap: 1rem;
+    width: 300px;
+  }
+}
+

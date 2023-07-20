@@ -1,0 +1,5 @@
+<form [formGroup]="loginForm" (ngSubmit)="login()">
+  <input type="text" pInputText formControlName="email" placeholder="E-Mail" class="p-fluid"/>
+  <p-password formControlName="password" [feedback]="false" [toggleMask]="true" placeholder="Password" class="p-fluid"></p-password>
+  <button pButton label="Login" type="submit" [disabled]="loginForm.invalid"></button>
+</form>
