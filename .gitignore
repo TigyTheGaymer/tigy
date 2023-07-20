@@ -44,3 +44,16 @@ Thumbs.db
 .firebase
 *-debug.log
 .runtimeconfig.json
+
+
+# Nx-Firebase
+.runtimeconfig.json
+**/.emulators/*
+**/.firebase/*
+database-debug.log
+firebase-debug.log
+firestore-debug.log
+pubsub-debug.log
+ui-debug.log
+firebase-export*
+
