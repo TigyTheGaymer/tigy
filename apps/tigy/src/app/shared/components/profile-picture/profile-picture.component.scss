@@ -1,0 +1,10 @@
+.profile-picture-grid {
+  display: grid;
+  justify-items: center;
+  grid-gap: 1em;
+
+  tigy-avatar {
+    width: 250px;
+    height: 250px;
+  }
+}

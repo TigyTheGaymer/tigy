@@ -1,0 +1,14 @@
+<img *ngIf="profilePicture && profilePicture.image"
+     [class.hidden]="isLoading"
+     [src]="profilePicture.image.downloadUrl"
+     alt="Profile Picture"
+     (error)="onImageLoadError()"
+     (load)="onImageLoad()">
+<div *ngIf="isImageLoadError || isLoading || !profilePicture || !profilePicture.image"
+     class="default flex align-items-center justify-content-center">
+  <span>T</span>
+</div>
+
+
+
+

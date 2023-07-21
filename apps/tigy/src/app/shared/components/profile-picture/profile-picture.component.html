@@ -1,0 +1,42 @@
+<div class="text-center">
+  <div class="profile-picture-grid" *ngIf="showProfilePicture">
+    <tigy-avatar [profilePicture]="profilePicture"></tigy-avatar>
+    <p-fileUpload mode="basic"
+                  accept="image/*"
+                  (onSelect)="fileChangeEvent($event)"
+                  [maxFileSize]="10000000"
+                  chooseIcon="fa-solid fa-upload"
+                  chooseLabel="Change"></p-fileUpload>
+  </div>
+  <div *ngIf="showPictureLoading" style="height: 300px">
+    <div class="spinner-border align-middle" role="status">
+      <span class="sr-only">Loading...</span>
+    </div>
+  </div>
+  <div [style.display]="isCropperImageLoaded ? 'inline-block' : 'none'">
+    <image-cropper *ngIf="imageFile"
+                   style="max-height: 300px"
+                   [imageFile]="imageFile"
+                   [maintainAspectRatio]="true"
+                   [aspectRatio]="1"
+                   [roundCropper]="true"
+                   [resizeToWidth]="500"
+                   (imageLoaded)="cropperImageLoaded()"
+                   (cropperReady)="cropperReady()"
+                   (imageCropped)="imageCropped($event)"
+                   (loadImageFailed)="loadImageFailed()">
+    </image-cropper>
+    <div class="px-2 py-2">
+      <button pButton
+              type="button"
+              label="Cancel"
+              class="p-button-secondary"
+              (click)="cancelProfilePicture()"></button>
+      <button pButton
+              type="button"
+              label="Save"
+              class="ml-2"
+              (click)="saveProfilePicture()"></button>
+    </div>
+  </div>
+</div>

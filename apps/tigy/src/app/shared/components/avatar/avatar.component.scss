@@ -1,0 +1,22 @@
+:host {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  img {
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+  }
+
+  .default {
+    font-size: xxx-large;
+    background-color: #ff8a00;
+    color: #ffffff;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+  }
+}
