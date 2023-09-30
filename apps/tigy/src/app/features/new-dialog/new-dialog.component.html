@@ -1,0 +1,100 @@
+<form [formGroup]="form" (ngSubmit)="save()" class="formgrid">
+  <h3 class="m-2">Image</h3>
+  <p-fileUpload [showUploadButton]="false"
+                [showCancelButton]="false"
+                (onSelect)="onUpload($event)"
+                (onRemove)="onRemove()"
+                accept="image/*"
+                [maxFileSize]="10000000"
+                class="block mt-5"></p-fileUpload>
+  <div class="title-group mt-6 mb-5">
+    <h3 class="m-0">Artist</h3>
+    <button *ngIf="!newArtistForm"
+            pButton
+            type="button"
+            label="Create new Artist instead"
+            class="p-button-text p-button-sm"
+            (click)="newArtist()"></button>
+    <button *ngIf="newArtistForm"
+            pButton
+            type="button"
+            label="Select Artist instead"
+            class="p-button-text p-button-sm"
+            (click)="selectArtist()"></button>
+  </div>
+
+  <ng-container *ngIf="!newArtistForm">
+    <p-dropdown *ngIf="artistOptions$ | async as artistOptions"
+                class="p-fluid block field"
+                inputId="artist"
+                id="artist"
+                [options]="artistOptions"
+                placeholder="Choose Artist"
+                dropdownIcon="fas fa-chevron-down"
+                formControlName="artistUid"
+                [filter]="true"
+                [showClear]="true"
+                appendTo="body"></p-dropdown>
+  </ng-container>
+  <ng-container *ngIf="newArtistForm">
+    <div [formGroup]="newArtistForm" class="">
+      <span class="p-float-label p-fluid">
+        <input type="text" pInputText formControlName="name" placeholder="Name"/>
+        <label htmlFor="name">Name</label>
+      </span>
+      <div class="title-group mt-4 mb-4">
+        <h4 class="m-0">Socials</h4>
+        <button pButton
+                type="button"
+                label="Add Social"
+                class="p-button-text p-button-sm"
+                (click)="addSocial()"></button>
+      </div>
+      <div class="socials" formArrayName="socials">
+        <div *ngFor="let socialFormGroup of socials.controls; index as i"
+             [formGroup]="socialFormGroup"
+             class="social mb-4">
+          <div class="flex">
+            <div class="col-4">
+              <span class="p-float-label">
+                <p-dropdown *ngIf="socialTypeOptions$ | async as socialTypeOptions"
+                            class="p-fluid"
+                            inputId="type{{i}}"
+                            id="type{{i}}"
+                            [options]="socialTypeOptions"
+                            placeholder="Choose Artist"
+                            dropdownIcon="fas fa-chevron-down"
+                            formControlName="type"
+                            [filter]="true"
+                            [showClear]="true"
+                            appendTo="body"></p-dropdown>
+                <label for="type{{i}}">Type</label>
+              </span>
+            </div>
+            <div class="col-4">
+              <span class="p-float-label p-fluid">
+                <input type="text" pInputText formControlName="name" placeholder="Name"/>
+                <label htmlFor="name{{i}}">Name</label>
+              </span>
+            </div>
+            <div class="col-4">
+              <span class="p-float-label p-fluid">
+                <input type="text" pInputText formControlName="url" placeholder="Url"/>
+                <label htmlFor="url{{i}}">Url</label>
+              </span>
+            </div>
+          </div>
+          <p-button icon="fa fa-trash" styleClass="p-button-text p-button-danger" (click)="deleteSocial(i)"></p-button>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+  <div class="flex">
+    <button pButton
+            type="submit"
+            label="Add new Image Item"
+            [loading]="isLoading"
+            [disabled]="isSubmitDisabled()"
+            class="mt-4 ml-auto"></button>
+  </div>
+</form>
