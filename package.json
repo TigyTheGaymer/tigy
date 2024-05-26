@@ -23,7 +23,7 @@
     "@angular/router": "17.3.9",
     "@nx/angular": "17.3.2",
     "@simondotm/nx-firebase": "^2.3.0",
-    "firebase": "^9.14.0",
+    "firebase": "^10.12.1",
     "firebase-admin": "^11.3.0",
     "firebase-functions": "^4.1.0",
     "ngx-image-cropper": "^7.0.2",
