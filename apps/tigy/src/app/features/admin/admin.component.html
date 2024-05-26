@@ -3,3 +3,16 @@
 </div>
 <button pButton label="Upload new Image" (click)="new()"></button>
 <button pButton label="Logout" (click)="logout()"></button>
+
+<div class="flex justify-content-center">
+  @if (imageItems$ | async; as imageItems) {
+    <div class="image-item-list">
+      @for (imageItem of imageItems; track imageItem.uid) {
+        <img [src]="imageItem.image.downloadUrl || ''"
+             class="image-item"
+             alt="tigy">
+      }
+    </div>
+  }
+</div>
+

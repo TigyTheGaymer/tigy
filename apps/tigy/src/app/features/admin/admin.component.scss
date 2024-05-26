@@ -1,0 +1,19 @@
+
+.image-item-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-rows: repeat(auto-fit, minmax(300px, 1fr));
+  grid-auto-flow: dense;
+  grid-gap: 3rem;
+  justify-items: center;
+  align-items: center;
+  max-width: 1500px;
+  width: 100%;
+
+  .image-item {
+    max-height: 500px;
+    max-width: 500px;
+    width: 100%;
+  }
+}
+

@@ -1,6 +1,7 @@
-import {Image} from './image.model';
+import { Image } from './image.model';
 
 export interface ImageItem {
+  uid?: string
   image: Image
   artistUid: string
 }
