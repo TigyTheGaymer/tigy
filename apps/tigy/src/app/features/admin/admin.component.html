@@ -8,7 +8,7 @@
   @if (imageItems$ | async; as imageItems) {
     <div class="image-item-list">
       @for (imageItem of imageItems; track imageItem.uid) {
-        <img [src]="imageItem.image.downloadUrl || ''"
+        <img [src]="imageItem.imageSmall?.downloadUrl || ''"
              class="image-item"
              alt="tigy">
       }

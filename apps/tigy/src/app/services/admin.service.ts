@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Auth, signInWithEmailAndPassword, signOut, user } from '@angular/fire/auth';
 import { Router } from '@angular/router';
-import { IMAGE_ITEM_COLLECTION, ImageItem } from '../shared/models/image-item.model';
+import { IMAGE_ITEM_COLLECTION, ImageItem } from '@tigy/shared';
 import { collection, collectionData, doc, Firestore, setDoc } from '@angular/fire/firestore';
 import { getDownloadURL, ref, Storage, uploadBytesResumable } from '@angular/fire/storage';
 import { v4 } from 'uuid';
@@ -38,7 +38,7 @@ export class AdminService {
 
   async uploadNewImageItem(image: File, artistUid: string) {
     const uid = v4();
-    const upload = await uploadBytesResumable(ref(this.storage, `image-items/${uid}`), image)
+    const upload = await uploadBytesResumable(ref(this.storage, `image-items/${uid}/image`), image)
     const downloadUrl = await getDownloadURL(upload.ref)
     const fullPath = upload.ref.fullPath
     const imageItem: ImageItem = {

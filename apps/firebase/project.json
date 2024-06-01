@@ -63,24 +63,17 @@
     "serve": {
       "executor": "nx:run-commands",
       "options": {
-        "commands": [
-          "nx run firebase:watch",
-          "nx run firebase:emulate"
-        ]
+        "commands": ["nx run firebase:watch", "nx run firebase:emulate"]
       }
     },
     "deploy": {
       "executor": "nx:run-commands",
-      "dependsOn": [
-        "build"
-      ],
+      "dependsOn": ["build"],
       "options": {
         "command": "nx run firebase:firebase deploy"
       }
     }
   },
-  "tags": [
-    "firebase:app",
-    "firebase:name:firebase"
-  ]
+  "tags": ["firebase:app", "firebase:name:firebase"],
+  "implicitDependencies": ["firebase-functions"]
 }

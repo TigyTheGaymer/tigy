@@ -1,5 +1,5 @@
-import {Image} from './image.model';
-import {Artist} from './artist.model';
+import { Image } from '@tigy/shared';
+import { Artist } from './artist.model';
 
 export interface ProfilePicture {
   image: Image

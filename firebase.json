@@ -4,15 +4,9 @@
     "indexes": "apps/firebase/firestore.indexes.json"
   },
   "hosting": {
-    "predeploy": [
-      "npm run build:tigy"
-    ],
+    "predeploy": ["npm run build:tigy"],
     "public": "dist/apps/tigy",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ],
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
     "rewrites": [
       {
         "source": "**",
@@ -21,9 +15,16 @@
     ]
   },
   "storage": {
-      "rules": "apps/firebase/storage.rules"
+    "rules": "apps/firebase/storage.rules"
   },
-  "functions": [],
+  "functions": [
+    {
+      "codebase": "firebase-functions",
+      "source": "dist/apps/firebase-functions",
+      "runtime": "nodejs18",
+      "ignore": ["*.local"]
+    }
+  ],
   "emulators": {
     "auth": {
       "port": 9099

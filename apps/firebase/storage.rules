@@ -9,7 +9,7 @@ service firebase.storage {
       allow read, write: if false;
     }
 
-    match /image-items/{filename} {
+    match /image-items/{imageItemUid}/{filename} {
     	allow write: if isAdmin();
       allow read: if true;
     }
