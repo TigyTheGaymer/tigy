@@ -1,10 +1,10 @@
-import {Component} from '@angular/core';
-import {CommonModule} from '@angular/common';
-import {InputTextModule} from 'primeng/inputtext';
-import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
-import {PasswordModule} from 'primeng/password';
-import {ButtonModule} from 'primeng/button';
-import {AdminService} from '../../services/admin.service';
+import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { InputTextModule } from 'primeng/inputtext';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { PasswordModule } from 'primeng/password';
+import { ButtonModule } from 'primeng/button';
+import { AdminService } from '../../services/admin/admin.service';
 
 @Component({
   selector: 'tigy-admin-login',

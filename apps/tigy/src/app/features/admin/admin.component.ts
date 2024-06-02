@@ -1,15 +1,15 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
-import { AdminService } from '../../services/admin.service';
+import { AdminService } from '../../services/admin/admin.service';
 import { ProfilePictureComponent } from '../../shared/components/profile-picture/profile-picture.component';
 import { DialogService, DynamicDialogModule } from 'primeng/dynamicdialog';
 import { NewDialogComponent } from '../new-dialog/new-dialog.component';
 import { ImageModule } from 'primeng/image';
 import { ImageItemsRepository } from '../../stores/image-items/image-items.repository';
-import { Dialog, DialogModule } from '@angular/cdk/dialog';
-import { ImageItemDialogComponent } from '../image-item-dialog/image-item-dialog.component';
+import { DialogModule } from '@angular/cdk/dialog';
 import { ImageItem } from '@tigy/shared';
+import { ImageItemDialogService } from '../../services/image-item-dialog/image-item-dialog.service';
 
 @Component({
   selector: 'tigy-admin',
@@ -30,8 +30,8 @@ export class AdminComponent implements OnInit {
 
   private adminService = inject(AdminService);
   private dialogService = inject(DialogService);
-  private cdkDialogService = inject(Dialog);
   private imageItemsRepository = inject(ImageItemsRepository);
+  private imageItemDialogService = inject(ImageItemDialogService);
 
   imageItems$ = this.imageItemsRepository.imageItems$;
 
@@ -51,10 +51,6 @@ export class AdminComponent implements OnInit {
   }
 
   openImage(imageItem: ImageItem) {
-    this.imageItemsRepository.setActive(imageItem.uid);
-    this.cdkDialogService.open(ImageItemDialogComponent, {
-      height: '100%',
-      width: '100%'
-    });
+    this.imageItemDialogService.openImageItem(imageItem.uid);
   }
 }

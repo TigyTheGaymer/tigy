@@ -5,7 +5,7 @@ import { IMAGE_ITEM_COLLECTION, ImageItem } from '@tigy/shared';
 import { doc, Firestore, setDoc } from '@angular/fire/firestore';
 import { getDownloadURL, ref, Storage, uploadBytesResumable } from '@angular/fire/storage';
 import { v4 } from 'uuid';
-import { Artist, ARTIST_COLLECTION } from '../shared/models/artist.model';
+import { Artist, ARTIST_COLLECTION } from '../../shared/models/artist.model';
 
 @Injectable({
   providedIn: 'root'

@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { DynamicDialogModule, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { FileUploadModule } from 'primeng/fileupload';
 import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { AdminService } from '../../services/admin.service';
+import { AdminService } from '../../services/admin/admin.service';
 import { DropdownModule } from 'primeng/dropdown';
 import { map, of } from 'rxjs';
 import { InputTextModule } from 'primeng/inputtext';

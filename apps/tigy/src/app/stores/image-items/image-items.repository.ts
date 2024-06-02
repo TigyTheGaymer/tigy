@@ -21,7 +21,9 @@ export class ImageItemsRepository {
     withEntities<ImageItem, 'uid'>({ idKey: 'uid' }),
     withActiveId()
   );
+
   private firestore = inject(Firestore);
+
   private loaded = false;
 
   imageItems$ = this.store.pipe(selectAllEntities());
@@ -34,16 +36,16 @@ export class ImageItemsRepository {
     }
     this.loaded = true;
     collectionData(
-      collection(this.firestore, IMAGE_ITEM_COLLECTION), { idField: 'uid' }
+      collection(this.firestore, IMAGE_ITEM_COLLECTION),
+      { idField: 'uid' }
     ).subscribe({
       next: value => this.store.update(setEntities(value as ImageItem[])),
       error: () => this.loaded = false,
       complete: () => this.loaded = false
     });
-
   }
 
-  setActive(uid: string): void {
+  setActive(uid: string | null): void {
     this.store.update(setActiveId(uid));
   }
 }
