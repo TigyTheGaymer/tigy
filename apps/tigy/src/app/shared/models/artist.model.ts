@@ -1,8 +1,9 @@
-import {Social} from './social.model';
+import { Social } from './social.model';
 
 export interface Artist {
-  name: string
-  socials: Social[]
+  uid: string;
+  name: string;
+  socials: Social[];
 }
 
-export const ARTIST_COLLECTION = 'Artists'
+export const ARTIST_COLLECTION = 'Artists';

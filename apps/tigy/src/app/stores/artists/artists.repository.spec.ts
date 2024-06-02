@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { ImageItemsRepository } from './image-items.repository';
+import { ArtistsRepository } from './artists.repository';
 
-describe('ImageItemsRepository', () => {
-  let service: ImageItemsRepository;
+describe('ArtistsRepository', () => {
+  let service: ArtistsRepository;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(ImageItemsRepository);
+    service = TestBed.inject(ArtistsRepository);
   });
 
   it('should be created', () => {

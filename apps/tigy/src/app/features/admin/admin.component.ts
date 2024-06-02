@@ -24,7 +24,7 @@ export class AdminComponent implements OnInit {
   imageItems$ = this.imageItemsRepository.imageItems$;
 
   ngOnInit() {
-    this.imageItemsRepository.loadImageItems()
+    this.imageItemsRepository.load()
   }
 
   logout() {
