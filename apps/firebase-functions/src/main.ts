@@ -37,7 +37,7 @@ export const onImageResize = onCustomEventPublished(
     };
 
     const bigPath = `${event.subject}_${BIG_RES}`;
-    const bigUrl = await getDownloadURL(getStorage().bucket().file(smallPath));
+    const bigUrl = await getDownloadURL(getStorage().bucket().file(bigPath));
     const imageBig = {
       fullPath: bigPath,
       downloadUrl: bigUrl
@@ -47,4 +47,5 @@ export const onImageResize = onCustomEventPublished(
       .collection(IMAGE_ITEM_COLLECTION)
       .doc(uid)
       .update({ imageSmall, imageBig } as Partial<ImageItem>);
-  });
+  }
+);

@@ -7,11 +7,22 @@ import { DialogService, DynamicDialogModule } from 'primeng/dynamicdialog';
 import { NewDialogComponent } from '../new-dialog/new-dialog.component';
 import { ImageModule } from 'primeng/image';
 import { ImageItemsRepository } from '../../stores/image-items/image-items.repository';
+import { Dialog, DialogModule } from '@angular/cdk/dialog';
+import { ImageItemDialogComponent } from '../image-item-dialog/image-item-dialog.component';
+import { ImageItem } from '@tigy/shared';
 
 @Component({
   selector: 'tigy-admin',
   standalone: true,
-  imports: [CommonModule, ButtonModule, ProfilePictureComponent, DynamicDialogModule, ImageModule, NgOptimizedImage],
+  imports: [
+    CommonModule,
+    ButtonModule,
+    ProfilePictureComponent,
+    DynamicDialogModule,
+    ImageModule,
+    NgOptimizedImage,
+    DialogModule
+  ],
   templateUrl: './admin.component.html',
   styleUrls: ['./admin.component.scss']
 })
@@ -19,12 +30,13 @@ export class AdminComponent implements OnInit {
 
   private adminService = inject(AdminService);
   private dialogService = inject(DialogService);
+  private cdkDialogService = inject(Dialog);
   private imageItemsRepository = inject(ImageItemsRepository);
 
   imageItems$ = this.imageItemsRepository.imageItems$;
 
   ngOnInit() {
-    this.imageItemsRepository.load()
+    this.imageItemsRepository.load();
   }
 
   logout() {
@@ -32,6 +44,17 @@ export class AdminComponent implements OnInit {
   }
 
   new() {
-    this.dialogService.open(NewDialogComponent, { header: 'Add new Image Item', width: '50%' });
+    this.dialogService.open(NewDialogComponent, {
+      header: 'Add new Image Item',
+      width: '50%'
+    });
+  }
+
+  openImage(imageItem: ImageItem) {
+    this.imageItemsRepository.setActive(imageItem.uid);
+    this.cdkDialogService.open(ImageItemDialogComponent, {
+      height: '100%',
+      width: '100%'
+    });
   }
 }

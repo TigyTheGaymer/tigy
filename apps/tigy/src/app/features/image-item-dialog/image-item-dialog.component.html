@@ -1,0 +1,5 @@
+@if (imageItem$ | async; as imageItem) {
+  <img [src]="imageItem.imageBig?.downloadUrl || ''"
+       class="image-item"
+       alt="tigy">
+}

@@ -10,7 +10,8 @@
       @for (imageItem of imageItems; track imageItem.uid) {
         <img [src]="imageItem.imageSmall?.downloadUrl || ''"
              class="image-item"
-             alt="tigy">
+             alt="tigy"
+             (click)="openImage(imageItem)">
       }
     </div>
   }
