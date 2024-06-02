@@ -1,7 +1,7 @@
 import { Image } from './image.model';
 
 export interface ImageItem {
-  uid?: string
+  uid: string
   image: Image,
   imageBig?: Image,
   imageSmall?: Image,
