@@ -3,15 +3,17 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "start:tigy": "nx serve tigy",
-    "lint:tigy": "nx lint tigy",
-    "build:tigy": "nx build tigy --configuration prod",
-    "build:firebase-function": "nx build firebase-functions",
-    "build:shared": "nx build shared",
-    "test:tigy": "nx test tigy --ci --watchAll=false --no-cache",
-    "export:firestore.indexes": "firebase firestore:indexes > apps/firebase/firestore.indexes.json",
+    "start.tigy": "nx serve tigy",
+    "start.emulator": "firebase emulators:start --import emulators",
+    "lint.tigy": "nx lint tigy",
+    "build.tigy": "nx build tigy --configuration prod",
+    "build.firebase-function": "nx build firebase-functions",
+    "build.shared": "nx build shared",
+    "test.tigy": "nx test tigy --ci --watchAll=false --no-cache",
+    "export.firestore.indexes": "firebase firestore:indexes > apps/firebase/firestore.indexes.json",
+    "export.emulator": "firebase emulators:export emulators",
     "deploy": "firebase deploy",
-    "deploy.functions": "firebase deploy --only functions"
+    "deploy.functions": "firebase deploy --only apps/firebase-functions/functions"
   },
   "private": true,
   "dependencies": {

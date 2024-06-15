@@ -4,9 +4,15 @@
     "indexes": "apps/firebase/firestore.indexes.json"
   },
   "hosting": {
-    "predeploy": ["npm run build:tigy"],
+    "predeploy": [
+      "npm run build:tigy"
+    ],
     "public": "dist/apps/tigy",
-    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
     "rewrites": [
       {
         "source": "**",
@@ -22,7 +28,9 @@
       "codebase": "firebase-functions",
       "source": "dist/apps/firebase-functions",
       "runtime": "nodejs18",
-      "ignore": ["*.local"]
+      "ignore": [
+        "*.local"
+      ]
     }
   ],
   "emulators": {
@@ -51,8 +59,12 @@
       "port": 9299
     },
     "ui": {
-      "enabled": true
+      "enabled": true,
+      "port": 4000
     },
     "singleProjectMode": true
+  },
+  "extensions": {
+    "storage-resize-images": "firebase/storage-resize-images@0.2.5"
   }
 }
