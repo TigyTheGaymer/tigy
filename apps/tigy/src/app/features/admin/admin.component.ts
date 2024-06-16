@@ -7,7 +7,6 @@ import { DialogService, DynamicDialogModule } from 'primeng/dynamicdialog';
 import { NewDialogComponent } from '../new-dialog/new-dialog.component';
 import { ImageModule } from 'primeng/image';
 import { ImageItemsRepository } from '../../stores/image-items/image-items.repository';
-import { DialogModule } from '@angular/cdk/dialog';
 import { ImageItem } from '@tigy/shared';
 import { ImageItemDialogService } from '../../services/image-item-dialog/image-item-dialog.service';
 
@@ -21,7 +20,6 @@ import { ImageItemDialogService } from '../../services/image-item-dialog/image-i
     DynamicDialogModule,
     ImageModule,
     NgOptimizedImage,
-    DialogModule
   ],
   templateUrl: './admin.component.html',
   styleUrls: ['./admin.component.scss']

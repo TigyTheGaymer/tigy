@@ -1,9 +1,10 @@
 import { inject, Injectable } from '@angular/core';
 import { ImageItemDialogComponent } from '../../features/image-item-dialog/image-item-dialog.component';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Dialog, DialogRef } from '@angular/cdk/dialog';
 import { BehaviorSubject, filter, map, switchMap } from 'rxjs';
 import { ImageItemsRepository } from '../../stores/image-items/image-items.repository';
+import { DialogService } from 'primeng/dynamicdialog';
+import { DynamicDialogRef } from 'primeng/dynamicdialog/dynamicdialog-ref';
 
 @Injectable({
   providedIn: 'root'
@@ -11,11 +12,11 @@ import { ImageItemsRepository } from '../../stores/image-items/image-items.repos
 export class ImageItemDialogService {
 
   private activatedRoute = inject(ActivatedRoute);
-  private cdkDialogService = inject(Dialog);
   private router = inject(Router);
   private imageItemsRepository = inject(ImageItemsRepository);
+  private dialogService = inject(DialogService);
 
-  private imageItemDialogRef$ = new BehaviorSubject<DialogRef<unknown, ImageItemDialogComponent> | null>(null);
+  private imageItemDialogRef$ = new BehaviorSubject<DynamicDialogRef<ImageItemDialogComponent> | null>(null);
 
   constructor() {
     this.initQueryParam();
@@ -29,6 +30,11 @@ export class ImageItemDialogService {
       map(p => p.get('imageItemUid'))
     ).subscribe(imageItemUid => {
       this.imageItemsRepository.setActive(imageItemUid);
+
+      // when active is undefined close the dialog. For example on back navigation
+      if (!imageItemUid && this.imageItemDialogRef$.value) {
+        this.imageItemDialogRef$.value?.close();
+      }
     });
   }
 
@@ -38,9 +44,13 @@ export class ImageItemDialogService {
       filter(item => !!item),
       filter(() => !this.imageItemDialogRef$.value)
     ).subscribe(() => {
-      const imageItemDialogRef = this.cdkDialogService.open(ImageItemDialogComponent, {
+      const imageItemDialogRef = this.dialogService.open(ImageItemDialogComponent, {
         height: '100%',
-        width: '100%'
+        width: '100%',
+        showHeader: false,
+        closeOnEscape: true,
+        style: { padding: 0 },
+        contentStyle: { padding: 0 }
       });
       this.imageItemDialogRef$.next(imageItemDialogRef);
     });
@@ -52,7 +62,7 @@ export class ImageItemDialogService {
       filter(ref => !!ref),
       switchMap(ref => {
         // @ts-expect-error Is filtered
-        return ref.closed;
+        return ref.onClose;
       })
     ).subscribe(() => {
       this.imageItemDialogRef$.next(null);
