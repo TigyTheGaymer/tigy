@@ -21,7 +21,7 @@ export const appConfig: ApplicationConfig = {
     provideAuth(() => {
       const auth = getAuth();
       if (environment.useEmulators) {
-        connectAuthEmulator(auth, 'http://localhost:9099')
+        connectAuthEmulator(auth, 'http://localhost:9099', { disableWarnings: true });
       }
       return auth;
     }),
@@ -50,5 +50,5 @@ export const appConfig: ApplicationConfig = {
     ScreenTrackingService,
     UserTrackingService,
     DialogService
-  ],
+  ]
 };
