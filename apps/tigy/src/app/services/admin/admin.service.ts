@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Auth, signInWithEmailAndPassword, signOut, user } from '@angular/fire/auth';
 import { Router } from '@angular/router';
 import { IMAGE_ITEM_COLLECTION, ImageItem } from '@tigy/shared';
-import { doc, Firestore, setDoc } from '@angular/fire/firestore';
+import { doc, Firestore, serverTimestamp, setDoc } from '@angular/fire/firestore';
 import { getDownloadURL, ref, Storage, uploadBytesResumable } from '@angular/fire/storage';
 import { v4 } from 'uuid';
 import { Artist, ARTIST_COLLECTION } from '../../shared/models/artist.model';
@@ -38,10 +38,12 @@ export class AdminService {
     const upload = await uploadBytesResumable(ref(this.storage, `image-items/${uid}/image`), image)
     const downloadUrl = await getDownloadURL(upload.ref)
     const fullPath = upload.ref.fullPath
+    const createTimestamp = serverTimestamp()
     const imageItem: ImageItem = {
       uid,
       image: {fullPath, downloadUrl},
-      artistUid
+      artistUid,
+      createTimestamp
     }
 
     return setDoc(doc(this.firestore, `${IMAGE_ITEM_COLLECTION}/${uid}`), imageItem)
