@@ -1,9 +1,10 @@
-import {ChangeDetectionStrategy, Component, EventEmitter, Input, Output} from '@angular/core';
-import {ImageCroppedEvent, ImageCropperModule} from 'ngx-image-cropper';
-import {FileUploadModule} from 'primeng/fileupload';
-import {AvatarComponent} from '../avatar/avatar.component';
-import {CommonModule} from '@angular/common';
-import {ProfilePicture} from '../../models/profile-picture.model';
+import { ChangeDetectionStrategy, Component, EventEmitter, inject, Input, Output } from '@angular/core';
+import { ImageCroppedEvent, ImageCropperModule } from 'ngx-image-cropper';
+import { FileUploadModule } from 'primeng/fileupload';
+import { AvatarComponent } from '../avatar/avatar.component';
+import { CommonModule } from '@angular/common';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+import { ProfilePicture } from '@tigy/shared';
 
 @Component({
   selector: 'tigy-profile-picture',
@@ -20,12 +21,14 @@ import {ProfilePicture} from '../../models/profile-picture.model';
 })
 export class ProfilePictureComponent {
 
+  private domSanitizer = inject(DomSanitizer);
+
   @Input() profilePicture?: ProfilePicture;
-  @Output() saveNewProfilePicture = new EventEmitter<string>();
+  @Output() saveNewProfilePicture = new EventEmitter<SafeUrl>();
 
   imageFile?: File;
   isCropperImageLoaded?: boolean;
-  private croppedImage?: string;
+  private croppedImage?: SafeUrl;
   private isCropperReady?: boolean;
 
   fileChangeEvent($event: any): void {
@@ -33,7 +36,9 @@ export class ProfilePictureComponent {
   }
 
   imageCropped($event: ImageCroppedEvent): void {
-    this.croppedImage = $event.base64 || undefined;
+    console.log($event);
+    if (!$event.objectUrl) return;
+    this.croppedImage = this.domSanitizer.bypassSecurityTrustUrl($event.objectUrl);
   }
 
   cropperImageLoaded(): void {
@@ -57,6 +62,7 @@ export class ProfilePictureComponent {
   }
 
   saveProfilePicture(): void {
+    console.log(this.croppedImage);
     if (!this.croppedImage) {
       return;
     }

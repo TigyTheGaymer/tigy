@@ -9,6 +9,7 @@ import { ImageModule } from 'primeng/image';
 import { ImageItemsRepository } from '../../stores/image-items/image-items.repository';
 import { ImageItem } from '@tigy/shared';
 import { ImageItemDialogService } from '../../services/image-item-dialog/image-item-dialog.service';
+import { SafeUrl } from '@angular/platform-browser';
 
 @Component({
   selector: 'tigy-admin',
@@ -50,5 +51,10 @@ export class AdminComponent implements OnInit {
 
   openImage(imageItem: ImageItem) {
     this.imageItemDialogService.openImageItem(imageItem.uid);
+  }
+
+  saveNewProfilePicture(image: SafeUrl) {
+    console.log(image);
+    // this.adminService.uploadNewProfilePicture(picture)
   }
 }

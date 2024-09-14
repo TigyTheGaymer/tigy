@@ -1,6 +1,6 @@
-import {ChangeDetectionStrategy, Component, Input} from '@angular/core';
-import {CommonModule} from '@angular/common';
-import {ProfilePicture} from '../../models/profile-picture.model';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ProfilePicture } from '../../../../../../../libs/shared/src/lib/models/profile-picture.model';
 
 @Component({
   selector: 'tigy-avatar',

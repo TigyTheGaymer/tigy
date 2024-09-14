@@ -1,0 +1,19 @@
+{
+  "name": "image-items/bf8b9dd7-3f8c-48f0-87b1-16a6cd599fca/image",
+  "bucket": "tigy-165cc.appspot.com",
+  "metageneration": 1,
+  "generation": 1719395100857,
+  "contentType": "image/jpeg",
+  "storageClass": "STANDARD",
+  "contentDisposition": "inline",
+  "downloadTokens": [
+    "bdd17b4c-52cd-4a1f-9e15-dc0c7425f6b3"
+  ],
+  "etag": "BdRgUuXaFuyo7IWN+MqkAt4T9FY",
+  "customMetadata": {},
+  "timeCreated": "2024-06-26T09:45:00.859Z",
+  "updated": "2024-06-26T09:45:00.859Z",
+  "size": 14713453,
+  "md5Hash": "tDCbQgYD589Wtydya8ycfw==",
+  "crc32c": "3603090111"
+}

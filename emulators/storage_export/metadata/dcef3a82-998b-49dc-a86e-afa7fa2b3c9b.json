@@ -1,0 +1,21 @@
+{
+  "name": "image-items/89d4eb11-5402-4754-9bb9-c82a45a64657/image_2000x2000",
+  "bucket": "tigy-165cc.appspot.com",
+  "metageneration": 2,
+  "generation": 1719350412807,
+  "contentType": "image/webp",
+  "storageClass": "STANDARD",
+  "contentDisposition": "",
+  "downloadTokens": [
+    "67ec4a83-c243-4acf-80bc-a66fbd00db2e"
+  ],
+  "etag": "f2vmry3mdh//Q1HLNXehsqVkweI",
+  "customMetadata": {
+    "resizedImage": "true"
+  },
+  "timeCreated": "2024-06-25T21:20:12.807Z",
+  "updated": "2024-06-25T21:20:12.825Z",
+  "size": 337658,
+  "md5Hash": "8qsrB5wOoLPhtgwNM5YEhg==",
+  "crc32c": "3859135900"
+}
