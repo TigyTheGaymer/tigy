@@ -1,5 +1,12 @@
-@if (imageItem$ | async; as imageItem) {
-  <img [src]="imageItem.imageBig?.downloadUrl || ''"
-       class="image-item"
-       alt="tigy">
-}
+<div class="header">
+  <p-button [icon]="TigyIcons.BACK" (onClick)="close()" [text]="true" [rounded]="true" />
+</div>
+<div class="image">
+  @if (imageItem$ | async; as imageItem) {
+    <img [src]="imageItem.imageBig?.downloadUrl || ''"
+         class="image-item"
+         alt="tigy">
+  }
+</div>
+<div class="info"></div>
+
