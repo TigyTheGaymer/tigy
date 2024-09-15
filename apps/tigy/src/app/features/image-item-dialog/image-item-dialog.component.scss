@@ -4,7 +4,7 @@
     'header info'
     'image info';
   grid-template-rows: auto 1fr;
-  grid-template-columns: 1fr 350px;
+  grid-template-columns: 1fr auto;
   background: #ffffff;
   height: 100%;
   width: 100%;
@@ -25,9 +25,13 @@
 
   .header {
     grid-area: header;
+    padding: 0.5rem;
   }
 
   .info {
+    width: 350px;
     grid-area: info;
+    background: var(--surface-ground);
+    padding: 0.5rem 2rem 2rem;
   }
 }

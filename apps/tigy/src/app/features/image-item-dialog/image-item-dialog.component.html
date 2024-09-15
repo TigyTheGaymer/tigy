@@ -1,5 +1,16 @@
 <div class="header">
-  <p-button [icon]="TigyIcons.BACK" (onClick)="close()" [text]="true" [rounded]="true" />
+  <p-button [icon]="TigyIcons.BACK"
+            (onClick)="close()"
+            [text]="true"
+            [rounded]="true"
+            severity="secondary"
+            size="large" />
+  <p-button [icon]="TigyIcons.INFO"
+            (onClick)="toggleInfo()"
+            [text]="true"
+            [rounded]="true"
+            severity="secondary"
+            size="large" />
 </div>
 <div class="image">
   @if (imageItem$ | async; as imageItem) {
@@ -8,5 +19,15 @@
          alt="tigy">
   }
 </div>
-<div class="info"></div>
+<div class="info" [@infoOpen]="isInfoOpen()">
+  <div class="flex align-items-center gap-2">
+    <p-button [icon]="TigyIcons.CLOSE"
+              (onClick)="closeInfo()"
+              [text]="true"
+              [rounded]="true"
+              severity="secondary"
+              size="large" />
+    <h3 class="m-0">Info</h3>
+  </div>
+</div>
 
