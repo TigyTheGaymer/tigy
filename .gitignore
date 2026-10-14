@@ -1,2 +1,6 @@
 # Claude Code is the only agent; skills live in .claude/skills
 .agents/
+
+.nx/polygraph
+.claude/worktrees
+.claude/settings.local.json
