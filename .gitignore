@@ -1,0 +1,2 @@
+# Claude Code is the only agent; skills live in .claude/skills
+.agents/
