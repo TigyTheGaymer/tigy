@@ -23,9 +23,9 @@ UI scope: admin and public screens in sections 6-12 use minimal, unstyled markup
 
 ## 3. Spikes (real project, before building features)
 
-- [ ] 3.1 S4: deploy the scaffolded `apps/public` to App Hosting (`europe-west4`, root directory `apps/public`) and verify the SSR page loads on its `*.hosted.app` address; if it fails, pin Angular/Nx to the newest App Hosting-supported versions and record the outcome in design.md
-- [ ] 3.2 S1: upload a test file, create a download-token URL with the Admin SDK, deploy Storage rules denying all reads, and verify the token URL still serves the file while a tokenless request is denied; record the result in design.md
-- [ ] 3.3 S2: request a token URL from at least two distant locations (or a CDN checker) and inspect response headers to determine whether downloads are edge-cached; record the result and whether the fallback (serving through the App Hosting CDN) is needed in design.md
+- [x] 3.1 S4: deploy the scaffolded `apps/public` to App Hosting (`europe-west4`, root directory `apps/public`) and verify the SSR page loads on its `*.hosted.app` address; if it fails, pin Angular/Nx to the newest App Hosting-supported versions and record the outcome in design.md
+- [x] 3.2 S1: upload a test file, create a download-token URL with the Admin SDK, deploy Storage rules denying all reads, and verify the token URL still serves the file while a tokenless request is denied; record the result in design.md
+- [x] 3.3 S2: request a token URL from at least two distant locations (or a CDN checker) and inspect response headers to determine whether downloads are edge-cached; record the result and whether the fallback (serving through the App Hosting CDN) is needed in design.md
 - [ ] 3.4 S3: set up Workload Identity Federation and a deploy service account, run a minimal GitHub workflow that runs `firebase deploy --only firestore:rules`, and verify it succeeds with no stored key; record the outcome in design.md
 - [ ] 3.5 S5: strip metadata from real artist files (JPEG, PNG, GIF, APNG) without re-encoding and verify pixel equality against the originals, color profile kept and GPS/camera data gone; record the chosen approach in design.md
 
@@ -33,7 +33,7 @@ UI scope: admin and public screens in sections 6-12 use minimal, unstyled markup
 
 - [ ] 4.1 Add `deploy` targets: firebase (rules and indexes), functions, admin (`firebase deploy --only hosting`), public (`firebase apphosting:rollouts:create --git-commit`); verify each one runs locally against the real project, including the functions deploy while `apps/functions` exports no functions yet
 - [ ] 4.2 Write the GitHub workflow: nx-set-shas, `nx affected -t lint test build` gate, stage 1 `tag:backend` deploy, stage 2 `tag:frontend` deploy, a concurrency group, keyless auth; verify that a push touching only `apps/admin` deploys only the admin
-- [ ] 4.3 Turn off App Hosting automatic rollouts and add the Artifact Registry cleanup policy; verify both settings in the console
+- [ ] 4.3 Turn off App Hosting automatic rollouts and add Artifact Registry cleanup policies (App Hosting builds, and functions images in `europe-west6` via `firebase functions:artifacts:setpolicy`); verify the settings in the console
 - [ ] 4.4 Document the pipeline (what deploys when, and how to roll back) in README.md and verify a rollback to an earlier commit works for the public site
 
 ## 5. Shared models
@@ -76,10 +76,11 @@ UI scope: admin and public screens in sections 6-12 use minimal, unstyled markup
 - [ ] 9.1 Add Firestore rules for public reads: published images only, list queries limited to 24; verify with rules tests that drafts are unreadable and a query with limit 25 is refused
 - [ ] 9.2 Define the composite index (`published`, `nsfw`, `sortDate`, id) for the SFW gallery; verify the paging query runs without index errors against the emulator
 - [ ] 9.3 Set up public data access as an anonymous client with the server-to-browser handoff of the first page's data; verify that the browser does not re-fetch page 1 after hydration
-- [ ] 9.4 Build the gallery with 24-per-page cursor paging in catalog order, a plain "next page" link as the placeholder paging control, and SFW images only; verify with tests that no image is skipped or repeated across pages
-- [ ] 9.5 Build the image page (`/i/{id}`) with details, other SFW versions in the same set, the master download, and not-found for drafts and unknown IDs; verify with tests for each spec scenario
-- [ ] 9.6 Set `Cache-Control` on SSR responses within the 5-minute freshness budget; verify the header on the deployed site
-- [ ] 9.7 Add `apphosting.yaml` and document the public app's configuration in apps/public/README.md; verify an App Hosting rollout of the commit succeeds
+- [ ] 9.4 Build the image route `/img/{id}/{v}/{name}` for `thumb.webp`, `full.webp` and `preview.jpg` (anonymous doc read, file streamed from the token URL, long-lived cache headers, not-found for drafts and unknown IDs) and use it for every web image on public pages; verify with tests for each spec scenario and, on the deployed site, that a repeat request from a distant region is served from the CDN (`Age` header)
+- [ ] 9.5 Build the gallery with 24-per-page cursor paging in catalog order, a plain "next page" link as the placeholder paging control, and SFW images only; verify with tests that no image is skipped or repeated across pages
+- [ ] 9.6 Build the image page (`/i/{id}`) with details, other SFW versions in the same set, the master download, and not-found for drafts and unknown IDs; verify with tests for each spec scenario
+- [ ] 9.7 Set `Cache-Control` on SSR responses within the 5-minute freshness budget; verify the header on the deployed site
+- [ ] 9.8 Add `apphosting.yaml` and document the public app's configuration in apps/public/README.md; verify an App Hosting rollout of the commit succeeds
 
 ## 10. NSFW
 
@@ -102,7 +103,7 @@ UI scope: admin and public screens in sections 6-12 use minimal, unstyled markup
 
 ## 12. Sharing
 
-- [ ] 12.1 Add link-preview metadata (preview.jpg, title, artist) for SFW images only, and no image metadata for NSFW; verify by inspecting the server HTML of both kinds
+- [ ] 12.1 Add link-preview metadata (preview.jpg through the image route, title, artist) for SFW images only, and no image metadata for NSFW; verify by inspecting the server HTML of both kinds
 
 ## 13. Launch checks (production)
 

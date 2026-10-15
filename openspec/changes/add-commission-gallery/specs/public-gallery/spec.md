@@ -68,6 +68,21 @@ Every published image's page SHALL offer a download of its master file.
 - **WHEN** a visitor uses the download option on an image page
 - **THEN** the master file is downloaded under its readable filename
 
+### Requirement: Web images are served from nearby caches
+Thumbnails, full-view versions and preview images SHALL be served from the public site's own image addresses, with response headers that let shared caches keep them long-term, so visitors anywhere load them from a nearby cache. An image address SHALL only serve files of a published image. The master download SHALL use the file address recorded on the image's entry.
+
+#### Scenario: Thumbnail request
+- **WHEN** a visitor's browser requests the thumbnail of a published image from the public site
+- **THEN** the thumbnail is returned with headers that allow shared caches to keep it long-term
+
+#### Scenario: Draft or unknown image
+- **WHEN** someone requests a public-site image address for a draft or an unknown ID
+- **THEN** the response is not found
+
+#### Scenario: Unpublished image
+- **WHEN** an image has been unpublished and its image address is requested from the public site, without a cached copy in between
+- **THEN** the response is not found
+
 ### Requirement: Artist page
 Each artist SHALL have a page at `/artists/{id}` that shows the artist's name, their links, and their published images, following the catalog's ordering and paging and the visitor's NSFW switch.
 

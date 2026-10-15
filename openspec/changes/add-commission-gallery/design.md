@@ -54,8 +54,9 @@ There is a single owner, who is the only admin and the only developer. Visitors 
       |
       v
   Cloud CDN --miss--> App Hosting: apps/public (Angular SSR)   [NL europe-west4]
-                          |
-                          | firestore/lite, anonymous (rules apply)
+                          |   pages, plus /img/{id}/{v}/{name} for web versions (A14)
+                          | firestore/lite, anonymous (rules apply);
+                          | /img misses fetch the file via its token URL
                           v
   owner --> Hosting: apps/admin (SPA) --> Firestore / Storage   [CH europe-west6]
             Google sign-in                      ^        |
@@ -105,7 +106,7 @@ One functions codebase (`apps/functions`) with these triggers: upload processing
 
 ### A2 - Storage is closed to public reads; token URLs live in the doc
 
-Storage rules allow no public reads at all. The function creates download-token URLs (Admin SDK `getDownloadURL`) and writes them into `images/{id}.files`. Whoever can read the doc gets the URLs, so Firestore rules are the only gate.
+Storage rules allow no public reads at all. The function creates download-token URLs (Admin SDK `getDownloadURL`) and writes them into `images/{id}.files`. Whoever can read the doc gets the URLs, so Firestore rules are the only gate. Visitors' browsers load the web versions through the public site instead (A14), so only master downloads (and the admin) use token URLs directly.
 
 - *Why:* drafts' files are unreachable because their URLs only exist in docs the rules hide. There is no per-view cost and no lag between publishing and the images working.
 - *Alternatives:* public files protected only by unguessable paths (draft files guessable by ID); Storage rules that `firestore.get()` the doc (one billed read per image view, so a 40-tile grid costs 40 reads); a `published` metadata flag kept in sync by a third trigger (publish lag, more code).
@@ -214,14 +215,35 @@ on failure: status error + message; the upload is kept so the owner can retry
 - **Animated sources** (GIF/APNG/animated WebP) are detected by `pages > 1` and processed with `{ animated: true }`.
 - **A size guard** (width × height × frames) rejects absurd inputs with a clear error.
 - **Function settings:** 2 GiB memory, 300 s timeout, concurrency 1, max 3 instances, automatic retries off.
-- **Replacing an image's file** issues new token URLs, so caches update without versioned filenames.
+- **Replacing an image's file** issues new token URLs, so caches update without versioned filenames. The `/img` addresses (A14) carry a version taken from the token, so they change too.
 - *Why "same format as delivered":* re-encoding a JPEG to lossless WebP makes it 2-3x larger with no quality gain. WebP downloads are awkward for many users. Untouched pixels are the only real guarantee of "original".
 - *Why the upload is deleted:* the master replaces it, and keeping uploads in a separate prefix stops the function from triggering on its own output.
+
+### A14 - Web versions are served through the public site's CDN
+
+Spike S2 showed that Storage token URLs are not edge-cached: every request goes back to Zurich (0.7-4.4 s to first byte from the US, Tokyo and Sydney, against 20-70 ms for a CDN). So visitors load `thumb.webp`, `full.webp` and `preview.jpg` from the public site instead, where App Hosting's Cloud CDN caches them near the visitor.
+
+```
+GET /img/{id}/{v}/thumb.webp | full.webp | preview.jpg      (apps/public server route)
+  -> read images/{id} with firestore/lite, anonymous (rules apply, as in A3)
+       not readable (draft, unknown ID) -> 404, short cache
+  -> fetch the file through the doc's token URL, stream it back
+       Cache-Control: public, max-age=31536000, immutable, s-maxage=86400
+```
+
+- `{v}` is a short version taken from the file's current download token. Replacing a file issues new tokens (A13), so the address changes and no cache keeps the old image. The route always serves the image's current file; `{v}` only busts caches.
+- Pages, link previews (`og:image`) and the gallery use `/img` addresses. Master downloads keep the direct token URL: they are large (5-20 MB, above Cloud CDN's ~10 MB cache limit for responses without range support) and rare. The admin keeps using token URLs, since it shows drafts the route can't serve.
+- Browsers keep an image for a year. The CDN keeps it for a day (`s-maxage`), which bounds how long an unpublished image is still served to new visitors. Exact values are settled during implementation.
+- *Why:* first loads outside Europe drop from seconds to the CDN's tens of milliseconds, while the rules stay the only gate.
+- *Alternatives:* direct token URLs everywhere (slow first loads outside Europe); Firebase Hosting in front of Storage (Hosting can only rewrite to functions and Cloud Run, not proxy Storage); public-read files behind a separate CDN (gives up A2).
+- *Trade-off:* each CDN miss costs one Firestore read plus a Zurich-to-Netherlands fetch. An unpublished image can stay cached at the CDN for up to a day.
 
 ## Risks / Trade-offs
 
 - [Token URLs might stop working if Storage rules deny all reads] → spike S1 before launch. Fallback: per-file public-read rules for `images/**` outputs (draft files then rely on unguessable IDs).
-- [Storage downloads may not be edge-cached, so faraway visitors load images from Zurich] → spike S2. The 1-year `Cache-Control` helps repeat visits. Fallback: serve images through the App Hosting CDN.
+- [Storage downloads are not edge-cached, so faraway visitors load images from Zurich] → confirmed by spike S2; web versions go through the App Hosting CDN (A14). Master downloads still come from Zurich; the 1-year `Cache-Control` helps repeat downloads.
+- [Cloud CDN does not cache responses over ~10 MB from an origin without range support, so a very long animated `full.webp` would always be fetched from Zurich] → rare; it still works, just slower. The size guard (A13) limits how large outputs get.
+- [An unpublished image stays cached at the CDN for up to a day (A14)] → accepted; the same applies today to anyone who saved a token URL (A2).
 - [The Firebase CLI might not work with keyless auth in GitHub Actions] → spike S3. Fallback: a narrowly scoped service-account key in GitHub secrets.
 - [The current Angular/Nx versions may be newer than what App Hosting officially supports; the docs list Angular 19.2.x and Nx 20.8.x] → spike S4. Fallback: pin to the newest versions App Hosting lists as supported.
 - [Metadata stripping without re-encoding could miss metadata or corrupt unusual files] → spike S5 on real files from the owner's artists.
@@ -258,6 +280,15 @@ This is a new system, so there is nothing to migrate. Rollout order:
 - Google sign-in as the only Auth provider; the owner's UID in the rules.
 - Admin served with `noindex`.
 - Workload Identity Federation and the deploy service account.
+
+## Spike results
+
+Run in `tigy-165cc` (default bucket `tigy-165cc.appspot.com`).
+
+- **S4 - current Angular + Nx on App Hosting: passed, no pinning needed.** The owner created backend `public` (`europe-west4`, root directory `apps/public`, live branch `main`, automatic rollouts off). The scaffolded app (Angular 22.1, Nx 23.2, application builder) built and runs on the `nodejs24` runtime. `https://public--tigy-165cc.europe-west4.hosted.app/` returns server-rendered HTML (`ng-server-context="ssr"`, `ng-version="22.1.8"`) through Google's CDN (`via: 1.1 google`).
+
+- **S1 - token URLs with deny-all Storage rules: passed, A2 stands.** With the placeholder rules (`allow read, write: if false`) deployed, a temporary function uploaded a test JPEG and called the Admin SDK's `getDownloadURL()`, then was deleted. The token URL returns 200 with the exact uploaded bytes and the `Cache-Control` set on upload (`public, max-age=31536000, immutable`). The same URL without the token, with a wrong token, the object's metadata URL, and the public `storage.googleapis.com` path all return 403. The fallback (public-read rules on `images/**`) is not needed.
+- **S2 - edge caching of token URLs: not edge-cached.** Temporary probe functions in `us-central1`, `asia-northeast1` and `australia-southeast1` each fetched the S1 token URL (625 KB JPEG, `immutable`) six times, with a same-size file from cdnjs as a control. Every Storage response came from Google's storage front end (`Server: UploadServer`) with no `Age` or `Via` header, and repeats were no faster: time to first byte 0.7-1.9 s from the US and 2.7-4.4 s from Tokyo and Sydney (about 0.3 s from Switzerland). The control was served from cache (`Age` present) in 18-70 ms everywhere. Browser caching (1-year `immutable`) still helps repeat visits. Fallback adopted (owner, 2026-10-16): web versions are served through the App Hosting CDN, see A14.
 
 ## Open Questions
 

@@ -47,7 +47,7 @@ Anyone SHALL be able to read artist records. Only the owner SHALL be able to wri
 - **THEN** the request succeeds
 
 ### Requirement: No direct public access to stored files
-Stored files SHALL NOT be readable through direct, unauthenticated storage requests. Public access to a file SHALL only be possible through the file address recorded on a published image's entry.
+Stored files SHALL NOT be readable through direct, unauthenticated storage requests. Public access to a file SHALL only be possible through a published image's entry: the file address recorded on it, or the public site's image address for it.
 
 #### Scenario: Guessing a file path
 - **WHEN** someone who knows an image's ID requests its files from storage directly, without a file address from the image's entry
@@ -56,6 +56,10 @@ Stored files SHALL NOT be readable through direct, unauthenticated storage reque
 #### Scenario: Draft image files
 - **WHEN** an image is a draft
 - **THEN** no one but the owner can obtain the addresses of its files
+
+#### Scenario: Draft image through the public site
+- **WHEN** someone requests the public site's image address for a draft image
+- **THEN** the response is not found
 
 ### Requirement: Owner uploads are restricted
 The owner SHALL be able to upload only to the upload area, and only image files of at most 20 MB. No client, including the owner's, SHALL be able to write processed files directly.
