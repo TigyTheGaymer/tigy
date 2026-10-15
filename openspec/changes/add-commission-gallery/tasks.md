@@ -26,8 +26,8 @@ UI scope: admin and public screens in sections 6-12 use minimal, unstyled markup
 - [x] 3.1 S4: deploy the scaffolded `apps/public` to App Hosting (`europe-west4`, root directory `apps/public`) and verify the SSR page loads on its `*.hosted.app` address; if it fails, pin Angular/Nx to the newest App Hosting-supported versions and record the outcome in design.md
 - [x] 3.2 S1: upload a test file, create a download-token URL with the Admin SDK, deploy Storage rules denying all reads, and verify the token URL still serves the file while a tokenless request is denied; record the result in design.md
 - [x] 3.3 S2: request a token URL from at least two distant locations (or a CDN checker) and inspect response headers to determine whether downloads are edge-cached; record the result and whether the fallback (serving through the App Hosting CDN) is needed in design.md
-- [ ] 3.4 S3: set up Workload Identity Federation and a deploy service account, run a minimal GitHub workflow that runs `firebase deploy --only firestore:rules`, and verify it succeeds with no stored key; record the outcome in design.md
-- [ ] 3.5 S5: strip metadata from real artist files (JPEG, PNG, GIF, APNG) without re-encoding and verify pixel equality against the originals, color profile kept and GPS/camera data gone; record the chosen approach in design.md
+- [x] 3.4 S3: set up Workload Identity Federation and a deploy service account, run a minimal GitHub workflow that runs `firebase deploy --only firestore:rules`, and verify it succeeds with no stored key; record the outcome in design.md
+- [x] 3.5 S5: strip metadata from real artist files (JPEG, PNG, GIF, APNG) without re-encoding and verify pixel equality against the originals, color profile kept and GPS/camera data gone; record the chosen approach in design.md
 
 ## 4. Delivery pipeline
 
