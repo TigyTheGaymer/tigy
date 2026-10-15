@@ -54,6 +54,8 @@
 
 ## 7. Admin app
 
+UI scope: screens use minimal, unstyled markup, just enough to exercise each feature and its tests. Layout, look and interaction polish are deferred to the separate UI/UX change (see Workflow follow-up).
+
 - [ ] 7.1 Add Google sign-in with an owner-only guard and `noindex`; verify with tests that another account is refused and with a response check that the noindex header/meta is present
 - [ ] 7.2 Build the image list (drafts and published, including NSFW) with live processing status and error reasons; verify against the emulator that a status change appears without reload
 - [ ] 7.3 Build image creation: create the ID first, write the draft doc, upload to `uploads/{id}/`; verify end to end on the emulators that a new entry reaches status ready
@@ -65,8 +67,10 @@
 
 ## 8. Public app
 
+UI scope: pages use minimal, unstyled markup, just enough to meet the specs and their tests. Layout, look and browsing controls are deferred to the separate UI/UX change (see Workflow follow-up). Paged lists (gallery, artist page) use a plain "next page" link as a placeholder until then.
+
 - [ ] 8.1 Set up public data access as an anonymous client with the server-to-browser handoff of the first page's data; verify that the browser does not re-fetch page 1 after hydration
-- [ ] 8.2 Build the gallery with 24-per-page cursor paging in catalog order and the SFW filter by default; verify with tests that no image is skipped or repeated across pages
+- [ ] 8.2 Build the gallery with 24-per-page cursor paging in catalog order, a plain "next page" link as the placeholder paging control, and the SFW filter by default; verify with tests that no image is skipped or repeated across pages
 - [ ] 8.3 Build the "show NSFW" switch remembered in the browser and applied after hydration; verify that server HTML never contains NSFW images and that the switch persists across reloads
 - [ ] 8.4 Build the image page (`/i/{id}`) with details, artist credit, other set versions following the switch, the master download, and not-found for drafts and unknown IDs; verify with tests for each spec scenario
 - [ ] 8.5 Build the NSFW confirm screen (server-rendered, skipped when the switch is on) and `noindex` on NSFW pages; verify with server-HTML tests
@@ -91,5 +95,5 @@
 
 ## Workflow follow-up
 
-- A separate UI/UX change covers layout, look, browsing controls, footer notice and cookie banner.
+- A separate UI/UX change covers layout and look for both apps, browsing controls (including replacing the placeholder next-page link), footer notice and cookie banner.
 - Archive this change after implementation and review.
