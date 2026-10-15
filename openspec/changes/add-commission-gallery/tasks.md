@@ -4,22 +4,22 @@ UI scope: admin and public screens in sections 5-11 use minimal, unstyled markup
 
 ## 1. Firebase project (done by the owner in the Firebase/Google Cloud console)
 
-- [ ] 1.1 Owner creates the Firebase project on the Blaze plan and verifies billing is active in the console
-- [ ] 1.2 Owner creates Firestore (Standard edition, `europe-west6`) and the default Storage bucket (`europe-west6`), and verifies both locations in the console
-- [ ] 1.3 Owner enables Firebase Auth with Google as the only provider, signs in once, and records the owner UID for the rules; verify the UID appears under Auth > Users
-- [ ] 1.4 Owner creates budget alerts (for example $5 / $20 / $50) and verifies they are listed under Billing > Budgets & alerts
+- [x] 1.1 Owner creates the Firebase project on the Blaze plan and verifies billing is active in the console
+- [x] 1.2 Owner creates Firestore (Standard edition, `europe-west6`) and the default Storage bucket (`europe-west6`), and verifies both locations in the console
+- [x] 1.3 Owner enables Firebase Auth with Google as the only provider, signs in once, and records the owner UID for the rules; verify the UID appears under Auth > Users
+- [x] 1.4 Owner creates budget alerts (for example $5 / $20 / $50) and verifies they are listed under Billing > Budgets & alerts
 
 ## 2. Workspace scaffold
 
-- [ ] 2.1 Create the Nx workspace with pnpm at the repo root and verify `pnpm nx report` runs
-- [ ] 2.2 Generate `apps/public` (Angular, SSR enabled, application builder) and verify `pnpm nx build public` produces a server bundle
-- [ ] 2.3 Generate `apps/admin` (Angular, no SSR) and verify `pnpm nx build admin` succeeds
-- [ ] 2.4 Generate `apps/functions` (Node, TypeScript) targeting `europe-west6` and verify `pnpm nx build functions` succeeds
-- [ ] 2.5 Generate `libs/models` and verify it can be imported from all three apps by building them
-- [ ] 2.6 Add the `firebase` Nx project owning `firebase.json`, `firestore.rules`, `storage.rules` and `firestore.indexes.json` as inputs, and verify `pnpm nx show project firebase` lists those inputs
-- [ ] 2.7 Tag projects (`backend`: firebase, functions; `frontend`: admin, public) and verify `pnpm nx show projects --projects tag:backend` returns exactly firebase and functions
-- [ ] 2.8 Configure the Emulator Suite (Auth, Firestore, Storage, Functions) with a `serve`/`emulators` Nx target and verify all four start locally
-- [ ] 2.9 Document local setup (install, emulators, running each app) in README.md and verify the documented commands run as written
+- [x] 2.1 Create the Nx workspace with npm at the repo root and verify `npx nx report` runs
+- [x] 2.2 Generate `apps/public` (Angular, SSR enabled, application builder) and verify `npx nx build public` produces a server bundle
+- [x] 2.3 Generate `apps/admin` (Angular, no SSR) and verify `npx nx build admin` succeeds
+- [x] 2.4 Generate `apps/functions` (Node, TypeScript) targeting `europe-west6` and verify `npx nx build functions` succeeds
+- [x] 2.5 Generate `libs/models` and verify it can be imported from all three apps by building them
+- [x] 2.6 Add the `firebase` Nx project owning `firebase.json`, `firestore.rules`, `storage.rules` and `firestore.indexes.json` as inputs, and verify `npx nx show project firebase` lists those inputs
+- [x] 2.7 Tag projects (`backend`: firebase, functions; `frontend`: admin, public) and verify `npx nx show projects --projects tag:backend` returns exactly firebase and functions
+- [x] 2.8 Configure the Emulator Suite (Auth, Firestore, Storage, Functions) with a `serve`/`emulators` Nx target and verify all four start locally
+- [x] 2.9 Document local setup (install, emulators, running each app) in README.md and verify the documented commands run as written
 
 ## 3. Spikes (real project, before building features)
 
