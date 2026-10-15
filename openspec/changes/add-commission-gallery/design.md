@@ -231,6 +231,7 @@ on failure: status error + message; the upload is kept so the owner can retry
 - [Artifact Registry keeps every App Hosting build; only 0.5 GB is free] → cleanup policy that keeps the last few images.
 - [Content can be up to 5 minutes stale after publishing] → accepted (A4).
 - [Artist copies are briefly stale after an edit] → accepted (A6).
+- [The workflow runs from the start, so unfinished features reach the live but unadvertised `*.hosted.app` and `*.web.app` addresses before launch] → accepted. Rules deny everything until each slice lands its own, and drafts are never public.
 
 ## Migration Plan
 
@@ -244,8 +245,8 @@ This is a new system, so there is nothing to migrate. Rollout order:
    - S3: the Firebase CLI deploys from GitHub Actions with keyless auth.
    - S4: a current Angular + Nx SSR app builds and runs on App Hosting with root directory `apps/public`.
    - S5: metadata stripping without re-encoding works on real artist files (JPEG, PNG, GIF, APNG).
-4. Build the features as vertical slices, each landing its own rules, indexes, functions and admin/public screens with their tests: owner sign-in, upload and processing, editing/publishing/deleting, public browsing, NSFW handling, artists, then link previews.
-5. Turn on the GitHub workflow. Set App Hosting automatic rollouts to off.
+4. Turn on the GitHub workflow. Set App Hosting automatic rollouts to off. From then on every feature slice ships through it.
+5. Build the features as vertical slices, each landing its own rules, indexes, functions and admin/public screens with their tests: owner sign-in, upload and processing, editing/publishing/deleting, public browsing, NSFW handling, artists, then link previews.
 
 **Rollback:** App Hosting can roll out an earlier commit. Hosting keeps release history. Functions and rules roll back by redeploying an earlier commit through the workflow.
 

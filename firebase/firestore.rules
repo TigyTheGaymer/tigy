@@ -1,6 +1,6 @@
 rules_version = '2';
 
-// Placeholder: everything is denied until the owner-only rules land (task 5.1).
+// Placeholder: everything is denied until the owner-only rules land (task 6.1).
 service cloud.firestore {
   match /databases/{database}/documents {
     match /{document=**} {

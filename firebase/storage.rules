@@ -1,6 +1,6 @@
 rules_version = '2';
 
-// Placeholder: everything is denied until the upload rules land (task 6.1).
+// Placeholder: everything is denied until the upload rules land (task 7.1).
 service firebase.storage {
   match /b/{bucket}/o {
     match /{allPaths=**} {
