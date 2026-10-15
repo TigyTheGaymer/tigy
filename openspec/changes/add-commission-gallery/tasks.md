@@ -1,5 +1,7 @@
 # Tasks
 
+UI scope: admin and public screens in sections 5-11 use minimal, unstyled markup, just enough to meet the specs and their tests. Layout, look and browsing controls are deferred to the separate UI/UX change (see Workflow follow-up). Paged lists (gallery, artist page) use a plain "next page" link as a placeholder until then.
+
 ## 1. Firebase project (done by the owner in the Firebase/Google Cloud console)
 
 - [ ] 1.1 Owner creates the Firebase project on the Blaze plan and verifies billing is active in the console
@@ -32,66 +34,82 @@
 - [ ] 4.1 Define `Image`, `Artist`, `ArtistLink`, the processing status, and the file set types in `libs/models`, and verify all three apps compile against them
 - [ ] 4.2 Add the `sortDate` helper (`date ?? createdAt`) and the download-filename helper (slug from artist, title and date), and verify their unit tests cover missing fields and special characters
 
-## 5. Security rules and indexes
+## 5. Owner sign-in
 
-- [ ] 5.1 Write Firestore rules: owner-only writes by UID, public read of published images only, list queries limited to 24, artists publicly readable; verify with emulator rules tests covering every access-control scenario for data
-- [ ] 5.2 Add Firestore rules that block clients from writing processing fields (status, error, files, width, height, animated, masterName) and from publishing unless status is ready; verify with rules tests
-- [ ] 5.3 Write Storage rules: no public reads, owner uploads only to `uploads/{id}/` with image content types and at most 20 MB, no client writes under `images/`; verify with emulator rules tests
-- [ ] 5.4 Define composite indexes for the gallery (with and without the nsfw filter) and the artist page, each with the document-ID tiebreaker, and verify the paging queries run without index errors against the emulator
+- [ ] 5.1 Write the base Firestore rules: owner-only writes to images and artists by UID, everything else denied for now; verify with emulator rules tests that a signed-out client and another account cannot write
+- [ ] 5.2 Add Google sign-in to the admin with an owner-only guard and `noindex`; verify with tests that another account is refused and with a response check that the noindex header/meta is present
 
-## 6. Image processing functions
+## 6. Upload and processing
 
-- [ ] 6.1 Implement the upload trigger on `uploads/**` that sets status processing and rejects unsupported types; verify with an emulator test that a PDF leads to status error
-- [ ] 6.2 Produce the master in the source format with metadata removed (using the S5 approach), color profile kept, and a readable download filename; verify with fixture tests for JPEG and PNG that pixels match and GPS data is gone
-- [ ] 6.3 Produce `full.webp` (at most 1200px) and `thumb.webp` (at most 400px) with no upscaling; verify with fixture tests for large and small images
-- [ ] 6.4 Handle animated GIF/APNG/WebP (animated web versions, `animated` flag) and produce `preview.jpg` from the first frame or still image; verify with an animated GIF fixture that frame count and timing are kept
-- [ ] 6.5 Add the size guard (width × height × frames) and error handling (status error with reason, no auto-retry, upload kept); verify with an oversized fixture
-- [ ] 6.6 Write token URLs, dimensions and status ready to the image doc, set immutable Cache-Control on outputs, then delete the upload; verify with an emulator test that the doc is complete and `uploads/{id}/` is empty
-- [ ] 6.7 Make replacing an upload regenerate all outputs with new token URLs; verify with an emulator test that the URLs change
-- [ ] 6.8 Implement cleanup on image-doc delete (all files under `images/{id}/` and `uploads/{id}/`); verify with an emulator test
-- [ ] 6.9 Implement the artist fan-out on artist update (BulkWriter over `images where artistId == id`, drafts included); verify with an emulator test that renaming an artist updates all their images
-- [ ] 6.10 Set function options (`europe-west6`, 2 GiB, 300 s, concurrency 1, max 3 instances, retries off) and document the functions' behavior in apps/functions/README.md; verify the deployed configuration in the console
+- [ ] 6.1 Write Storage rules: no public reads, owner uploads only to `uploads/{id}/` with image content types and at most 20 MB, no client writes under `images/`; verify with emulator rules tests
+- [ ] 6.2 Add Firestore rules that block clients from writing processing fields (status, error, files, width, height, animated, masterName); verify with rules tests
+- [ ] 6.3 Implement the upload trigger on `uploads/**` that sets status processing and rejects unsupported types; verify with an emulator test that a PDF leads to status error
+- [ ] 6.4 Produce the master in the source format with metadata removed (using the S5 approach), color profile kept, and a readable download filename; verify with fixture tests for JPEG and PNG that pixels match and GPS data is gone
+- [ ] 6.5 Produce `full.webp` (at most 1200px) and `thumb.webp` (at most 400px) with no upscaling; verify with fixture tests for large and small images
+- [ ] 6.6 Handle animated GIF/APNG/WebP (animated web versions, `animated` flag) and produce `preview.jpg` from the first frame or still image; verify with an animated GIF fixture that frame count and timing are kept
+- [ ] 6.7 Add the size guard (width × height × frames) and error handling (status error with reason, no auto-retry, upload kept); verify with an oversized fixture
+- [ ] 6.8 Write token URLs, dimensions and status ready to the image doc, set immutable Cache-Control on outputs, then delete the upload; verify with an emulator test that the doc is complete and `uploads/{id}/` is empty
+- [ ] 6.9 Set the upload function's options (`europe-west6`, 2 GiB, 300 s, concurrency 1, max 3 instances, retries off) and document upload processing in apps/functions/README.md; verify the deployed configuration in the console
+- [ ] 6.10 Build image creation in the admin: create the ID first, write the draft doc, upload to `uploads/{id}/`; verify end to end on the emulators that a new entry reaches status ready
+- [ ] 6.11 Build the admin image list (drafts and published, including NSFW) with live processing status and error reasons; verify against the emulator that a status change appears without reload
+- [ ] 6.12 Make replacing an upload regenerate all outputs with new token URLs, and offer replace-file in the admin for images in error; verify with an emulator test that the URLs change
+- [ ] 6.13 Document adding an image and retrying failed processing in apps/admin/README.md and verify the steps match the running app
 
-## 7. Admin app
+## 7. Edit, publish, delete
 
-UI scope: screens use minimal, unstyled markup, just enough to exercise each feature and its tests. Layout, look and interaction polish are deferred to the separate UI/UX change (see Workflow follow-up).
+- [ ] 7.1 Add the Firestore rule that blocks publishing unless status is ready; verify with rules tests
+- [ ] 7.2 Build image editing (all fields except artist, set autocomplete from existing set names, `sortDate` on save); verify with component tests and an emulator round trip
+- [ ] 7.3 Build publish/unpublish (disabled unless ready); verify on the emulators
+- [ ] 7.4 Implement cleanup on image-doc delete (all files under `images/{id}/` and `uploads/{id}/`) and add it to apps/functions/README.md; verify with an emulator test
+- [ ] 7.5 Build delete with confirmation in the admin; verify on the emulators that the doc and its files are removed
+- [ ] 7.6 Document editing, publishing and deleting in apps/admin/README.md and verify the steps match the running app
 
-- [ ] 7.1 Add Google sign-in with an owner-only guard and `noindex`; verify with tests that another account is refused and with a response check that the noindex header/meta is present
-- [ ] 7.2 Build the image list (drafts and published, including NSFW) with live processing status and error reasons; verify against the emulator that a status change appears without reload
-- [ ] 7.3 Build image creation: create the ID first, write the draft doc, upload to `uploads/{id}/`; verify end to end on the emulators that a new entry reaches status ready
-- [ ] 7.4 Build image editing (all fields, artist picker writing `artistId` plus the artist copy, set autocomplete from existing set names, `sortDate` on save); verify with component tests and an emulator round trip
-- [ ] 7.5 Build publish/unpublish (disabled unless ready) and replace-file for retries; verify on the emulators
-- [ ] 7.6 Build delete with confirmation; verify on the emulators that the doc and its files are removed
-- [ ] 7.7 Build artist management (create, edit, delete, add/edit/reorder/remove links) and flag images whose artist no longer exists; verify on the emulators
-- [ ] 7.8 Document admin usage in apps/admin/README.md and verify the steps match the running app
+## 8. Public browsing
 
-## 8. Public app
+- [ ] 8.1 Add Firestore rules for public reads: published images only, list queries limited to 24; verify with rules tests that drafts are unreadable and a query with limit 25 is refused
+- [ ] 8.2 Define the composite index (`published`, `nsfw`, `sortDate`, id) for the SFW gallery; verify the paging query runs without index errors against the emulator
+- [ ] 8.3 Set up public data access as an anonymous client with the server-to-browser handoff of the first page's data; verify that the browser does not re-fetch page 1 after hydration
+- [ ] 8.4 Build the gallery with 24-per-page cursor paging in catalog order, a plain "next page" link as the placeholder paging control, and SFW images only; verify with tests that no image is skipped or repeated across pages
+- [ ] 8.5 Build the image page (`/i/{id}`) with details, other SFW versions in the same set, the master download, and not-found for drafts and unknown IDs; verify with tests for each spec scenario
+- [ ] 8.6 Set `Cache-Control` on SSR responses within the 5-minute freshness budget; verify the header on the deployed site
+- [ ] 8.7 Add `apphosting.yaml` and document the public app's configuration in apps/public/README.md; verify an App Hosting rollout of the commit succeeds
 
-UI scope: pages use minimal, unstyled markup, just enough to meet the specs and their tests. Layout, look and browsing controls are deferred to the separate UI/UX change (see Workflow follow-up). Paged lists (gallery, artist page) use a plain "next page" link as a placeholder until then.
+## 9. NSFW
 
-- [ ] 8.1 Set up public data access as an anonymous client with the server-to-browser handoff of the first page's data; verify that the browser does not re-fetch page 1 after hydration
-- [ ] 8.2 Build the gallery with 24-per-page cursor paging in catalog order, a plain "next page" link as the placeholder paging control, and the SFW filter by default; verify with tests that no image is skipped or repeated across pages
-- [ ] 8.3 Build the "show NSFW" switch remembered in the browser and applied after hydration; verify that server HTML never contains NSFW images and that the switch persists across reloads
-- [ ] 8.4 Build the image page (`/i/{id}`) with details, artist credit, other set versions following the switch, the master download, and not-found for drafts and unknown IDs; verify with tests for each spec scenario
-- [ ] 8.5 Build the NSFW confirm screen (server-rendered, skipped when the switch is on) and `noindex` on NSFW pages; verify with server-HTML tests
-- [ ] 8.6 Build the artist page (`/artists/{id}`) with links, paged images, and not-found for deleted artists; verify with tests
-- [ ] 8.7 Add link-preview metadata (preview.jpg, title, artist) for SFW images only, and no image metadata for NSFW; verify by inspecting the server HTML of both kinds
-- [ ] 8.8 Set `Cache-Control` on SSR responses within the 5-minute freshness budget; verify the header on the deployed site
-- [ ] 8.9 Add `apphosting.yaml` and document the public app's configuration in apps/public/README.md; verify an App Hosting rollout of the commit succeeds
+- [ ] 9.1 Define the composite index (`published`, `sortDate`, id) for lists that include NSFW; verify the paging query runs without index errors against the emulator
+- [ ] 9.2 Build the "show NSFW" switch remembered in the browser and applied after hydration; verify that server HTML never contains NSFW images and that the switch persists across reloads
+- [ ] 9.3 Build the NSFW confirm screen (server-rendered, skipped when the switch is on) and `noindex` on NSFW pages; verify with server-HTML tests
+- [ ] 9.4 Make the other versions in the same set follow the switch; verify with tests for both spec scenarios
 
-## 9. Delivery pipeline
+## 10. Artists
 
-- [ ] 9.1 Add `deploy` targets: firebase (rules and indexes), functions, admin (`firebase deploy --only hosting`), public (`firebase apphosting:rollouts:create --git-commit`); verify each one runs locally against the real project
-- [ ] 9.2 Write the GitHub workflow: nx-set-shas, `nx affected -t lint test build` gate, stage 1 `tag:backend` deploy, stage 2 `tag:frontend` deploy, a concurrency group, keyless auth; verify that a push touching only `apps/admin` deploys only the admin
-- [ ] 9.3 Turn off App Hosting automatic rollouts and add the Artifact Registry cleanup policy; verify both settings in the console
-- [ ] 9.4 Document the pipeline (what deploys when, and how to roll back) in README.md and verify a rollback to an earlier commit works for the public site
+- [ ] 10.1 Add the Firestore rule that makes artists publicly readable; verify with rules tests
+- [ ] 10.2 Build artist management in the admin (create, edit, delete, add/edit/reorder/remove links); verify on the emulators
+- [ ] 10.3 Add the artist picker to image editing, writing `artistId` plus the artist copy; verify with a component test and an emulator round trip
+- [ ] 10.4 Implement the artist fan-out on artist update (BulkWriter over `images where artistId == id`, drafts included) and add it to apps/functions/README.md; verify with emulator tests that renaming an artist updates all their images and deleting one leaves them unchanged
+- [ ] 10.5 Flag images whose artist no longer exists in the admin; verify on the emulators
+- [ ] 10.6 Show the artist credit with links on the image page; verify with tests for an image with an artist and one without
+- [ ] 10.7 Define the artist-page composite indexes (with and without the nsfw filter), each with the document-ID tiebreaker; verify the paging queries run without index errors against the emulator
+- [ ] 10.8 Build the artist page (`/artists/{id}`) with links, paged images following the switch, and not-found for deleted artists; verify with tests
+- [ ] 10.9 Document artist management in apps/admin/README.md and verify the steps match the running app
 
-## 10. Launch checks (production)
+## 11. Sharing
 
-- [ ] 10.1 Upload a still and an animated image, publish them, and verify they appear on the public gallery within 5 minutes with working downloads
-- [ ] 10.2 Share an SFW and an NSFW image link on at least two platforms (for example Discord and Bluesky) and verify the previews match the spec
-- [ ] 10.3 Verify from a signed-out browser that a draft's `/i/{id}` shows not found and that direct storage requests are denied
-- [ ] 10.4 Update PRODUCT.md with the product's purpose, users and capabilities, and verify it no longer says the purpose is undecided
+- [ ] 11.1 Add link-preview metadata (preview.jpg, title, artist) for SFW images only, and no image metadata for NSFW; verify by inspecting the server HTML of both kinds
+
+## 12. Delivery pipeline
+
+- [ ] 12.1 Add `deploy` targets: firebase (rules and indexes), functions, admin (`firebase deploy --only hosting`), public (`firebase apphosting:rollouts:create --git-commit`); verify each one runs locally against the real project
+- [ ] 12.2 Write the GitHub workflow: nx-set-shas, `nx affected -t lint test build` gate, stage 1 `tag:backend` deploy, stage 2 `tag:frontend` deploy, a concurrency group, keyless auth; verify that a push touching only `apps/admin` deploys only the admin
+- [ ] 12.3 Turn off App Hosting automatic rollouts and add the Artifact Registry cleanup policy; verify both settings in the console
+- [ ] 12.4 Document the pipeline (what deploys when, and how to roll back) in README.md and verify a rollback to an earlier commit works for the public site
+
+## 13. Launch checks (production)
+
+- [ ] 13.1 Upload a still and an animated image, publish them, and verify they appear on the public gallery within 5 minutes with working downloads
+- [ ] 13.2 Share an SFW and an NSFW image link on at least two platforms (for example Discord and Bluesky) and verify the previews match the spec
+- [ ] 13.3 Verify from a signed-out browser that a draft's `/i/{id}` shows not found and that direct storage requests are denied
+- [ ] 13.4 Update PRODUCT.md with the product's purpose, users and capabilities, and verify it no longer says the purpose is undecided
 
 ## Workflow follow-up
 
