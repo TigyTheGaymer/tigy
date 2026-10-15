@@ -1,0 +1,60 @@
+{
+  "name": "functions",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/functions/src",
+  "projectType": "application",
+  "tags": ["backend"],
+  "targets": {
+    "build": {
+      "executor": "@nx/esbuild:esbuild",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "platform": "node",
+        "outputPath": "dist/apps/functions",
+        "format": ["cjs"],
+        "bundle": true,
+        "main": "apps/functions/src/main.ts",
+        "tsConfig": "apps/functions/tsconfig.app.json",
+        "assets": ["apps/functions/src/assets"],
+        "generatePackageJson": true,
+        "esbuildOptions": {
+          "sourcemap": true,
+          "outExtension": {
+            ".js": ".js"
+          }
+        },
+        "thirdParty": false
+      },
+      "configurations": {
+        "development": {},
+        "production": {
+          "esbuildOptions": {
+            "sourcemap": false,
+            "outExtension": {
+              ".js": ".js"
+            }
+          }
+        }
+      }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": ["typescript"]
+        }
+      ],
+      "options": {
+        "commands": [
+          "tsc -p {projectRoot}/tsconfig.app.json --noEmit",
+          "tsc -p {projectRoot}/tsconfig.spec.json --noEmit"
+        ],
+        "parallel": false
+      }
+    }
+  }
+}

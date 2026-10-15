@@ -1,0 +1,25 @@
+{
+  "name": "firebase",
+  "$schema": "../node_modules/nx/schemas/project-schema.json",
+  "tags": ["backend"],
+  "namedInputs": {
+    "firebaseConfig": [
+      "{workspaceRoot}/firebase.json",
+      "{projectRoot}/firestore.rules",
+      "{projectRoot}/storage.rules",
+      "{projectRoot}/firestore.indexes.json"
+    ]
+  },
+  "targets": {
+    "emulators": {
+      "executor": "nx:run-commands",
+      "continuous": true,
+      "dependsOn": [{ "projects": ["functions"], "target": "build" }],
+      "inputs": ["firebaseConfig"],
+      "options": {
+        "command": "firebase emulators:start --project demo-tigy",
+        "cwd": "{workspaceRoot}"
+      }
+    }
+  }
+}

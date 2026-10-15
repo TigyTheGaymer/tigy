@@ -1,0 +1,10 @@
+rules_version = '2';
+
+// Placeholder: everything is denied until the upload rules land (task 6.1).
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
