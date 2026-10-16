@@ -1,0 +1,49 @@
+# Every push to main checks and deploys whatever changed since the last
+# successful run (design A11). Backend deploys before frontends.
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  actions: read # nx-set-shas looks up the last successful run
+  contents: read
+  id-token: write # keyless Google Cloud auth
+
+# Never run two deploys at once; a newer push waits for the current one.
+concurrency:
+  group: deploy-main
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+
+      # base = the commit of the last successful run, so a failed deploy is
+      # retried by the next push.
+      - uses: nrwl/nx-set-shas@v5
+
+      - name: Lint, test and build
+        run: npx nx affected -t lint test build
+
+      - uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: projects/418667371179/locations/global/workloadIdentityPools/github/providers/tigy-repo
+          service_account: github-deploy@tigy-165cc.iam.gserviceaccount.com
+
+      - name: 'Stage 1: backend (rules, indexes, functions)'
+        run: npx nx affected -t deploy --projects=tag:backend --parallel=1
+
+      - name: 'Stage 2: frontends (admin, public)'
+        run: npx nx affected -t deploy --projects=tag:frontend --parallel=1 --commit=${{ github.sha }}
