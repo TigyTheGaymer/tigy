@@ -92,10 +92,3 @@ The owner SHALL be able to replace the file of an existing image. The new file S
 #### Scenario: Replacement
 - **WHEN** the owner replaces an image's file
 - **THEN** the image keeps its ID, its files are regenerated from the new upload, and the addresses of its files differ from before
-
-### Requirement: Files are removed with their image
-Deleting an image entry SHALL delete all of its files: master, web versions, preview, and any remaining raw upload.
-
-#### Scenario: Deleting an image
-- **WHEN** the owner deletes an image entry
-- **THEN** none of its files remain in storage
