@@ -85,6 +85,8 @@ Everything lives in one Firebase project, `tigy-165cc`. Every push to `main` run
 
 Backend always deploys before frontends, so a page never ships before the rules or indexes it needs. Newly added composite indexes can take a few minutes to build, so a new query can briefly fail right after a deploy.
 
+Each stage deploys the affected projects that do not carry the other stage's tag, so every project with a `deploy` target must be tagged `backend` or `frontend`.
+
 The workflow is the only thing that ships the public site: App Hosting's own automatic rollouts are off. Only one deploy runs at a time; a newer push waits. A failed run is retried by the next push, because the next run compares against the last successful one.
 
 The workflow signs in to Google Cloud with Workload Identity Federation (pool `github`, provider `tigy-repo`, service account `github-deploy`), so no key is stored in GitHub.
@@ -115,7 +117,7 @@ npx nx run public:deploy --commit=$(git rev-parse HEAD)
 
 ### Roll back
 
-- **Public site**: roll out an earlier commit. App Hosting rebuilds it, which takes a few minutes. The next push that touches `apps/public` ships the latest code again.
+- **Public site**: roll out an earlier commit. App Hosting rebuilds it, which takes a few minutes; the command returns when the build is ready, and traffic moves to it about a minute later. The next push that touches `apps/public` ships the latest code again.
 
   ```bash
   npx nx run public:deploy --commit=<earlier-sha>
