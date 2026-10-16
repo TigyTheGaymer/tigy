@@ -55,6 +55,14 @@
         ],
         "parallel": false
       }
+    },
+    "deploy": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["build"],
+      "options": {
+        "command": "firebase deploy --only functions --force --project tigy-165cc --non-interactive",
+        "cwd": "{workspaceRoot}"
+      }
     }
   }
 }

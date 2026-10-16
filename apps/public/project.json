@@ -80,6 +80,13 @@
         "staticFilePath": "dist/apps/public/browser",
         "spa": true
       }
+    },
+    "deploy": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "firebase apphosting:rollouts:create public --git-commit {args.commit} --force --project tigy-165cc",
+        "cwd": "{workspaceRoot}"
+      }
     }
   }
 }

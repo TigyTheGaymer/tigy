@@ -20,6 +20,13 @@
         "command": "firebase emulators:start --project demo-tigy",
         "cwd": "{workspaceRoot}"
       }
+    },
+    "deploy": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "firebase deploy --only firestore,storage --project tigy-165cc --non-interactive",
+        "cwd": "{workspaceRoot}"
+      }
     }
   }
 }

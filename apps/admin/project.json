@@ -75,6 +75,19 @@
         "staticFilePath": "dist/apps/admin/browser",
         "spa": true
       }
+    },
+    "deploy": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["build"],
+      "options": {
+        "commands": [
+          {
+            "command": "firebase deploy --only hosting --project tigy-165cc --non-interactive",
+            "forwardAllArgs": false
+          }
+        ],
+        "cwd": "{workspaceRoot}"
+      }
     }
   }
 }
