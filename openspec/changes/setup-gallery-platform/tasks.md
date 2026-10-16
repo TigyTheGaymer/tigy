@@ -29,9 +29,9 @@
 
 ## 4. Delivery pipeline
 
-- [ ] 4.1 Add `deploy` targets: firebase (rules and indexes), functions, admin (`firebase deploy --only hosting`), public (`firebase apphosting:rollouts:create --git-commit`); verify each one runs locally against the real project, including the functions deploy while `apps/functions` exports no functions yet
+- [x] 4.1 Add `deploy` targets: firebase (rules and indexes), functions, admin (`firebase deploy --only hosting`), public (`firebase apphosting:rollouts:create --git-commit`); verify each one runs locally against the real project, including the functions deploy while `apps/functions` exports no functions yet
 - [ ] 4.2 Write the GitHub workflow: nx-set-shas, `nx affected -t lint test build` gate, stage 1 `tag:backend` deploy, stage 2 `tag:frontend` deploy, a concurrency group, keyless auth; verify that a push touching only `apps/admin` deploys only the admin
-- [ ] 4.3 Turn off App Hosting automatic rollouts and add Artifact Registry cleanup policies (App Hosting builds, and functions images in `europe-west6` via `firebase functions:artifacts:setpolicy`); verify the settings in the console
+- [x] 4.3 Turn off App Hosting automatic rollouts and add Artifact Registry cleanup policies (App Hosting builds, and functions images in `europe-west6` via `firebase functions:artifacts:setpolicy`); verify the settings in the console
 - [ ] 4.4 Document the pipeline (what deploys when, and how to roll back) in README.md and verify a rollback to an earlier commit works for the public site
 
 ## Workflow follow-up

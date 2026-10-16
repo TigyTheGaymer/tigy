@@ -94,7 +94,7 @@ App Check conflicts with A3 (an anonymous SSR server has no browser to produce a
 - [The current Angular/Nx versions may be newer than what App Hosting officially supports] → spike S4 passed; no pinning needed.
 - [Master downloads (5-20 MB each) are the most attractive target for bill abuse] → budget alerts (A12). A billing kill switch remains a drastic last resort.
 - [Newly deployed composite indexes take minutes to build; a public rollout right after can briefly fail new queries] → rare (only when a new query shape is added) and fixes itself.
-- [Artifact Registry keeps every App Hosting build; only 0.5 GB is free] → cleanup policy that keeps the last few images.
+- [Artifact Registry keeps every App Hosting build and function image; only 0.5 GB is free] → cleanup policies. App Hosting sets its own on `firebaseapphosting-images` (keeps the latest build, deletes the rest after 30 minutes), so an App Hosting rollback rebuilds from the earlier commit. Function images in `europe-west6` are deleted after 1 day (`firebase functions:artifacts:setpolicy`).
 - [The workflow runs from the start, so unfinished features reach the live but unadvertised `*.hosted.app` and `*.web.app` addresses before launch] → accepted. Rules deny everything until each feature change lands its own, and drafts are never public.
 
 ## Migration Plan

@@ -64,3 +64,62 @@ Or one project at a time, for example:
 ```bash
 npx nx build public
 ```
+
+## Deploy
+
+Everything lives in one Firebase project, `tigy-165cc`. Every push to `main` runs [.github/workflows/deploy.yml](.github/workflows/deploy.yml), which deploys only what changed since the last successful run:
+
+1. **Gate**: `nx affected -t lint test build`. If anything fails, nothing deploys.
+2. **Stage 1, backend** (`tag:backend`): `firebase` deploys the Firestore rules and indexes and the Storage rules; `functions` deploys the Cloud Functions.
+3. **Stage 2, frontends** (`tag:frontend`): `admin` deploys to Firebase Hosting (https://tigy-165cc.web.app); `public` creates an App Hosting rollout of the pushed commit (https://public--tigy-165cc.europe-west4.hosted.app).
+
+| You change                        | What deploys           |
+| --------------------------------- | ---------------------- |
+| `firebase/*` or `firebase.json`   | rules and indexes      |
+| `apps/functions`                  | functions              |
+| `apps/admin`                      | admin                  |
+| `apps/public`                     | public site            |
+| `libs/models`                     | every app using it     |
+| a dependency in `package.json`    | every project using it |
+| `nx.json` or `tsconfig.base.json` | everything             |
+
+Backend always deploys before frontends, so a page never ships before the rules or indexes it needs. Newly added composite indexes can take a few minutes to build, so a new query can briefly fail right after a deploy.
+
+The workflow is the only thing that ships the public site: App Hosting's own automatic rollouts are off. Only one deploy runs at a time; a newer push waits. A failed run is retried by the next push, because the next run compares against the last successful one.
+
+The workflow signs in to Google Cloud with Workload Identity Federation (pool `github`, provider `tigy-repo`, service account `github-deploy`), so no key is stored in GitHub.
+
+Changing only the `hosting` section of `firebase.json` marks the `firebase` project, not `admin`. Deploy the admin by hand afterwards (see below).
+
+### Deploy by hand
+
+Signed in with `npx firebase login`, each project deploys on its own:
+
+```bash
+npx nx run firebase:deploy
+```
+
+```bash
+npx nx run functions:deploy
+```
+
+```bash
+npx nx run admin:deploy
+```
+
+The public site builds on App Hosting from a commit that is already pushed to GitHub:
+
+```bash
+npx nx run public:deploy --commit=$(git rev-parse HEAD)
+```
+
+### Roll back
+
+- **Public site**: roll out an earlier commit. App Hosting rebuilds it, which takes a few minutes. The next push that touches `apps/public` ships the latest code again.
+
+  ```bash
+  npx nx run public:deploy --commit=<earlier-sha>
+  ```
+
+- **Admin**: in the Firebase console, open Hosting > Release history and choose Rollback on an earlier release.
+- **Rules, indexes and functions**: revert the commit on `main` and push. The workflow redeploys the earlier version.
