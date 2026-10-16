@@ -42,8 +42,11 @@ jobs:
           workload_identity_provider: projects/418667371179/locations/global/workloadIdentityPools/github/providers/tigy-repo
           service_account: github-deploy@tigy-165cc.iam.gserviceaccount.com
 
+      # nx affected has no --projects filter (it would be passed on to the
+      # tasks), so each stage excludes the other stage's tag. Every project
+      # with a deploy target must be tagged backend or frontend.
       - name: 'Stage 1: backend (rules, indexes, functions)'
-        run: npx nx affected -t deploy --projects=tag:backend --parallel=1
+        run: npx nx affected -t deploy --exclude=tag:frontend --parallel=1
 
       - name: 'Stage 2: frontends (admin, public)'
-        run: npx nx affected -t deploy --projects=tag:frontend --parallel=1 --commit=${{ github.sha }}
+        run: npx nx affected -t deploy --exclude=tag:backend --parallel=1 --commit=${{ github.sha }}
