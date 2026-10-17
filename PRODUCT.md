@@ -8,21 +8,52 @@ web
 
 ## Stack
 
-Angular (confirmed by the owner during init). The repo has no Angular scaffold yet; the `angular-developer` skill in `.claude/skills/` and `.agents/skills/` is the reference for Angular conventions.
+Angular, confirmed by the owner. Two apps in an Nx workspace: the public site (`apps/public`, Angular with server-side rendering on Firebase App Hosting) and a private admin (`apps/admin`, Angular single-page app on Firebase Hosting), backed by Cloud Functions, Firestore and Storage. Design mockups before the build are plain static HTML, CSS and vanilla JavaScript under `design/mockups/`.
 
 ## Users
 
-Undecided. The owner gave no preference for the primary user or their job when asked during init. Future work must ask rather than assume an audience.
+- **Primary:** the owner's followers and friends, mostly arriving from a link in a social post, often on a phone. They come to look at the art of Tigy, see who drew it, and find the owner's other socials.
+- **Also:** the artists who drew the pieces and the owners of other characters shown in them, who look for their credit.
+- **The owner** manages everything in the private admin; the public site has no visitor accounts.
 
 ## Product Purpose
 
-Undecided. The project is named **tigy**; beyond the name, no product purpose, scope, or success measure has been confirmed.
+**Tigy** is a showcase of art of Tigy, the owner's fursona (a tiger), much of it commissioned from different artists, and a contact hub that links to the owner's socials. Success: a visitor arriving from a shared link sees the art at its best, knows who made it and who the characters are, and finds the owner's socials without searching.
+
+## Positioning
+
+One character's own home, not a feed: every piece is shown with full credit to its artists and to the owners of any other characters in it, and nothing else competes with the art.
+
+## Operating Context
+
+- Visitors usually land on the home page or directly on one artwork's page (`/i/{id}`) from a social post.
+- Artwork ranges from transparent sticker-style pieces (square) to tall comics with text and wide, detailed reference sheets; some pieces are animated.
+- Pieces can show several characters, some owned by other people, and can be collaborations of several artists.
+- Some art is NSFW. It is hidden by default behind a visitor-side "show NSFW" switch, a direct link to it asks for confirmation first, and it never appears in link previews or search.
 
 ## Capabilities and Constraints
 
-- Planning follows the OpenSpec spec-driven workflow (`openspec/config.yaml`, `/opsx` commands); specs live in `openspec/specs/`, which is currently empty.
-- No features, routes, roles, or data sources exist yet.
+- Planned public pages: home (Tigy intro, socials, gallery by date), artwork detail, person, character, tag, and not found. Pages are server-rendered and CDN-cached for up to 5 minutes; the first HTML is always the NSFW-hidden view.
+- The gallery lists published art newest first, 24 at a time. Images without a date sort by the day they were added.
+- Artwork pages offer a fullscreen view with zoom, previous/next, share, download of the original, and back to the gallery.
+- Site copy is in English only. The site goes by the name **Tigy**.
+- **Undecided:** the data model for people, characters and tags (explored in `openspec/changes/design-public-site/design.md`, paused); whether tags are flat or typed; whether characters carry a reference sheet or bio.
+- Planning follows the OpenSpec spec-driven workflow (`openspec/`); the public site's design work is the change `design-public-site`.
+
+## Brand Commitments
+
+- The name is **Tigy**. The character's own colours (tiger orange, cream, deep maroon stripes, pink nose and pads) are available as brand material but are not a binding palette.
+- The site must not feel like a corporate or agency portfolio, a dark and edgy gamer site, or a generic social-media feed. Cute is welcome; the art itself ranges from chibi stickers to detailed painted pieces.
 
 ## Evidence on Hand
 
-None. There is no copy, imagery, logo, testimonials, metrics, or other proof in the repo. Future work must not fabricate any of these.
+- Five real pieces provided by the owner, listed with paths and dimensions in `openspec/changes/design-public-site/design.md`: two transparent chibi stickers, a three-panel comic of Tigy with another character, Tigy's reference sheet, and an animated GIF portrait. The reference sheet is SFW.
+- Tigy's interests, from the reference sheet: gaming, plants, photography.
+- Not provided: artist names and links, the other characters' names and owners, the owner's social links. Mockups use clearly marked placeholders; never invent them.
+
+## Product Principles
+
+1. The art leads. Interface recedes wherever a piece is on screen.
+2. Credit is first-class: artists and character owners are always shown with their links.
+3. Built for the shared link: a visitor landing on one artwork, on a phone, gets everything they need there.
+4. Safe by default: NSFW stays out of sight, previews and search unless the visitor chooses otherwise.
