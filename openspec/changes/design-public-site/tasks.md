@@ -28,7 +28,7 @@ Build order: this change styles and extends the public pages that the feature ch
 
 - [ ] 4.1 Build the viewer layout: full-height dark stage with the piece, a top bar with back, logo, theme button, NSFW switch, share, full view, credits and download; verify on a phone and a desktop screen in both themes
 - [ ] 4.2 Add previous/next through buttons, arrow keys and swipe, and Escape back to the gallery; verify the spec scenarios "Arrow key", "Swipe on a phone" and "First piece"
-- [ ] 4.3 Build the flat credits panel (title, description, date, artists, characters with links to their owners, tags, set and other versions, original file), beside the stage and closable on wide screens, below it at 1100px and narrower; verify the spec scenarios "Wide screen" and "Piece with only an image" for the credits panel
+- [ ] 4.3 Build the flat credits panel (title, description, date, artists, characters with their links, tags, set and other versions, original file), beside the stage and closable on wide screens, below it at 1100px and narrower; verify the spec scenarios "Wide screen" and "Piece with only an image" for the credits panel
 - [ ] 4.4 Build the full view with zoom in and out, fit, drag, pinch and Escape to close; verify the spec scenarios "Zooming into a reference sheet" and "Closing"
 - [ ] 4.5 Add sharing through the share sheet, with a copy-and-confirm fallback; verify the spec scenario "Desktop without a share sheet"
 - [ ] 4.6 Style the NSFW confirm and not-found screens as plain panels on the stage; verify the NSFW scenarios from the feature changes still pass

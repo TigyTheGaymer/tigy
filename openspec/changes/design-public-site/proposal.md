@@ -11,18 +11,18 @@ This change is the public site's visual design and browsing controls. The featur
 - **Social links with logos.** Each link shows its network's logo (Simple Icons, in the text colour) and the handle; on phones they become logo-only buttons with the network and handle as their accessible name.
 - **Gallery.** One continuous justified gallery, newest first, with each thumbnail at its piece's real shape and no year or month sections. Further pages load automatically as the visitor nears the end, and returning from an artwork restores the scroll position.
 - **Tail timeline.** A ringed-tail scroll timeline on the right edge that fills as the visitor scrolls, marks the years and can be dragged; a thin ringed bar on phones.
-- **Artwork page.** A photo viewer: the piece on a calm dark stage, previous/next (buttons, arrow keys, swipe), share, download of the original, full view with zoom and pan, and a flat credits panel (title, description, date, artists, characters with links to their owners, tags, set and other versions, original file). On narrower screens the panel moves below the stage.
+- **Artwork page.** A photo viewer: the piece on a calm dark stage, previous/next (buttons, arrow keys, swipe), share, download of the original, full view with zoom and pan, and a flat credits panel (title, description, date, artists, characters with their links, tags, set and other versions, original file). On narrower screens the panel moves below the stage.
 - **Theme switch.** Automatic (follows the device), Light and Dark, remembered in the visitor's browser and applied before the first paint.
 - **NSFW in the chrome.** The "Show NSFW" switch sits in the top bar; a direct link to an NSFW piece shows a plain confirm panel without the image.
 - **Filter row, design only.** A row of filter chips (Characters, Artists, Tags, Year) sits above the gallery, marked as coming later. It does not filter yet.
 
-Out of scope: the person, character and tag pages and the working filters (they follow this design later); the admin site; the data model for people, characters and tags, which was explored but paused (see design.md).
+Out of scope: the person and tag pages and the working filters (they follow this design later); the admin site; the data model for people and tags (starting notes in design.md).
 
 ## Capabilities
 
 ### New Capabilities
 
-- `public-gallery`: the home header and social links, the gallery layout and its loading, the tail timeline, the artwork viewer and credits panel, the theme switch, and where the NSFW switch and confirm panel live. Whether people, characters and tags become a capability of their own is decided with the data model.
+- `public-gallery`: the home header and social links, the gallery layout and its loading, the tail timeline, the artwork viewer and credits panel, the theme switch, and where the NSFW switch and confirm panel live. Whether people and tags become a capability of their own is decided with the data model.
 
 ### Modified Capabilities
 

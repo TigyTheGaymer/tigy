@@ -1172,11 +1172,6 @@ img {
   text-decoration: underline;
 }
 
-.person-meta {
-  display: block;
-  font-size: 0.88rem;
-}
-
 .person-links {
   display: flex;
   flex-wrap: wrap;

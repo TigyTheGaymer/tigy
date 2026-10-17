@@ -381,32 +381,21 @@
     return html ? '<div class="detail-row">' + U.icon(icon) + '<div><span class="label">' + label + '</span>' + html + '</div></div>' : '';
   }
 
-  function artistsHTML(p) {
-    return p.artists
-      .map(function (a) {
-        return (
-          '<div class="person"><span class="person-dot" aria-hidden="true">' + esc(a.name.charAt(0)) + '</span><div>' +
-          '<span class="person-name"><a href="#">' + U.ph(a.name, a.placeholder) + '</a></span>' + personLinks(a.links) + '</div></div>'
-        );
-      })
-      .join('');
+  // Artists and characters are both people, so they render the same way.
+  function personHTML(person) {
+    if (person.own)
+      return (
+        '<div class="person"><span class="person-dot own" aria-hidden="true"><img src="assets/tigy-portrait.gif" alt=""></span><div>' +
+        '<span class="person-name"><a href="index.html">Tigy</a></span></div></div>'
+      );
+    return (
+      '<div class="person"><span class="person-dot" aria-hidden="true">' + esc(person.name.charAt(0)) + '</span><div>' +
+      '<span class="person-name"><a href="#">' + U.ph(person.name, person.placeholder) + '</a></span>' + personLinks(person.links) + '</div></div>'
+    );
   }
 
-  function charactersHTML(p) {
-    return p.characters
-      .map(function (c) {
-        if (c.own)
-          return (
-            '<div class="person"><span class="person-dot own" aria-hidden="true"><img src="assets/tigy-portrait.gif" alt=""></span><div>' +
-            '<span class="person-name"><a href="index.html">Tigy</a></span></div></div>'
-          );
-        return (
-          '<div class="person"><span class="person-dot" aria-hidden="true">' + esc(c.name.charAt(0)) + '</span><div>' +
-          '<span class="person-name"><a href="#">' + U.ph(c.name, c.placeholder) + '</a></span>' +
-          personLinks(c.owner.links) + '</div></div>'
-        );
-      })
-      .join('');
+  function peopleHTML(list) {
+    return list.map(personHTML).join('');
   }
 
   var nav = { prev: null, next: null };
@@ -520,8 +509,8 @@
       '<h1 id="title"' + (p.title ? '' : ' class="untitled"') + '>' + esc(title) + '</h1>' +
       (p.description ? '<p class="desc">' + esc(p.description) + '</p>' : '') +
       (p.mock ? '<p class="mock-flag">' + esc(p.mock) + '</p>' : '') +
-      row('palette', p.artists.length > 1 ? 'Art by' : 'Art by', artistsHTML(p)) +
-      row('users', 'Characters', charactersHTML(p)) +
+      row('palette', 'Art by', peopleHTML(p.artists)) +
+      row('users', 'Characters', peopleHTML(p.characters)) +
       row('tag', 'Tags', tags) +
       row('calendar', 'Date', p.date ? '<div class="ph" title="Placeholder for the mockup">' + U.formatDate(p.date) + '</div>' : '<div>Added ' + U.formatDate(p.added) + '</div>') +
       row(

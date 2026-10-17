@@ -19,8 +19,8 @@ Constraints the mockup was designed under. They came from earlier feature change
 - Keep the server-rendered, CDN-cached, SFW-first pages intact; nothing the design adds in the browser may shift the layout or flash the wrong theme.
 
 **Non-Goals:**
-- The person, character and tag pages, and working filters. They follow this design later.
-- The data model for people, characters and tags (paused, below).
+- The person and tag pages, and working filters. They follow this design later.
+- The data model for people and tags (below).
 - Final copy or real credits; the mockup's placeholders stay placeholders until real content exists.
 
 ## Decisions
@@ -40,7 +40,7 @@ Constraints the mockup was designed under. They came from earlier feature change
 **Artwork detail page (D3).** It carries:
 - the image at page size, opening a **fullscreen view with zoom and pan** for detailed pieces;
 - **previous/next** in gallery date order, with arrow keys and swipe;
-- title, **artists** (one or more, each with links), **characters** (one or more, each with links to its owner), **tags**, date, description, each only when set;
+- title, **artists** (one or more, each with links), **characters** (one or more, each with its links), **tags**, date, description, each only when set;
 - **other versions** in the same set (for example a clean and an NSFW version of one piece);
 - **download** of the original file;
 - **share** (the phone's share sheet) or copy link;
@@ -55,7 +55,7 @@ Constraints the mockup was designed under. They came from earlier feature change
 | File | Piece | Shape | What it tests |
 |---|---|---|---|
 | `0b97227b-image.png` | Chibi Tigy sitting | 512×512, transparent | Sticker-style art without a background |
-| `57fe542c-image.png` | Three-panel comic: Tigy and a dog character ("Hey Pookie!") | ~1530×2000, portrait | Reading a comic with text; a cropped thumbnail cuts its panels; a multi-character credit with another owner's character |
+| `57fe542c-image.png` | Three-panel comic: Tigy and a dog character ("Hey Pookie!") | ~1530×2000, portrait | Reading a comic with text; a cropped thumbnail cuts its panels; a multi-character credit with another person as a character |
 | `fda93f14-image.png` | Tigy with hearts | 512×512, transparent | Sticker-style art, same as above |
 | `13dcf1c9-image.png` | Tigy reference sheet | ~2000×1217, landscape | Zoom and pan on a detailed piece; the natural "who is Tigy" piece |
 | `77aac42b-image.gif` | Tigy portrait | 560×560, animated GIF (27 frames) | The animated state: playing in the gallery, the detail page and as an avatar |
@@ -100,9 +100,9 @@ Owner feedback from the round, to carry into the build:
 
 Explored in this change's discussion, not decided, and not part of the mockup round. The data model is designed from scratch in the new feature changes; these notes and the mockup's content (`design/mockups/shared/data.js`) are their starting point. It only matters to the mockups as the shape of the credits on the detail page.
 
-- **People** are one directory: name plus public links. A person is attached to an image as an **artist** and to a character as its **owner**. The owner is a person too, and their social links come from that record.
-- **Characters** are records with a name and an owner. An image can show several characters.
-- **Images** keep copies of their artists and characters (with each character's owner) for display, plus ID arrays for queries: when a person or character is edited, every image's copy is updated. Artists and characters are arrays, so collaborations and multi-character pieces fit.
+- **People** are one directory: name plus public links. A person is credited on an image as an **artist**, as a **character**, or both. Characters have no separate owner: the character is the person, with that person's links.
+- **Tigy** is a person too, the site's own: credited without links, linking to the home page.
+- **Images** keep copies of their artists and characters (name and links) for display, plus ID arrays for queries: when a person is edited, every image's copy is updated. Artists and characters are arrays, so collaborations and multi-character pieces fit.
 - **Tags** are on images, picked with autocomplete so typos can't split them. Flat or typed is not decided.
 
 ## Risks / Trade-offs
@@ -114,5 +114,5 @@ Explored in this change's discussion, not decided, and not part of the mockup ro
 
 ## Open Questions
 
-- Tags flat or typed (for example "type: icon"); and whether characters carry a reference sheet or short bio. Neither changes the two mockup pages much.
+- Tags flat or typed (for example "type: icon"); and whether people carry a reference sheet or short bio. Neither changes the two mockup pages much.
 - Context-aware previous/next (for example "next by this artist" when the visitor came from an artist's page) and a "more by this artist" row on the detail page. Both were deferred and can be added later.

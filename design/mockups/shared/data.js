@@ -1,8 +1,11 @@
 /*
  * Mockup content for the public site pages.
  * Real: the five art pieces, the name Tigy, the interests from the reference sheet.
- * Placeholder (marked with placeholder: true): every artist, character owner,
- * social link, title and date. Repeats pad the gallery so paging can be judged.
+ * Placeholder (marked with placeholder: true): every person other than Tigy,
+ * social link, title and date.
+ * People are one directory: a person is credited on a piece as an artist, as a
+ * character, or both. Characters have no owners.
+ * Repeats pad the gallery so paging can be judged.
  */
 (function () {
   var ASSET = 'assets/';
@@ -52,7 +55,9 @@
     ];
   }
 
-  var TIGY_CHAR = { name: 'Tigy', own: true };
+  // Tigy is the site's own person: credited without links, linking to the home page.
+  var TIGY_PERSON = { name: 'Tigy', own: true };
+  var FRIEND = { name: 'Character name', links: [{ label: 'Bluesky', url: '#' }], placeholder: true };
 
   var real = [
     {
@@ -61,7 +66,7 @@
       title: 'Tigy portrait',
       date: '2026-04-08',
       artists: [{ name: 'Artist name', links: links(), placeholder: true }],
-      characters: [TIGY_CHAR],
+      characters: [TIGY_PERSON],
       tags: ['animated', 'bust'],
       animated: true,
       nsfw: false,
@@ -72,7 +77,7 @@
       title: 'Tigy reference sheet',
       date: '2026-03-21',
       artists: [{ name: 'Artist name', links: links(), placeholder: true }],
-      characters: [TIGY_CHAR],
+      characters: [TIGY_PERSON],
       tags: ['reference sheet', 'full body', 'expressions'],
       description: 'Side, front and back views, with paw, eye and expression studies.',
       nsfw: false,
@@ -84,14 +89,7 @@
       date: '2026-02-14',
       set: 'Hey Pookie',
       artists: [{ name: 'Artist name', links: links(), placeholder: true }],
-      characters: [
-        TIGY_CHAR,
-        {
-          name: 'Character name',
-          owner: { name: 'Owner name', links: [{ label: 'Bluesky', url: '#' }] },
-          placeholder: true,
-        },
-      ],
+      characters: [TIGY_PERSON, FRIEND],
       tags: ['comic', 'couple'],
       description: 'A three-panel comic.',
       nsfw: false,
@@ -103,14 +101,7 @@
       date: '2026-02-14',
       set: 'Hey Pookie',
       artists: [{ name: 'Artist name', links: links(), placeholder: true }],
-      characters: [
-        TIGY_CHAR,
-        {
-          name: 'Character name',
-          owner: { name: 'Owner name', links: [{ label: 'Bluesky', url: '#' }] },
-          placeholder: true,
-        },
-      ],
+      characters: [TIGY_PERSON, FRIEND],
       tags: ['comic', 'couple'],
       nsfw: true,
       mock: 'Flagged NSFW for this mockup only, to show the NSFW states. Same image as the clean version.',
@@ -121,7 +112,7 @@
       title: 'Happy Tigy',
       date: '2025-12-03',
       artists: [{ name: 'Artist name', links: links(), placeholder: true }],
-      characters: [TIGY_CHAR],
+      characters: [TIGY_PERSON],
       tags: ['sticker', 'chibi'],
       nsfw: false,
     },
