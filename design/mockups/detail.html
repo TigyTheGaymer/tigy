@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Tigy</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Grandstander:wght@600;700;800&family=Nunito:wght@400;600;700;800&display=swap"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <!-- Applied before first paint, so a chosen theme never flashes the other one -->
+    <script>
+      try {
+        var t = localStorage.getItem('tigy-mock-theme');
+        if (t) document.documentElement.dataset.theme = t;
+      } catch (e) {}
+    </script>
+  </head>
+  <body class="viewer-page">
+    <main class="photo" id="photo"></main>
+    <div class="toast" id="toast" role="status"></div>
+
+
+    <script src="shared/data.js"></script>
+    <script src="shared/common.js"></script>
+    <script src="shared/brands.js"></script>
+    <script src="app.js"></script>
+    <script>
+      TigyAlbum.detail();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,666 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Tigy design sheet</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Grandstander:wght@600;700;800&family=Nunito:wght@400;600;700;800&family=Fredoka:wght@700&family=Sour+Gummy:wght@800&display=swap"
+    />
+    <!-- The sheet uses the mockup's own stylesheet, so every token and component below is the live one -->
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      .sheet {
+        max-width: 1240px;
+        margin: 0 auto;
+        padding: 28px var(--gutter) 80px;
+      }
+      .sheet-top {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 8px;
+      }
+      .sheet-top h1 {
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.12em;
+        font-family: var(--font-display);
+        font-weight: 800;
+        font-size: clamp(2.6rem, 6vw, 4rem);
+        line-height: 1;
+      }
+      .sheet-top h1 .mark {
+        width: 0.6em;
+        height: 0.6em;
+      }
+      .sheet-top p {
+        margin: 6px 0 0;
+        font-weight: 600;
+        max-width: 46rem;
+      }
+      .theme-pick {
+        display: flex;
+        gap: 6px;
+      }
+      .theme-pick .pad[aria-pressed='true'] {
+        background: var(--dark-btn);
+        color: var(--on-dark-btn);
+        box-shadow: 0 3px 0 rgb(0 0 0 / 0.35);
+      }
+      section.block {
+        margin-top: 44px;
+      }
+      section.block > h2 {
+        margin: 0 0 4px;
+        font-family: var(--font-display);
+        font-weight: 800;
+        font-size: clamp(1.8rem, 3.6vw, 2.4rem);
+        line-height: 1.05;
+      }
+      section.block > p.intro {
+        margin: 0 0 18px;
+        max-width: 60ch;
+        font-weight: 600;
+      }
+      .rule {
+        margin: 14px 0 0;
+        padding-left: 14px;
+        border-left: 1px solid color-mix(in srgb, var(--ink) 40%, transparent);
+        max-width: 70ch;
+      }
+      .rule strong {
+        font-weight: 800;
+      }
+      /* colour palettes */
+      .palettes {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 520px), 1fr));
+        gap: 18px;
+      }
+      .palette {
+        padding: 18px;
+        border-radius: var(--r-panel);
+      }
+      .palette.light {
+        background: #f5a742;
+        color: #4b1416;
+      }
+      .palette.dark {
+        background: #2a0d0e;
+        color: #fde3bc;
+      }
+      .palette h3 {
+        margin: 0 0 12px;
+        font-family: var(--font-display);
+        font-weight: 800;
+        font-size: 1.3rem;
+      }
+      .swatches {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 10px;
+      }
+      .swatch {
+        overflow: hidden;
+        border-radius: var(--r-small);
+        background: rgb(255 255 255 / 0.12);
+        box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.08);
+      }
+      .swatch .chip-color {
+        height: 58px;
+      }
+      .swatch .meta {
+        padding: 8px 10px 10px;
+        font-size: 0.8rem;
+        line-height: 1.35;
+      }
+      .swatch .meta b {
+        display: block;
+        font-size: 0.88rem;
+      }
+      .swatch .meta code {
+        font-family: ui-monospace, Consolas, monospace;
+        font-size: 0.76rem;
+      }
+      .contrast {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 12px;
+        font-size: 0.82rem;
+        font-weight: 700;
+      }
+      .contrast span {
+        padding: 4px 10px;
+        border-radius: var(--r-tag);
+        background: rgb(0 0 0 / 0.12);
+      }
+      /* typography */
+      .type-row {
+        display: grid;
+        grid-template-columns: 220px minmax(0, 1fr);
+        gap: 18px;
+        align-items: baseline;
+        padding: 16px 0;
+        border-top: 1px solid color-mix(in srgb, var(--ink) 20%, transparent);
+      }
+      .type-row .spec {
+        font-size: 0.82rem;
+        font-weight: 700;
+        line-height: 1.4;
+      }
+      .type-row .spec b {
+        display: block;
+        font-size: 0.95rem;
+      }
+      .t-display {
+        font: 800 clamp(3.4rem, 9vw, 5.6rem) / 0.9 var(--font-display);
+        letter-spacing: -0.02em;
+      }
+      .t-headline {
+        font: 800 clamp(2.1rem, 4.6vw, 3rem) / 1 var(--font-display);
+      }
+      .t-title {
+        font: 800 clamp(1.8rem, 2.6vw, 2.4rem) / 1.05 var(--font-display);
+      }
+      .t-logo {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font: 800 1.7rem / 1 var(--font-display);
+      }
+      .t-body {
+        max-width: 60ch;
+        font: 400 1.02rem / 1.55 var(--font-ui);
+      }
+      .t-button {
+        font: 800 0.95rem / 1.2 var(--font-ui);
+      }
+      .t-label {
+        font: 800 0.78rem / 1.3 var(--font-ui);
+        color: var(--ink-2);
+      }
+      /* corners */
+      .corners {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 14px;
+      }
+      .corner {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        font-size: 0.82rem;
+        font-weight: 700;
+      }
+      .corner .box {
+        height: 90px;
+        background: var(--panel);
+        box-shadow: 0 2px 0 var(--page-deep);
+      }
+      .corner b {
+        font-size: 0.95rem;
+      }
+      /* markings */
+      .markings {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
+        gap: 14px;
+      }
+      .marking {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        padding: 18px;
+        border-radius: var(--r-panel);
+        background: color-mix(in srgb, var(--panel) 55%, transparent);
+      }
+      .marking .stage-area {
+        position: relative;
+        display: grid;
+        place-items: center;
+        height: 120px;
+        overflow: hidden;
+        isolation: isolate;
+      }
+      .marking .big-mark {
+        width: 84px;
+        height: 84px;
+        color: var(--ink);
+      }
+      .marking .big-paw {
+        width: 72px;
+        height: 72px;
+        color: var(--pink-deep);
+      }
+      .marking .stripe-demo svg {
+        position: absolute;
+        height: auto;
+        fill: var(--stripe);
+      }
+      .marking .tail-demo {
+        width: 85%;
+        height: 14px;
+        border-radius: 0 999px 999px 0;
+        background:
+          linear-gradient(90deg, transparent calc(100% - 20px), var(--tail-b) calc(100% - 20px)),
+          repeating-linear-gradient(90deg, var(--tail-a) 0 24px, var(--tail-b) 24px 36px);
+      }
+      .marking h3 {
+        margin: 0;
+        font-family: var(--font-display);
+        font-weight: 800;
+        font-size: 1.2rem;
+      }
+      .marking p {
+        margin: 0;
+        font-size: 0.9rem;
+        font-weight: 600;
+      }
+      /* components */
+      .components {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+        gap: 14px;
+      }
+      .component {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        padding: 18px;
+        border-radius: var(--r-panel);
+        background: color-mix(in srgb, var(--panel) 55%, transparent);
+      }
+      .component h3 {
+        margin: 0;
+        font-family: var(--font-display);
+        font-weight: 800;
+        font-size: 1.15rem;
+      }
+      .component p {
+        margin: 0;
+        font-size: 0.86rem;
+        font-weight: 600;
+      }
+      .component .row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 10px;
+      }
+      .demo-nav {
+        position: static;
+        margin: 0;
+        opacity: 1;
+      }
+      .demo-tile {
+        position: relative;
+        display: block;
+        width: 100%;
+        height: 190px;
+      }
+      .demo-tile .tile-label {
+        opacity: 1;
+        transform: none;
+      }
+      .demo-tile.is-transparent {
+        width: 190px;
+      }
+      .demo-stage {
+        display: grid;
+        place-items: center;
+        padding: 18px;
+        border-radius: var(--r-small);
+        background: var(--stage);
+      }
+      .demo-stage img {
+        max-height: 150px;
+        width: auto;
+        border-radius: var(--r-art);
+      }
+      .demo-pill {
+        position: static;
+        opacity: 1;
+        transform: none;
+      }
+      .shadow-demo {
+        display: grid;
+        place-items: center;
+        height: 80px;
+        padding: 0 12px;
+        border-radius: var(--r-small);
+        background: var(--panel);
+        font-size: 0.82rem;
+        font-weight: 700;
+        text-align: center;
+      }
+      .icon-row .icon,
+      .icon-row .brand {
+        width: 22px;
+        height: 22px;
+      }
+      .icon-row .brand {
+        fill: currentColor;
+      }
+      .social .brand {
+        width: 18px;
+        height: 18px;
+        flex: none;
+        fill: currentColor;
+      }
+      .dos {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+        gap: 18px;
+      }
+      .dos ul {
+        margin: 0;
+        padding-left: 1.1em;
+        font-weight: 600;
+      }
+      .dos li + li {
+        margin-top: 6px;
+      }
+      .dos h3 {
+        margin: 0 0 8px;
+        font-family: var(--font-display);
+        font-weight: 800;
+        font-size: 1.3rem;
+      }
+      @media (max-width: 640px) {
+        .type-row {
+          grid-template-columns: 1fr;
+          gap: 6px;
+        }
+      }
+    </style>
+    <script>
+      try {
+        var t = localStorage.getItem('tigy-mock-theme');
+        if (t) document.documentElement.dataset.theme = t;
+      } catch (e) {}
+    </script>
+  </head>
+  <body>
+    <div class="sheet">
+      <header class="sheet-top">
+        <div>
+          <h1><span data-mark></span>Tigy design sheet</h1>
+          <p>
+            The agreed design for the public site, “Tigy’s Album”. Everything below is drawn with the mockup’s own
+            stylesheet (<a href="index.html">open the mockup</a>). The written version is <code>apps/public/DESIGN.md</code>.
+          </p>
+        </div>
+        <div class="theme-pick" role="group" aria-label="Show the sheet in">
+          <button type="button" class="pad light" data-theme-pick="light">Light</button>
+          <button type="button" class="pad light" data-theme-pick="dark">Dark</button>
+        </div>
+      </header>
+
+      <section class="block" aria-labelledby="colors-h">
+        <h2 id="colors-h">Colours</h2>
+        <p class="intro">Every colour comes from Tigy’s coat: fur, cream from the muzzle and chest, maroon from the stripes and pink from the paw pads. Dark mode swaps the roles instead of adding colours.</p>
+        <div class="palettes" id="palettes"></div>
+        <p class="rule"><strong>The Coat Rule.</strong> A new colour needs a place on Tigy to come from.</p>
+        <p class="rule"><strong>The Pink Pad Rule.</strong> Paw pink marks things you press and Tigy’s own accents; never a background for content.</p>
+        <p class="rule"><strong>The Night Swap Rule.</strong> At night the page becomes stripe maroon, text becomes cream, and the fur becomes the accent.</p>
+      </section>
+
+      <section class="block" aria-labelledby="type-h">
+        <h2 id="type-h">Typography</h2>
+        <p class="intro">Grandstander for names and headings, Nunito for everything you read or press.</p>
+        <div class="type-row"><div class="spec"><b>Display</b>Grandstander 800 · clamp(3.4–5.6rem) · 0.9</div><div class="t-display">Tigy</div></div>
+        <div class="type-row"><div class="spec"><b>Headline</b>Grandstander 800 · clamp(2.1–3rem) · 1</div><div class="t-headline">All the art</div></div>
+        <div class="type-row"><div class="spec"><b>Title</b>Grandstander 800 · clamp(1.8–2.4rem) · 1.05</div><div class="t-title">Hey Pookie!</div></div>
+        <div class="type-row"><div class="spec"><b>Logo</b>Grandstander 800 · 1.7rem, with the forehead mark</div><div class="t-logo"><span data-mark></span>Tigy</div></div>
+        <div class="type-row"><div class="spec"><b>Body</b>Nunito 400 · 1.02rem · 1.55</div><div class="t-body">Every piece credits the artists who drew it and the owners of any other characters in it.</div></div>
+        <div class="type-row"><div class="spec"><b>Button</b>Nunito 800 · 0.95rem</div><div class="t-button">Download original</div></div>
+        <div class="type-row"><div class="spec"><b>Label</b>Nunito 800 · 0.78rem</div><div class="t-label">Art by · Characters · Tags</div></div>
+        <div class="type-row"><div class="spec"><b>Alternates</b>Kept for a later swap; both have a standard “g”. <a href="fonts.html">Compare</a></div><div class="t-headline"><span style="font-family: Fredoka; font-weight: 700">Tigy · Fredoka</span><br /><span style="font-family: 'Sour Gummy'; font-weight: 800">Tigy · Sour Gummy</span></div></div>
+        <p class="rule"><strong>The Two Voices Rule.</strong> Grandstander is only for names and headings. Anything a visitor reads or presses is Nunito.</p>
+      </section>
+
+      <section class="block" aria-labelledby="corners-h">
+        <h2 id="corners-h">Corners</h2>
+        <p class="intro">Three steps, all gently rounded, plus the circle where Tigy is round.</p>
+        <div class="corners">
+          <div class="corner"><div class="box" style="border-radius: var(--r-sm)"></div><b>6px · small</b>Tags, badges, labels, date pill</div>
+          <div class="corner"><div class="box" style="border-radius: var(--r-md)"></div><b>8px · standard</b>Gallery tiles, the artwork, thumbnails, buttons, dropdowns, chips, icon buttons, switch</div>
+          <div class="corner"><div class="box" style="border-radius: var(--r-lg)"></div><b>16px · large</b>NSFW and not-found panels</div>
+          <div class="corner"><div class="box" style="border-radius: 50%; aspect-ratio: 1; height: auto; width: 90px"></div><b>Circle</b>Faces (avatar, people dots), tail, paw thumb</div>
+        </div>
+        <p class="rule"><strong>The Three Steps Rule.</strong> Corners are 6px, 8px or 16px; nothing in between. Full circles are reserved for faces, the tail and the paw thumb.</p>
+      </section>
+
+      <section class="block" aria-labelledby="markings-h">
+        <h2 id="markings-h">Tigy’s markings</h2>
+        <p class="intro">The signature shapes. They live on the frame of the page, never over a piece of art.</p>
+        <div class="markings">
+          <div class="marking"><div class="stage-area"><span class="big-mark" data-mark></span></div><h3>Forehead mark</h3><p>One long tapered stroke crossed by two shorter ones. The logo mark, before the wordmark.</p></div>
+          <div class="marking"><div class="stage-area stripe-demo" id="stripe-demo"></div><h3>Flank stripes</h3><p>Tapered strokes entering from both edges; the divider between the header and the gallery.</p></div>
+          <div class="marking"><div class="stage-area"><span class="big-paw" data-paw></span></div><h3>Paw print</h3><p>On the primary button and the switch thumb; three of them walk up a tile on hover and while loading more.</p></div>
+          <div class="marking"><div class="stage-area"><div class="tail-demo"></div></div><h3>Ringed tail</h3><p>The scroll timeline: fur and maroon rings with a dark tip. Marks years, can be dragged; a bottom bar on phones.</p></div>
+        </div>
+      </section>
+
+      <section class="block" aria-labelledby="components-h">
+        <h2 id="components-h">Components</h2>
+        <p class="intro">The live pieces, as they appear in the mockup. Hover them to see their states.</p>
+        <div class="components">
+          <div class="component">
+            <h3>Buttons</h3>
+            <div class="row">
+              <a class="pad dark" href="#" data-demo-paw>Download original</a>
+              <button type="button" class="pad" data-icon="share">Share</button>
+              <button type="button" class="pad light" data-icon="expand">Full view</button>
+            </div>
+            <p>Primary maroon (fur at night), paw pink for things you press, light cream for quiet actions. 8px corners, a ledge underneath, a springy lift on hover.</p>
+          </div>
+          <div class="component">
+            <h3>Filter chips</h3>
+            <div class="row">
+              <button type="button" class="filter-chip" data-icon="users">Characters</button>
+              <button type="button" class="filter-chip" data-icon="tag">Tags</button>
+              <button type="button" class="filter-chip" data-icon="calendar">Year</button>
+            </div>
+            <p>The sticky filter row above the gallery. Design only for now; pickers come later.</p>
+          </div>
+          <div class="component">
+            <h3>Tags and badges</h3>
+            <div class="row">
+              <span class="tags"><a href="#">#comic</a><a href="#">#couple</a></span>
+              <span class="badge">GIF</span>
+              <span class="badge nsfw">NSFW</span>
+            </div>
+            <p>Tags on the credits panel; badges in the top-left corner of a tile.</p>
+          </div>
+          <div class="component">
+            <h3>Social links</h3>
+            <ul class="socials" data-socials aria-label="Social link examples"></ul>
+            <p>Simple Icons logos in the text colour, with the handle. On phones they become 46px logo-only buttons. Home header only; there is no footer.</p>
+          </div>
+          <div class="component">
+            <h3>Icons</h3>
+            <div class="row icon-row" id="icon-row"></div>
+            <p>Interface icons are Lucide only, with round line ends and a slightly heavier line, in the current text colour.</p>
+            <div class="row icon-row" id="brand-row"></div>
+            <p>Social logos are Simple Icons, always in one colour. Tigy's own shapes (forehead mark, paw, stripes) are drawn, not icons.</p>
+          </div>
+          <div class="component">
+            <h3>Top bar controls</h3>
+            <div class="row">
+              <button type="button" class="round theme-btn" data-icon-only="moon" aria-label="Theme"></button>
+              <label class="switch"><span class="label">Show NSFW</span><input type="checkbox" role="switch" /><span class="track" aria-hidden="true"><span class="thumb" data-paw></span></span></label>
+            </div>
+            <p>The theme button cycles Automatic, Light and Dark. The NSFW switch has a paw thumb and turns pink when on (try it).</p>
+          </div>
+          <div class="component">
+            <h3>Viewer arrows</h3>
+            <div class="row">
+              <span class="stage-nav demo-nav" data-icon-only="arrow-left"></span>
+              <span class="stage-nav demo-nav" data-icon-only="arrow-right"></span>
+            </div>
+            <p>52px paw-pink buttons with 8px corners on either side of the stage.</p>
+          </div>
+          <div class="component">
+            <h3>Gallery tile</h3>
+            <a class="tile demo-tile" href="#" style="aspect-ratio: 1; height: auto; width: min(100%, 260px)"><img src="assets/tigy-portrait.gif" alt="" /><span class="tile-badges"><span class="badge">GIF</span></span><span class="tile-label">Tigy portrait</span></a>
+            <p>8px corners, the piece at its real shape. On hover: lift, title label, paw prints.</p>
+          </div>
+          <div class="component">
+            <h3>The stage</h3>
+            <div class="demo-stage"><img src="assets/hey-pookie-thumb.jpg" alt="" /></div>
+            <p>The open piece always sits on a calm dark stage with 8px corners; the credits are a flat cream panel beside it.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="block" aria-labelledby="depth-h">
+        <h2 id="depth-h">Depth and motion</h2>
+        <p class="intro">Mostly flat. Only things you can press get a ledge; tiles lift on hover. Motion is small and springy.</p>
+        <div class="corners">
+          <div class="corner"><div class="shadow-demo" style="box-shadow: 0 2px 0 var(--page-deep)">Ledge</div>Raised controls at rest</div>
+          <div class="corner"><div class="shadow-demo" style="box-shadow: 0 2px 0 var(--page-deep), 0 16px 26px -14px rgb(0 0 0 / 0.5)">Lifted tile</div>A tile on hover</div>
+          <div class="corner"><div class="shadow-demo" style="box-shadow: var(--shadow)">Panel</div>NSFW and not-found panels</div>
+          <div class="corner"><div class="shadow-demo">Squish</div><code>cubic-bezier(0.34, 1.3, 0.64, 1)</code>: presses and lifts</div>
+          <div class="corner"><div class="shadow-demo">Ease out</div><code>cubic-bezier(0.16, 1, 0.3, 1)</code>: fades and the viewer</div>
+        </div>
+        <p class="rule"><strong>The One Set Rule.</strong> Every interface icon comes from Lucide at one line weight. Social logos and Tigy’s own shapes are the only exceptions.</p>
+        <p class="rule"><strong>The Press Rule.</strong> Only things you can press get a ledge. Text, panels at rest and the art itself stay flat.</p>
+      </section>
+
+      <section class="block" aria-labelledby="dos-h">
+        <h2 id="dos-h">Do’s and don’ts</h2>
+        <div class="dos">
+          <div>
+            <h3>Do</h3>
+            <ul>
+              <li>Keep thumbnails at each piece’s real shape; never crop to squares.</li>
+              <li>Keep the gallery one continuous run, newest first, with no year or month headings.</li>
+              <li>Keep content straight on the page: an open header, a flat credits panel, no footer.</li>
+              <li>Keep the art on a calm surface: cream behind thumbnails, the dark stage behind the open piece.</li>
+              <li>Use paw pink only for things you press and Tigy’s own accents.</li>
+              <li>Use the forehead mark (one long stroke, two crossings) as the logo mark.</li>
+              <li>Draw social logos from Simple Icons in one colour, the button’s text colour.</li>
+            </ul>
+          </div>
+          <div>
+            <h3>Don’t</h3>
+            <ul>
+              <li>Put stripes or other markings over or behind a piece of art.</li>
+              <li>Wrap content in cards: no card around the header, the credits or the NSFW toggle.</li>
+              <li>Round everything: no pills, and circles only for faces, the tail and the paw thumb.</li>
+              <li>Add a footer; social links live in the home header.</li>
+              <li>Replace the browser’s scrollbar; the tail timeline sits beside it.</li>
+              <li>Use Grandstander for running text or controls.</li>
+              <li>Mix icon sets, or show social logos in their brand colours.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <script src="shared/data.js"></script>
+    <script src="shared/common.js"></script>
+    <script src="shared/brands.js"></script>
+    <script>
+      (function () {
+        var U = TIGY.ui;
+        var MARK =
+          '<svg class="mark" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
+          '<path d="M12.6 1.5c.9 0 1.3 1.2 1.2 3.4l-.5 15.4c-.1 1.4-.5 2.2-1.2 2.2s-1-.8-1-2.2l-.3-15.4c0-2.2.6-3.4 1.8-3.4z"/>' +
+          '<path d="M4.5 8.6c4.6-1.3 10.5-1.6 15.4-.7.9.2.9 1.1 0 1.2-4.9.6-10.4.9-15.2.8-1.2 0-1.3-1-.2-1.3z"/>' +
+          '<path d="M6 14.1c3.9-1 8.8-1.2 12.8-.5.8.1.8 1 0 1.1-4 .5-8.6.7-12.6.6-1 0-1.1-.9-.2-1.2z"/></svg>';
+        var PAW =
+          '<svg class="paw" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
+          '<path d="M12 12.6c-3.1 0-6.3 3.4-6.3 5.9 0 1.9 1.5 2.6 3.1 2.6 1.3 0 2.1-.7 3.2-.7s1.9.7 3.2.7c1.6 0 3.1-.7 3.1-2.6 0-2.5-3.2-5.9-6.3-5.9z"/>' +
+          '<ellipse cx="4.6" cy="10.4" rx="1.9" ry="2.5" transform="rotate(-22 4.6 10.4)"/><ellipse cx="9" cy="6.2" rx="2" ry="2.7" transform="rotate(-8 9 6.2)"/>' +
+          '<ellipse cx="15" cy="6.2" rx="2" ry="2.7" transform="rotate(8 15 6.2)"/><ellipse cx="19.4" cy="10.4" rx="1.9" ry="2.5" transform="rotate(22 19.4 10.4)"/></svg>';
+        var STRIPE = 'M0 9 C 40 2, 120 0, 200 7 C 120 13, 40 16, 0 9 Z';
+
+        document.querySelectorAll('[data-mark]').forEach(function (el) { el.innerHTML = MARK; });
+        document.querySelectorAll('[data-paw]').forEach(function (el) { el.innerHTML = PAW; });
+        document.querySelectorAll('.big-mark svg').forEach(function (s) { s.style.width = s.style.height = '100%'; });
+        document.querySelectorAll('.big-paw svg').forEach(function (s) { s.style.width = s.style.height = '100%'; });
+        document.querySelectorAll('[data-demo-paw]').forEach(function (el) { el.innerHTML = PAW + el.textContent; });
+        document.querySelectorAll('[data-icon]').forEach(function (el) {
+          var chev = el.classList.contains('filter-chip') ? U.icon('chevron-down', 'chev') : '';
+          el.innerHTML = U.icon(el.dataset.icon) + '<span>' + U.esc(el.textContent) + '</span>' + chev;
+        });
+        document.querySelectorAll('[data-icon-only]').forEach(function (el) { el.innerHTML = U.icon(el.dataset.iconOnly); });
+
+        // Icons and social logos, drawn the same way as in the mockup
+        var B = window.TIGY_BRANDS || {};
+        var logo = function (id) { return '<svg class="brand" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="' + B[id].path + '"/></svg>'; };
+        document.getElementById('icon-row').innerHTML = ['arrow-left', 'arrow-right', 'share', 'download', 'expand', 'info', 'calendar', 'tag', 'users', 'sun', 'moon', 'x'].map(function (n) { return U.icon(n); }).join('');
+        document.getElementById('brand-row').innerHTML = ['bluesky', 'telegram', 'twitter', 'furaffinity'].map(logo).join('');
+        document.querySelectorAll('[data-socials]').forEach(function (ul) {
+          ul.innerHTML = TIGY.socials.slice(0, 2).map(function (s) {
+            return '<li><a class="pad light social" href="#" aria-label="' + U.esc(s.label + ': ' + s.handle) + '">' + logo(s.brand) + '<span class="handle ph">' + U.esc(s.handle) + '</span></a></li>';
+          }).join('');
+        });
+
+        var s = function (style) {
+          return '<svg viewBox="0 0 200 18" style="' + style + '" aria-hidden="true"><path d="' + STRIPE + '"/></svg>';
+        };
+        document.getElementById('stripe-demo').innerHTML =
+          s('left:-4%;top:14%;width:58%;transform:rotate(4deg)') + s('left:-6%;top:52%;width:40%;transform:rotate(-3deg)') +
+          s('right:-4%;top:30%;width:52%;transform:scaleX(-1) rotate(5deg)') + s('right:-6%;top:70%;width:36%;transform:scaleX(-1) rotate(-4deg)');
+
+        // Palettes: both themes side by side, with the key contrast pairs
+        var PALETTES = [
+          { cls: 'light', name: 'Light', colors: [
+            ['Tigy Fur', '#f5a742', 'Page'], ['Deep Fur', '#e48c2b', 'Ledges, tail rings'], ['Light Fur', '#f9c27a', 'Tags, quiet fills'],
+            ['Muzzle Cream', '#fde3bc', 'Panels, tile fill'], ['Light Cream', '#fff3e0', 'Raised controls'], ['Stripe Maroon', '#4b1416', 'Text, primary button, stripes'],
+            ['Soft Maroon', '#6e2422', 'Secondary text'], ['Paw Pink', '#f4a3ad', 'Pressables, accents'], ['Deep Paw Pink', '#e07c8b', 'Pink ledges'], ['Stage', '#2a0b0c', 'Behind the open piece'] ],
+            pairs: [['Stripe Maroon', '#4b1416', 'Tigy Fur', '#f5a742'], ['Stripe Maroon', '#4b1416', 'Muzzle Cream', '#fde3bc'], ['Stripe Maroon', '#4b1416', 'Paw Pink', '#f4a3ad']] },
+          { cls: 'dark', name: 'Dark', colors: [
+            ['Night Page', '#2a0d0e', 'Page'], ['Night Deep', '#1c0708', 'Ledges'], ['Night Raised', '#4a1b1b', 'Tags, quiet fills'],
+            ['Night Panel', '#3d1718', 'Panels, tile fill'], ['Night Panel Light', '#4d2020', 'Raised controls'], ['Muzzle Cream', '#fde3bc', 'Text'],
+            ['Night Soft Ink', '#f0c99a', 'Secondary text'], ['Tigy Fur', '#f5a742', 'Accent, primary button, stripes'], ['Paw Pink', '#f4a3ad', 'Pressables, accents'], ['Stage', '#160506', 'Behind the open piece'] ],
+            pairs: [['Muzzle Cream', '#fde3bc', 'Night Page', '#2a0d0e'], ['Night Soft Ink', '#f0c99a', 'Night Panel', '#3d1718'], ['Night Page', '#2a0b0c', 'Tigy Fur', '#f5a742']] },
+        ];
+        function lum(hex) {
+          var c = [1, 3, 5].map(function (i) { var v = parseInt(hex.substr(i, 2), 16) / 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); });
+          return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+        }
+        function ratio(a, b) {
+          var x = lum(a), y = lum(b);
+          return ((Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05)).toFixed(1);
+        }
+        document.getElementById('palettes').innerHTML = PALETTES.map(function (p) {
+          return (
+            '<div class="palette ' + p.cls + '"><h3>' + p.name + '</h3><div class="swatches">' +
+            p.colors.map(function (c) {
+              return '<div class="swatch"><div class="chip-color" style="background:' + c[1] + '"></div><div class="meta"><b>' + c[0] + '</b><code>' + c[1] + '</code><br>' + c[2] + '</div></div>';
+            }).join('') +
+            '</div><div class="contrast">' +
+            p.pairs.map(function (q) { return '<span>' + q[0] + ' on ' + q[2] + ': ' + ratio(q[1], q[3]) + ':1</span>'; }).join('') +
+            '</div></div>'
+          );
+        }).join('');
+
+        // Light / dark preview of the whole sheet
+        function paint() {
+          var t = document.documentElement.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+          document.querySelectorAll('[data-theme-pick]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.themePick === t)); });
+        }
+        document.querySelectorAll('[data-theme-pick]').forEach(function (b) {
+          b.addEventListener('click', function () {
+            document.documentElement.dataset.theme = b.dataset.themePick;
+            try { localStorage.setItem('tigy-mock-theme', b.dataset.themePick); } catch (e) {}
+            paint();
+          });
+        });
+        paint();
+      })();
+    </script>
+  </body>
+</html>

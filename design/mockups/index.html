@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Tigy</title>
+    <meta name="description" content="Art of Tigy the tiger, with credit to every artist." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Grandstander:wght@600;700;800&family=Nunito:wght@400;600;700;800&display=swap"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <!-- Applied before first paint, so a chosen theme never flashes the other one -->
+    <script>
+      try {
+        var t = localStorage.getItem('tigy-mock-theme');
+        if (t) document.documentElement.dataset.theme = t;
+      } catch (e) {}
+    </script>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="logo" href="index.html"><span data-mark></span>Tigy</a>
+      <div class="topbar-right">
+        <button type="button" class="round theme-btn" data-theme-toggle></button>
+        <label class="switch">
+          <span class="label">Show NSFW</span>
+          <input type="checkbox" role="switch" data-nsfw-switch />
+          <span class="track" aria-hidden="true"><span class="thumb" data-paw></span></span>
+        </label>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero" aria-labelledby="intro-h">
+        <div class="head">
+          <img class="avatar" src="assets/tigy-portrait.gif" alt="Tigy, animated portrait" width="560" height="560" />
+          <div>
+            <h1 id="intro-h"><span data-mark></span>Tigy</h1>
+            <p class="bio">A tiger</p>
+            <p class="meta" id="meta"></p>
+            <ul class="socials" data-socials aria-label="Tigy elsewhere"></ul>
+          </div>
+        </div>
+      </section>
+
+      <div id="stripes"></div>
+
+      <section aria-labelledby="album-h">
+        <div class="album">
+          <div class="album-head">
+            <h2 id="album-h">All the art</h2>
+            <p id="count"></p>
+          </div>
+        </div>
+        <!-- Design only: filters are planned for later and do nothing yet -->
+        <div class="filters-bar">
+          <div class="album">
+            <div class="filters" role="group" aria-label="Filter the art (coming later)">
+              <button type="button" class="filter-chip" data-icon="users" aria-disabled="true" title="Filters are coming later">Characters</button>
+              <button type="button" class="filter-chip" data-icon="palette" aria-disabled="true" title="Filters are coming later">Artists</button>
+              <button type="button" class="filter-chip" data-icon="tag" aria-disabled="true" title="Filters are coming later">Tags</button>
+              <button type="button" class="filter-chip" data-icon="calendar" aria-disabled="true" title="Filters are coming later">Year</button>
+              <span class="filters-note">Filters coming later</span>
+            </div>
+          </div>
+        </div>
+        <div class="album" id="photos"></div>
+        <div class="album"><div class="sentinel" id="sentinel" role="status"></div></div>
+      </section>
+    </main>
+
+    <div class="timeline" id="timeline" aria-hidden="true"></div>
+    <div class="date-pill" id="date-pill" aria-hidden="true"></div>
+    <div class="tail" id="tail" aria-hidden="true"></div>
+
+
+    <script src="shared/data.js"></script>
+    <script src="shared/common.js"></script>
+    <script src="shared/brands.js"></script>
+    <script src="app.js"></script>
+    <script>
+      TigyAlbum.home();
+    </script>
+  </body>
+</html>
