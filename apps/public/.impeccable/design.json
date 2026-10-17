@@ -1,0 +1,474 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-17T14:04:06.698Z",
+  "title": "Design System: Tigy",
+  "extensions": {
+    "colorMeta": {
+      "fur": {
+        "role": "primary",
+        "displayName": "Tigy Fur",
+        "canonical": "oklch(78.7% 0.145 69.3)",
+        "tonalRamp": [
+          "#2b0000",
+          "#4c0300",
+          "#6d2800",
+          "#904900",
+          "#b36a00",
+          "#d78b1b",
+          "#ffb14e",
+          "#ffe7ba"
+        ]
+      },
+      "fur-deep": {
+        "role": "primary",
+        "displayName": "Deep Fur",
+        "canonical": "oklch(71.7% 0.149 62.8)",
+        "tonalRamp": [
+          "#2e0000",
+          "#500000",
+          "#722200",
+          "#954400",
+          "#b96500",
+          "#de8723",
+          "#ffad52",
+          "#ffe4bb"
+        ]
+      },
+      "fur-light": {
+        "role": "primary",
+        "displayName": "Light Fur",
+        "canonical": "oklch(84.8% 0.109 72.9)",
+        "tonalRamp": [
+          "#230000",
+          "#421500",
+          "#613300",
+          "#825200",
+          "#a47226",
+          "#c8934b",
+          "#efb971",
+          "#ffeac7"
+        ]
+      },
+      "stripe-maroon": {
+        "role": "secondary",
+        "displayName": "Stripe Maroon",
+        "canonical": "oklch(28.4% 0.083 22.1)",
+        "tonalRamp": [
+          "#240000",
+          "#440d10",
+          "#652b2b",
+          "#864948",
+          "#a96967",
+          "#cd8a87",
+          "#f6afac",
+          "#ffe4e2"
+        ]
+      },
+      "stripe-maroon-soft": {
+        "role": "secondary",
+        "displayName": "Soft Maroon",
+        "canonical": "oklch(37.3% 0.106 25.2)",
+        "tonalRamp": [
+          "#2a0000",
+          "#4b0005",
+          "#6d2321",
+          "#90433e",
+          "#b4635d",
+          "#d8847d",
+          "#ffa9a1",
+          "#ffe2dd"
+        ]
+      },
+      "paw-pink": {
+        "role": "tertiary",
+        "displayName": "Paw Pink",
+        "canonical": "oklch(79.7% 0.097 11.4)",
+        "tonalRamp": [
+          "#270003",
+          "#470418",
+          "#692532",
+          "#8b4450",
+          "#af646e",
+          "#d3858f",
+          "#fcaab4",
+          "#ffe2e6"
+        ]
+      },
+      "paw-pink-deep": {
+        "role": "tertiary",
+        "displayName": "Deep Paw Pink",
+        "canonical": "oklch(70.0% 0.124 11.2)",
+        "tonalRamp": [
+          "#2d0001",
+          "#4f0014",
+          "#72182f",
+          "#963a4c",
+          "#ba5b6a",
+          "#e07c8b",
+          "#ffa1b0",
+          "#ffdee4"
+        ]
+      },
+      "cream": {
+        "role": "neutral",
+        "displayName": "Muzzle Cream",
+        "canonical": "oklch(92.7% 0.058 77.9)",
+        "tonalRamp": [
+          "#180600",
+          "#332000",
+          "#513c19",
+          "#705a37",
+          "#917955",
+          "#b39a76",
+          "#d9c09a",
+          "#faedd9"
+        ]
+      },
+      "cream-light": {
+        "role": "neutral",
+        "displayName": "Light Cream",
+        "canonical": "oklch(96.9% 0.028 79.5)",
+        "tonalRamp": [
+          "#110a01",
+          "#2b2314",
+          "#483e2f",
+          "#665c4c",
+          "#867c6b",
+          "#a89d8b",
+          "#cec2b0",
+          "#f4eee4"
+        ]
+      },
+      "night-page": {
+        "role": "neutral",
+        "displayName": "Night Page",
+        "canonical": "oklch(20.7% 0.048 20.2)",
+        "tonalRamp": [
+          "#1b0204",
+          "#381a1a",
+          "#573535",
+          "#775352",
+          "#987271",
+          "#bb9392",
+          "#e2b8b7",
+          "#ffe8e8"
+        ]
+      },
+      "night-page-deep": {
+        "role": "neutral",
+        "displayName": "Night Deep",
+        "canonical": "oklch(16.5% 0.038 18.7)",
+        "tonalRamp": [
+          "#180506",
+          "#341c1d",
+          "#523838",
+          "#725555",
+          "#937574",
+          "#b59695",
+          "#dcbbbb",
+          "#fbeae9"
+        ]
+      },
+      "night-raised": {
+        "role": "neutral",
+        "displayName": "Night Raised",
+        "canonical": "oklch(29.4% 0.072 22.5)",
+        "tonalRamp": [
+          "#220001",
+          "#401213",
+          "#602f2e",
+          "#824d4b",
+          "#a46c69",
+          "#c88d8a",
+          "#efb2af",
+          "#ffe6e3"
+        ]
+      },
+      "night-panel": {
+        "role": "neutral",
+        "displayName": "Night Panel",
+        "canonical": "oklch(26.3% 0.060 20.5)",
+        "tonalRamp": [
+          "#1e0002",
+          "#3c1617",
+          "#5b3232",
+          "#7c504f",
+          "#9e6f6e",
+          "#c1908f",
+          "#e9b5b4",
+          "#ffe7e6"
+        ]
+      },
+      "night-panel-light": {
+        "role": "neutral",
+        "displayName": "Night Panel Light",
+        "canonical": "oklch(30.9% 0.068 21.9)",
+        "tonalRamp": [
+          "#210001",
+          "#3f1414",
+          "#5f302f",
+          "#804e4c",
+          "#a26d6b",
+          "#c68e8b",
+          "#edb3b0",
+          "#ffe6e4"
+        ]
+      },
+      "night-ink-soft": {
+        "role": "neutral",
+        "displayName": "Night Soft Ink",
+        "canonical": "oklch(85.8% 0.076 71.8)",
+        "tonalRamp": [
+          "#1d0300",
+          "#3a1c00",
+          "#583806",
+          "#785629",
+          "#997649",
+          "#bc976a",
+          "#e3bd8e",
+          "#ffebd4"
+        ]
+      },
+      "stage": {
+        "role": "neutral",
+        "displayName": "Stage",
+        "canonical": "oklch(20.3% 0.052 21.0)",
+        "tonalRamp": [
+          "#1c0203",
+          "#391919",
+          "#583434",
+          "#785251",
+          "#9a7170",
+          "#bd9291",
+          "#e4b7b6",
+          "#ffe8e7"
+        ]
+      },
+      "stage-night": {
+        "role": "neutral",
+        "displayName": "Stage (dark mode)",
+        "canonical": "oklch(14.7% 0.033 17.2)",
+        "tonalRamp": [
+          "#170506",
+          "#321d1e",
+          "#503939",
+          "#6f5657",
+          "#907676",
+          "#b29797",
+          "#d9bcbc",
+          "#f9eaea"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "The Tigy name in the home header."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Section titles such as All the art."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Piece titles; NSFW and not-found headings."
+      },
+      "logo": {
+        "displayName": "Logo",
+        "purpose": "Top-bar wordmark with the forehead mark."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Bio, descriptions and credits."
+      },
+      "button": {
+        "displayName": "Button",
+        "purpose": "Buttons, chips and social links."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Credits field labels, tags and badges."
+      }
+    },
+    "shadows": [
+      {
+        "name": "ledge",
+        "value": "0 2px 0 #e48c2b",
+        "purpose": "Raised controls at rest (0 3px 0 #e07c8b under pink buttons)."
+      },
+      {
+        "name": "lifted-tile",
+        "value": "0 2px 0 #e48c2b, 0 16px 26px -14px rgb(0 0 0 / 0.5)",
+        "purpose": "A gallery tile on hover or focus."
+      },
+      {
+        "name": "panel",
+        "value": "0 2px 0 #e48c2b, 0 18px 34px -20px rgb(75 20 22 / 0.55)",
+        "purpose": "The NSFW and not-found panels."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-out",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Fades, reveals and the viewer opening."
+      },
+      {
+        "name": "ease-squish",
+        "value": "cubic-bezier(0.34, 1.3, 0.64, 1)",
+        "purpose": "Small springy presses and lifts on buttons, tiles and the switch thumb."
+      },
+      {
+        "name": "paw-steps",
+        "value": "1100ms, 160ms stagger",
+        "purpose": "Three paw prints walking up a gallery tile on hover."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "viewer-stack",
+        "value": "1100px"
+      },
+      {
+        "name": "phone",
+        "value": "720px"
+      },
+      {
+        "name": "header-stack",
+        "value": "560px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The main action on a page, such as Download original. Maroon with cream text (fur with maroon text in dark mode).",
+      "html": "<button class=\"ds-btn-primary\"><svg viewBox=\"0 0 24 24\" width=\"18\" height=\"18\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"M12 12.6c-3.1 0-6.3 3.4-6.3 5.9 0 1.9 1.5 2.6 3.1 2.6 1.3 0 2.1-.7 3.2-.7s1.9.7 3.2.7c1.6 0 3.1-.7 3.1-2.6 0-2.5-3.2-5.9-6.3-5.9z\"/><ellipse cx=\"4.6\" cy=\"10.4\" rx=\"1.9\" ry=\"2.5\" transform=\"rotate(-22 4.6 10.4)\"/><ellipse cx=\"9\" cy=\"6.2\" rx=\"2\" ry=\"2.7\" transform=\"rotate(-8 9 6.2)\"/><ellipse cx=\"15\" cy=\"6.2\" rx=\"2\" ry=\"2.7\" transform=\"rotate(8 15 6.2)\"/><ellipse cx=\"19.4\" cy=\"10.4\" rx=\"1.9\" ry=\"2.5\" transform=\"rotate(22 19.4 10.4)\"/></svg>Download original</button>",
+      "css": ".ds-btn-primary{display:inline-flex;align-items:center;gap:8px;min-height:46px;padding:10px 20px;border:0;border-radius:8px;font:800 0.95rem/1.2 Nunito,system-ui,sans-serif;text-decoration:none;cursor:pointer;transition:transform 260ms cubic-bezier(0.34,1.3,0.64,1),box-shadow 200ms;background:#4b1416;color:#fde3bc;box-shadow:0 3px 0 rgb(0 0 0 / 0.35)}.ds-btn-primary:hover{transform:translateY(-2px) scale(1.03)}.ds-btn-primary:active{transform:translateY(2px) scale(0.97)}.ds-btn-primary:focus-visible{outline:3px solid #4b1416;outline-offset:3px}"
+    },
+    {
+      "name": "Paw button",
+      "kind": "button",
+      "refersTo": "button-paw",
+      "description": "Paw-pink action such as Share; pink is reserved for things you press.",
+      "html": "<button class=\"ds-btn-paw\">Share</button>",
+      "css": ".ds-btn-paw{display:inline-flex;align-items:center;gap:8px;min-height:46px;padding:10px 20px;border:0;border-radius:8px;font:800 0.95rem/1.2 Nunito,system-ui,sans-serif;text-decoration:none;cursor:pointer;transition:transform 260ms cubic-bezier(0.34,1.3,0.64,1),box-shadow 200ms;background:#f4a3ad;color:#4b1416;box-shadow:0 3px 0 #e07c8b}.ds-btn-paw:hover{transform:translateY(-2px) scale(1.03)}.ds-btn-paw:active{transform:translateY(2px) scale(0.97)}.ds-btn-paw:focus-visible{outline:3px solid #4b1416;outline-offset:3px}"
+    },
+    {
+      "name": "Light button",
+      "kind": "button",
+      "refersTo": "button-light",
+      "description": "Quiet actions and social links, light cream on the fur page.",
+      "html": "<a class=\"ds-btn-light\" href=\"#\">Bluesky <span style=\"opacity:.75;font-weight:600\">@handle</span></a>",
+      "css": ".ds-btn-light{display:inline-flex;align-items:center;gap:8px;min-height:46px;padding:10px 20px;border:0;border-radius:8px;font:800 0.95rem/1.2 Nunito,system-ui,sans-serif;text-decoration:none;cursor:pointer;transition:transform 260ms cubic-bezier(0.34,1.3,0.64,1),box-shadow 200ms;background:#fff3e0;color:#4b1416;box-shadow:0 3px 0 #e48c2b}.ds-btn-light:hover{transform:translateY(-2px) scale(1.03)}.ds-btn-light:active{transform:translateY(2px) scale(0.97)}.ds-btn-light:focus-visible{outline:3px solid #4b1416;outline-offset:3px}"
+    },
+    {
+      "name": "Filter chip",
+      "kind": "chip",
+      "refersTo": "filter-chip",
+      "description": "A dropdown in the filter row above the gallery (design only for now).",
+      "html": "<button class=\"ds-filter\"><svg viewBox=\"0 0 24 24\" width=\"18\" height=\"18\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z\"/></svg>Tags<svg viewBox=\"0 0 24 24\" width=\"16\" height=\"16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\" aria-hidden=\"true\"><path d=\"m6 9 6 6 6-6\"/></svg></button>",
+      "css": ".ds-filter{display:inline-flex;align-items:center;gap:6px;min-height:42px;padding:6px 10px 6px 14px;border:2px solid rgb(75 20 22 / 0.22);border-radius:8px;background:#fff3e0;color:#4b1416;font:800 0.92rem Nunito,system-ui,sans-serif;cursor:pointer}.ds-filter:hover{border-color:#4b1416}.ds-filter:focus-visible{outline:3px solid #4b1416;outline-offset:3px}"
+    },
+    {
+      "name": "Tag",
+      "kind": "chip",
+      "refersTo": "tag",
+      "description": "A tag on the credits panel.",
+      "html": "<a class=\"ds-tag\" href=\"#\">#comic</a>",
+      "css": ".ds-tag{display:inline-block;padding:4px 12px;border-radius:6px;background:#f9c27a;color:#4b1416;font:800 0.86rem Nunito,system-ui,sans-serif;text-decoration:none;transition:transform 220ms cubic-bezier(0.34,1.3,0.64,1)}.ds-tag:hover{transform:scale(1.06)}.ds-tag:focus-visible{outline:3px solid #4b1416;outline-offset:3px}"
+    },
+    {
+      "name": "Gallery tile",
+      "kind": "card",
+      "refersTo": "gallery-tile",
+      "description": "One piece in the justified gallery at its real shape; lifts, shows its title and walks paw prints on hover.",
+      "html": "<a class=\"ds-tile\" href=\"#\"><span class=\"ds-badge\">GIF</span><span class=\"ds-tile-label\">Tigy portrait</span></a>",
+      "css": ".ds-tile{position:relative;display:block;width:220px;height:180px;border-radius:8px;background:#fde3bc;box-shadow:0 2px 0 #e48c2b;transition:transform 380ms cubic-bezier(0.34,1.3,0.64,1),box-shadow 300ms}.ds-tile:hover,.ds-tile:focus-visible{transform:translateY(-5px) rotate(-1.2deg) scale(1.02);box-shadow:0 2px 0 #e48c2b,0 16px 26px -14px rgb(0 0 0 / 0.5);outline:none}.ds-badge{position:absolute;top:8px;left:8px;padding:2px 10px;border-radius:6px;background:#4b1416;color:#fde3bc;font:800 0.72rem Nunito,system-ui,sans-serif}.ds-tile-label{position:absolute;left:8px;bottom:8px;padding:4px 12px;border-radius:6px;background:#fff3e0;color:#4b1416;font:700 0.9rem Grandstander,Nunito,sans-serif;opacity:0;transition:opacity 200ms}.ds-tile:hover .ds-tile-label,.ds-tile:focus-visible .ds-tile-label{opacity:1}"
+    },
+    {
+      "name": "Social link",
+      "kind": "button",
+      "refersTo": "button-light",
+      "description": "A social link: the network logo from Simple Icons in the text colour, plus the handle; logo-only on phones.",
+      "html": "<a class=\"ds-social\" href=\"#\" aria-label=\"Twitter: @handle\"><svg viewBox=\"0 0 24 24\" width=\"18\" height=\"18\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"M21.543 7.104c.015.211.015.423.015.636 0 6.507-4.954 14.01-14.01 14.01v-.003A13.94 13.94 0 0 1 0 19.539a9.88 9.88 0 0 0 7.287-2.041 4.93 4.93 0 0 1-4.6-3.42 4.916 4.916 0 0 0 2.223-.084A4.926 4.926 0 0 1 .96 9.167v-.062a4.887 4.887 0 0 0 2.235.616A4.928 4.928 0 0 1 1.67 3.148 13.98 13.98 0 0 0 11.82 8.292a4.929 4.929 0 0 1 8.39-4.49 9.868 9.868 0 0 0 3.128-1.196 4.941 4.941 0 0 1-2.165 2.724A9.828 9.828 0 0 0 24 4.555a10.019 10.019 0 0 1-2.457 2.549z\"/></svg><span>@handle</span></a>",
+      "css": ".ds-social{display:inline-flex;align-items:center;gap:8px;min-height:46px;padding:10px 20px;border:0;border-radius:8px;font:800 0.95rem/1.2 Nunito,system-ui,sans-serif;text-decoration:none;cursor:pointer;transition:transform 260ms cubic-bezier(0.34,1.3,0.64,1),box-shadow 200ms;padding:10px 18px 10px 14px;background:#fff3e0;color:#4b1416;box-shadow:0 3px 0 #e48c2b}.ds-social:hover{transform:translateY(-2px) scale(1.03)}.ds-social:active{transform:translateY(2px) scale(0.97)}.ds-social:focus-visible{outline:3px solid #4b1416;outline-offset:3px}"
+    },
+    {
+      "name": "Top bar",
+      "kind": "nav",
+      "refersTo": "icon-button",
+      "description": "Sticky top bar: forehead mark and wordmark, the Show NSFW switch.",
+      "html": "<header class=\"ds-bar\"><span class=\"ds-logo\"><svg viewBox=\"0 0 24 24\" width=\"26\" height=\"26\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"M12.6 1.5c.9 0 1.3 1.2 1.2 3.4l-.5 15.4c-.1 1.4-.5 2.2-1.2 2.2s-1-.8-1-2.2l-.3-15.4c0-2.2.6-3.4 1.8-3.4z\"/><path d=\"M4.5 8.6c4.6-1.3 10.5-1.6 15.4-.7.9.2.9 1.1 0 1.2-4.9.6-10.4.9-15.2.8-1.2 0-1.3-1-.2-1.3z\"/><path d=\"M6 14.1c3.9-1 8.8-1.2 12.8-.5.8.1.8 1 0 1.1-4 .5-8.6.7-12.6.6-1 0-1.1-.9-.2-1.2z\"/></svg>Tigy</span><span class=\"ds-switch\">Show NSFW<span class=\"ds-track\"><span class=\"ds-thumb\"></span></span></span></header>",
+      "css": ".ds-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 16px;background:#f5a742;color:#4b1416;width:420px}.ds-logo{display:inline-flex;align-items:center;gap:8px;font:800 1.7rem/1 Grandstander,Nunito,sans-serif}.ds-switch{display:inline-flex;align-items:center;gap:10px;min-height:44px;padding:6px 8px 6px 16px;border-radius:8px;background:#fff3e0;box-shadow:0 2px 0 #e48c2b;font:800 0.88rem Nunito,system-ui,sans-serif}.ds-track{position:relative;width:50px;height:30px;border-radius:8px;background:#fde3bc;box-shadow:inset 0 0 0 2px #4b1416}.ds-thumb{position:absolute;top:4px;left:4px;width:22px;height:22px;border-radius:50%;background:#4b1416}"
+    }
+  ],
+  "narrative": {
+    "northStar": "Tigy's Album",
+    "overview": "A photo album that wears Tigy's coat. The mechanics are those of a familiar photo library — a justified gallery that keeps every piece at its real shape, loads as you scroll, and opens into a viewer with a credits panel — and the surface is taken from Tigy: fur orange, cream from the muzzle and chest, maroon from the stripes, pink from the paw pads, and a ringed tail. The album makes the art easy to browse; the coat makes it unmistakably Tigy's.\n\nThe art always leads. Tigy's markings live on the frame — the page, the header, the dividers, the controls — and never on top of a piece. The page is light and fur-orange by day and turns to Tigy's maroon stripes at night, with the fur becoming the accent. Cute is welcome, but in small doses: a paw-print hover, paw prints while more art loads, a tail that fills as you scroll.\n\nThe site is not a card stack: content sits straight on the page, the credits panel is a flat side panel, and there is no footer.",
+    "keyCharacteristics": [
+      "Fur-orange page (light) and stripe-maroon page (dark), both from Tigy's own colours; visitors can pick Automatic, Light or Dark.",
+      "One continuous justified gallery, newest first, thumbnails at each piece's real shape, no year or month sections.",
+      "Three corner steps: 6px for small labels, 8px for almost everything, 16px for panels; only faces, the tail and the paw thumb are fully round.",
+      "Grandstander for display, Nunito for everything you read.",
+      "Signature markings: the forehead mark, tapered flank stripes, paw prints, the ringed tail."
+    ],
+    "rules": [
+      {
+        "name": "The Coat Rule",
+        "body": "Colours come from Tigy's markings only: fur, cream, stripe maroon, paw pink. A new colour needs a place on Tigy to come from.",
+        "section": "colors"
+      },
+      {
+        "name": "The Pink Pad Rule",
+        "body": "Paw Pink marks things you press and Tigy's own accents (the avatar ring, the hover paws). It is never a background for content.",
+        "section": "colors"
+      },
+      {
+        "name": "The Night Swap Rule",
+        "body": "Dark mode swaps roles rather than inventing colours: the page becomes stripe maroon, text becomes muzzle cream, and fur becomes the accent.",
+        "section": "colors"
+      },
+      {
+        "name": "The Two Voices Rule",
+        "body": "Grandstander is only for names and headings (Tigy, section titles, piece titles, tile hover labels). Anything a visitor reads or presses is Nunito.",
+        "section": "typography"
+      },
+      {
+        "name": "The Press Rule",
+        "body": "Only things you can press get a ledge. Text, panels at rest and the art itself stay flat.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Three Steps Rule",
+        "body": "Corners are 6px, 8px or 16px; nothing in between. Full circles are reserved for faces (avatar, people dots), the tail and the paw thumb.",
+        "section": "shapes"
+      },
+      {
+        "name": "The One Set Rule",
+        "body": "Every interface icon comes from Lucide at one line weight. Social logos and Tigy's own shapes are the only exceptions.",
+        "section": "components"
+      }
+    ],
+    "dos": [
+      "**Do** keep thumbnails at each piece's real shape; never crop to squares.",
+      "**Do** keep the gallery one continuous run, newest first, with no year or month headings.",
+      "**Do** keep content straight on the page: an open header, a flat credits panel, no footer.",
+      "**Do** keep the art on a calm surface: cream behind thumbnails, the dark stage behind the open piece.",
+      "**Do** use Paw Pink only for things you press and Tigy's own accents.",
+      "**Do** use the forehead mark (one long stroke, two crossings) as the logo mark.",
+      "**Do** draw social logos from Simple Icons in one colour, the button's text colour."
+    ],
+    "donts": [
+      "**Don't** put stripes or other markings over or behind a piece of art.",
+      "**Don't** wrap content in cards: no card around the header, the credits or the NSFW toggle.",
+      "**Don't** round everything: no pills, and circles only for faces, the tail and the paw thumb.",
+      "**Don't** add a footer; social links live in the home header.",
+      "**Don't** replace the browser's scrollbar; the tail timeline sits beside it.",
+      "**Don't** use Grandstander for running text or controls.",
+      "**Don't** mix icon sets, or show social logos in their brand colours."
+    ]
+  }
+}
