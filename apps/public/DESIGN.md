@@ -243,7 +243,7 @@ Only a few things are fully round, because Tigy is: the avatar (Tigy's face) and
 - **Hover / Focus:** lifts 5px with a slight tilt, shows the title in a cream label at the bottom, and walks three pink paw prints up the top-right corner.
 
 ### Credits panel
-- **Style:** a flat, full-height cream side panel next to the stage (no card inside it), with the title in Grandstander and icon rows for date, artists, characters with owners, tags, set and the original file.
+- **Style:** a flat, full-height cream side panel next to the stage (no card inside it), with the title in Grandstander and icon rows for date, artists, characters with links to their owners, tags, set and the original file.
 - **Phones:** the same content as a full-width cream section under the stage.
 
 ### Navigation

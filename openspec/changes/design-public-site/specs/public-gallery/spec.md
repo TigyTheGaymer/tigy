@@ -98,7 +98,7 @@ The artwork page SHALL open the original file in a full view that fills the scre
 - **THEN** the full view closes and the artwork page is shown again
 
 ### Requirement: Credits panel on the artwork page
-The artwork page SHALL show the piece's title, description, date, artists with their links, characters with their owners and links, tags, set and other versions, and the original file's format, size and dimensions, each only when set. On wide screens the panel SHALL sit beside the piece and can be closed; on narrower screens it SHALL sit below the piece.
+The artwork page SHALL show the piece's title, description, date, artists with their links, characters with links to their owners, tags, set and other versions, and the original file's format, size and dimensions, each only when set. On wide screens the panel SHALL sit beside the piece and can be closed; on narrower screens it SHALL sit below the piece.
 
 #### Scenario: Wide screen
 - **WHEN** a visitor opens an artwork page on a desktop screen

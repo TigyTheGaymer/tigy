@@ -398,12 +398,12 @@
         if (c.own)
           return (
             '<div class="person"><span class="person-dot own" aria-hidden="true"><img src="assets/tigy-portrait.gif" alt=""></span><div>' +
-            '<span class="person-name"><a href="index.html">Tigy</a></span><span class="person-meta">This album’s tiger</span></div></div>'
+            '<span class="person-name"><a href="index.html">Tigy</a></span></div></div>'
           );
         return (
           '<div class="person"><span class="person-dot" aria-hidden="true">' + esc(c.name.charAt(0)) + '</span><div>' +
           '<span class="person-name"><a href="#">' + U.ph(c.name, c.placeholder) + '</a></span>' +
-          '<span class="person-meta">owned by ' + U.ph(c.owner.name, c.placeholder) + '</span>' + personLinks(c.owner.links) + '</div></div>'
+          personLinks(c.owner.links) + '</div></div>'
         );
       })
       .join('');

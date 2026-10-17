@@ -40,7 +40,7 @@ Constraints from the earlier changes that a design must respect:
 **Artwork detail page (D3).** It carries:
 - the image at page size, opening a **fullscreen view with zoom and pan** for detailed pieces;
 - **previous/next** in gallery date order, with arrow keys and swipe;
-- title, **artists** (one or more, each with links), **characters** (one or more, each credited to its owner with links), **tags**, date, description, each only when set;
+- title, **artists** (one or more, each with links), **characters** (one or more, each with links to its owner), **tags**, date, description, each only when set;
 - **other versions** in the same set (for example a clean and an NSFW version of one piece);
 - **download** of the original file;
 - **share** (the phone's share sheet) or copy link;
