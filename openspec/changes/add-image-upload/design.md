@@ -82,7 +82,8 @@ uploads/{id}/file  --(finalize, uploads/** only)-->  function
    |                 filename (e.g. artist-title-date.ext)
    |- full.webp      1200px, thumb.webp 400px (animated if the source is),
    |                 WebP 'drawing' preset, never upscaled
-   |- preview.jpg    still image, first frame if animated, used for og:image (SFW only)
+   |- preview.jpg    still image, first frame if animated, used for og:image (SFW only);
+   |                 transparent areas filled with a set colour
    |- Cache-Control  public, max-age=31536000, immutable on all outputs
    |- doc            status ready, files, animated, width, height, masterName
    '- delete uploads/{id}/...   only after every output is written and the doc is ready
@@ -98,6 +99,7 @@ on failure: status error + message; the upload is kept so the owner can retry
   - When the source's EXIF orientation is not 1, a minimal EXIF holding only the orientation is written back, so photos still display upright.
   - The stripper moves into `apps/functions` with small synthetic fixtures; artists' originals are not committed.
 - **Animated sources** (GIF/APNG/animated WebP) are detected by `pages > 1` and processed with `{ animated: true }`.
+- **Transparent sources** (sticker-style art is common in the collection) keep their alpha in `thumb.webp` and `full.webp`. JPEG has no alpha, and sharp fills transparent areas with black by default, which turns dark-outlined stickers into a black square in link previews. `preview.jpg` is therefore flattened onto a set fill colour (sharp `flatten({ background })`). The colour comes from the public site's chosen design direction (`design-public-site`).
 - **A size guard** (width × height × frames) rejects absurd inputs with a clear error.
 - **Function settings:** 2 GiB memory, 300 s timeout, concurrency 1, max 3 instances, automatic retries off.
 - **Replacing an image's file** issues new token URLs, so caches update without versioned filenames. The public `/img` addresses (A14) carry a version taken from the token, so they change too.
@@ -113,3 +115,4 @@ on failure: status error + message; the upload is kept so the owner can retry
 ## Open Questions
 
 - Exact WebP quality settings and the `preview.jpg` dimensions. These are tuned on real art during implementation.
+- The fill colour behind transparent art in `preview.jpg`, taken from the public site's chosen design direction.
