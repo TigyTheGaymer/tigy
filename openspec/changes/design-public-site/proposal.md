@@ -2,7 +2,7 @@
 
 ## Why
 
-`add-public-gallery`, `add-nsfw-handling` and `add-artists` define what the public site does, but all three leave its visual design and browsing controls to "a separate UI/UX change". This is that change. The site has a confirmed purpose: a showcase of art of Tigy, the owner's fursona, and a hub for the owner's socials. A mockup round compared several visual directions as static mockups, and the owner chose one: **Tigy's Album**, a photo album wearing Tigy's coat. This change records that design and builds it into `apps/public`.
+This change is the public site's visual design and browsing controls. The feature changes that define the site's data and pages were removed so they can be written again from scratch, starting from this mockup. The site has a confirmed purpose: a showcase of art of Tigy, the owner's fursona, and a hub for the owner's socials. A mockup round compared several visual directions as static mockups, and the owner chose one: **Tigy's Album**, a photo album wearing Tigy's coat. This change records that design and builds it into `apps/public`.
 
 ## What Changes
 
@@ -22,15 +22,15 @@ Out of scope: the person, character and tag pages and the working filters (they 
 
 ### New Capabilities
 
-- None. Whether people, characters and tags become a capability of their own is decided with the paused data model.
+- `public-gallery`: the home header and social links, the gallery layout and its loading, the tail timeline, the artwork viewer and credits panel, the theme switch, and where the NSFW switch and confirm panel live. Whether people, characters and tags become a capability of their own is decided with the data model.
 
 ### Modified Capabilities
 
-- `public-gallery` (introduced by `add-public-gallery`): the home header and social links, the gallery layout and its loading, the tail timeline, the artwork viewer and credits panel, the theme switch, and where the NSFW switch and confirm panel live.
+- None.
 
 ## Impact
 
 - **Code:** `apps/public` (global styles and tokens, top bar, home header, gallery, timeline, artwork page, theme switch, icons).
 - **Dependencies:** `lucide-angular` for interface icons; the four Simple Icons social logos as copied SVGs; Grandstander and Nunito as self-hosted fonts.
 - **Design references:** `apps/public/DESIGN.md` and `apps/public/.impeccable/design.json` (normative visual system), `design/mockups/` (the mockup, design sheet and font alternates, with the provided art in `design/mockups/assets/`).
-- **Other changes:** builds on `add-public-gallery` and `add-nsfw-handling`; `add-artists` may be reworked into people, characters and tags when the data model resumes.
+- **Other changes:** needs the feature changes (not yet written) that store the images and create the public pages; this change styles and extends those pages.

@@ -1,6 +1,6 @@
 # Tasks
 
-Build order: this change styles and extends the public pages that `add-public-gallery` and `add-nsfw-handling` create, so it is implemented after them. `apps/public/DESIGN.md` is the normative visual system; the mockup in `design/mockups/` (`index.html`, `detail.html`, `design-sheet.html`) is the reference for look and behaviour. It replaces the plain "next page" placeholder from `add-public-gallery`.
+Build order: this change styles and extends the public pages that the feature changes (not yet written) create, so it is implemented after them. `apps/public/DESIGN.md` is the normative visual system; the mockup in `design/mockups/` (`index.html`, `detail.html`, `design-sheet.html`) is the reference for look and behaviour. It replaces any plain paging placeholder those changes leave.
 
 ## 1. Foundations
 
@@ -31,7 +31,7 @@ Build order: this change styles and extends the public pages that `add-public-ga
 - [ ] 4.3 Build the flat credits panel (title, description, date, artists, characters with links to their owners, tags, set and other versions, original file), beside the stage and closable on wide screens, below it at 1100px and narrower; verify the spec scenarios "Wide screen" and "Piece with only an image" for the credits panel
 - [ ] 4.4 Build the full view with zoom in and out, fit, drag, pinch and Escape to close; verify the spec scenarios "Zooming into a reference sheet" and "Closing"
 - [ ] 4.5 Add sharing through the share sheet, with a copy-and-confirm fallback; verify the spec scenario "Desktop without a share sheet"
-- [ ] 4.6 Style the NSFW confirm and not-found screens as plain panels on the stage; verify the NSFW scenarios from `add-nsfw-handling` still pass
+- [ ] 4.6 Style the NSFW confirm and not-found screens as plain panels on the stage; verify the NSFW scenarios from the feature changes still pass
 
 ## 5. Integration checks
 
@@ -41,5 +41,5 @@ Build order: this change styles and extends the public pages that `add-public-ga
 
 ## Workflow follow-up
 
-- Archive this change after `add-public-gallery` and `add-nsfw-handling` are archived, so the `public-gallery` capability exists when its additions are applied.
-- If the people, characters and tags data model resumes, rework `add-artists` first; the credits panel then shows real artists and characters.
+- Archive this change after the feature changes that create the public pages, so its requirements land on top of theirs.
+- The credits panel shows real artists and characters once the new data model is built.

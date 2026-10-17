@@ -2,12 +2,12 @@
 
 ## Context
 
-See proposal.md for motivation and scope. The public site's behaviour is defined by the pending changes `add-public-gallery`, `add-nsfw-handling` and `add-artists`, none of which are implemented yet. This document started as the brief for the mockup round; the round is finished and the owner chose **Tigy's Album** (D9). It now records that design and the decisions behind it. The visual system itself is normative in `apps/public/DESIGN.md`.
+See proposal.md for motivation and scope. The public site's data and behaviour will be defined by feature changes written from scratch after this mockup; none exist yet. This document started as the brief for the mockup round; the round is finished and the owner chose **Tigy's Album** (D9). It now records that design and the decisions behind it. The visual system itself is normative in `apps/public/DESIGN.md`.
 
-Constraints from the earlier changes that a design must respect:
+Constraints the mockup was designed under. They came from earlier feature changes that were removed, so the new feature changes confirm or replace them:
 
-- **Server-rendered, CDN-cached pages** (A3, A4 in `add-public-gallery`): every page arrives as complete HTML, and that first HTML is always the NSFW-hidden view. The visitor's NSFW choice is applied in the browser after load.
-- **The gallery pages 24 images at a time**, newest first (A5). How further pages load (pages, a "load more" button, infinite scroll) is open for the design.
+- **Server-rendered, CDN-cached pages**: every page arrives as complete HTML, and that first HTML is always the NSFW-hidden view. The visitor's NSFW choice is applied in the browser after load.
+- **The gallery pages 24 images at a time**, newest first. How further pages load (pages, a "load more" button, infinite scroll) is open for the design.
 - **Artwork comes in any aspect ratio**: tall reference sheets, wide scenes, square icons and badges, and animated GIF/APNG/WebP. The gallery and detail page must handle all of them.
 - **Images without a date** sort by the day they were added, so the design should not assume every image shows a date.
 
@@ -16,7 +16,7 @@ Constraints from the earlier changes that a design must respect:
 **Goals:**
 - Build Tigy's Album into `apps/public` as `apps/public/DESIGN.md` specifies, matching the mockup in behaviour and look.
 - Phone first: most visitors open shared links from social apps.
-- Keep the server-rendered, CDN-cached, SFW-first pages of `add-public-gallery` intact; nothing the design adds in the browser may shift the layout or flash the wrong theme.
+- Keep the server-rendered, CDN-cached, SFW-first pages intact; nothing the design adds in the browser may shift the layout or flash the wrong theme.
 
 **Non-Goals:**
 - The person, character and tag pages, and working filters. They follow this design later.
@@ -46,7 +46,7 @@ Constraints from the earlier changes that a design must respect:
 - **share** (the phone's share sheet) or copy link;
 - **back to the gallery**, returning to where the visitor was scrolled.
 
-**NSFW (D4).** A "show NSFW" switch, off by default and remembered in the browser, lives in the site chrome. With it off, NSFW images are left out of every list. A direct link to an NSFW image shows a confirm screen without the image until the visitor confirms or turns the switch on. The switch lives in the top bar, and the confirm screen is a plain panel on the artwork page's stage. Hidden images are left out entirely, as `add-nsfw-handling` specifies.
+**NSFW (D4).** A "show NSFW" switch, off by default and remembered in the browser, lives in the site chrome. With it off, NSFW images are left out of every list. A direct link to an NSFW image shows a confirm screen without the image until the visitor confirms or turns the switch on. The switch lives in the top bar, and the confirm screen is a plain panel on the artwork page's stage. Hidden images are left out entirely.
 
 **Content for the mockups (D5).** The mockups use the real art the owner provided (below). Anything not provided (artist names and links, the other character's name and owner, the owner's social links) is a clearly marked placeholder, never an invented name, link or bio. The data is a small JavaScript array shaped like the image entries (title, date, set, nsfw, description, tags, artists with links, characters with owners), so every page renders the same content.
 
@@ -96,21 +96,19 @@ Owner feedback from the round, to carry into the build:
 
 **Deliverable layout (D6).** After the round, `design/mockups/` holds only the chosen design: `index.html` (home) and `detail.html` (artwork page) with their `style.css` and `app.js`, the shared content and behaviour in `shared/`, `design-sheet.html` (the visual summary), `fonts.html` (the display font and its alternates) and the art in `assets/`. The other directions were removed. `node design/mockups/serve.mjs` serves them at http://localhost:4321; there is no build step, and nothing lives in the Nx projects.
 
-### Data model (paused)
+### Data model (input for the new feature changes)
 
-Explored in this change's discussion, not decided, and not part of the mockup round. It only matters to the mockups as the shape of the credits on the detail page.
+Explored in this change's discussion, not decided, and not part of the mockup round. The data model is designed from scratch in the new feature changes; these notes and the mockup's content (`design/mockups/shared/data.js`) are their starting point. It only matters to the mockups as the shape of the credits on the detail page.
 
 - **People** are one directory: name plus public links. A person is attached to an image as an **artist** and to a character as its **owner**. The owner is a person too, and their social links come from that record.
 - **Characters** are records with a name and an owner. An image can show several characters.
-- **Images** keep copies of their artists and characters (with each character's owner) for display, plus ID arrays for queries, following the copy-and-fan-out approach of A6 in `add-artists`. Artists and characters are arrays, so collaborations and multi-character pieces fit.
+- **Images** keep copies of their artists and characters (with each character's owner) for display, plus ID arrays for queries: when a person or character is edited, every image's copy is updated. Artists and characters are arrays, so collaborations and multi-character pieces fit.
 - **Tags** are on images, picked with autocomplete so typos can't split them. Flat or typed is not decided.
-
-Resuming the model means reworking `add-artists` (artists become people, characters are added) before it is implemented.
 
 ## Risks / Trade-offs
 
 - [Placeholder credits make the detail page hard to judge] → the art is real (D5), and the placeholders keep the shape and length range of real credits (D8).
-- [The design fights the server-rendered, SFW-first loading, for example the gallery visibly swapping when the NSFW switch is on] → the switch-on gallery loads after hydration as `add-nsfw-handling` specifies, which accepts the swap.
+- [The design fights the server-rendered, SFW-first loading, for example the gallery visibly swapping when the NSFW switch is on] → the switch-on gallery loads after hydration, which accepts the swap.
 - [The gallery layout, tail timeline and theme run in the browser after server rendering, so the first paint could jump or flash] → the server renders the gallery rows at a default width or reserves their space, and the theme is applied by an inline script before first paint (D9).
 - [Current Simple Icons releases no longer ship the Twitter bird] → the four logos are copied SVGs, so the bird stays as it is.
 
