@@ -38,6 +38,20 @@
         }
       }
     },
+    "test": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "parallelism": false,
+      "inputs": [
+        "default",
+        "^production",
+        { "externalDependencies": ["vitest", "firebase-tools"] }
+      ],
+      "options": {
+        "command": "firebase emulators:exec --only firestore,storage --project demo-tigy \"vitest run --config apps/functions/vitest.config.mts\"",
+        "cwd": "{workspaceRoot}"
+      }
+    },
     "typecheck": {
       "executor": "nx:run-commands",
       "cache": true,

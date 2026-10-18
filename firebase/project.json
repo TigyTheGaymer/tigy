@@ -24,6 +24,7 @@
     "test": {
       "executor": "nx:run-commands",
       "cache": true,
+      "parallelism": false,
       "inputs": [
         "firebaseConfig",
         "{projectRoot}/tests/**/*",

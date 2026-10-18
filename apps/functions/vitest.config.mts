@@ -6,6 +6,8 @@ export default defineConfig(() => ({
   root: import.meta.dirname,
   cacheDir: '../../node_modules/.vite/apps/functions',
   plugins: [nxViteTsPaths(), nxCopyAssetsPlugin(['*.md'])],
+  // The tests need the Firestore and Storage emulators: run them through
+  // `npx nx test functions`, which starts the emulators around them.
   test: {
     name: 'functions',
     watch: false,
@@ -13,6 +15,10 @@ export default defineConfig(() => ({
     environment: 'node',
     include: ['{src,tests}/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
     passWithNoTests: true,
+    // The files share the emulators and clear them between tests.
+    fileParallelism: false,
+    testTimeout: 20_000,
+    hookTimeout: 30_000,
     reporters: ['default'],
     coverage: {
       reportsDirectory: '../../coverage/apps/functions',

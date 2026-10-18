@@ -7,3 +7,11 @@ import { setGlobalOptions } from 'firebase-functions/options';
 setGlobalOptions({ region: 'europe-west6', maxInstances: 10 });
 
 initializeApp();
+
+// Keep the derived summaries under meta current (define-data-model, D4).
+export { onImageWritten } from './images/sync-image';
+export { onPersonWritten } from './people/sync-person';
+
+// Owner-only tools for the admin.
+export { rebuildSummariesCallable as rebuildSummaries } from './summaries/rebuild-summaries';
+export { deletePersonCallable as deletePerson } from './people/delete-person';

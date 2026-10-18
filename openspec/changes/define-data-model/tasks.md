@@ -19,10 +19,10 @@ Build order: this change provides the stored data and the server endpoints that 
 
 ## 3. Cloud Functions (`apps/functions`)
 
-- [ ] 3.1 Add a trigger on `images/{imageId}` writes that, in one transaction, re-reads the image, adds, replaces or removes its row in `meta/gallery`, adjusts `meta/tags`, and logs a warning above 70% of 1 MiB; on delete it also removes everything under `images/{id}/` in Storage; verify with emulator tests for publishing, editing, unpublishing and deleting an image, "Publishing later" and "Deleting a published artwork"
-- [ ] 3.2 Add a trigger on `people/{personId}` writes that adds, replaces or removes the person's entry in `meta/people`; verify with emulator tests for creating, renaming and deleting a person
-- [ ] 3.3 Add an owner-only callable that rebuilds `meta/gallery`, `meta/people` and `meta/tags` from every image and person; verify with an emulator test that deliberately corrupted summaries are restored and that a non-owner call is refused
-- [ ] 3.4 Add an owner-only callable that deletes a person only when no image, published or not, credits them, and otherwise returns the crediting images; verify with emulator tests for "Deleting a credited artist" and for deleting an uncredited person
+- [x] 3.1 Add a trigger on `images/{imageId}` writes that, in one transaction, re-reads the image, adds, replaces or removes its row in `meta/gallery`, adjusts `meta/tags`, and logs a warning above 70% of 1 MiB; on delete it also removes everything under `images/{id}/` in Storage; verify with emulator tests for publishing, editing, unpublishing and deleting an image, "Publishing later" and "Deleting a published artwork"
+- [x] 3.2 Add a trigger on `people/{personId}` writes that adds, replaces or removes the person's entry in `meta/people`; verify with emulator tests for creating, renaming and deleting a person
+- [x] 3.3 Add an owner-only callable that rebuilds `meta/gallery`, `meta/people` and `meta/tags` from every image and person; verify with an emulator test that deliberately corrupted summaries are restored and that a non-owner call is refused
+- [x] 3.4 Add an owner-only callable that deletes a person only when no image, published or not, credits them, and otherwise returns the crediting images; verify with emulator tests for "Deleting a credited artist" and for deleting an uncredited person
 
 ## 4. Public server endpoints (`apps/public`)
 
