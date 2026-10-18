@@ -13,7 +13,8 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "paths": {
-      "@tigy/models": ["./libs/models/src/index.ts"]
+      "@tigy/models": ["./libs/models/src/index.ts"],
+      "@tigy/gallery": ["./libs/gallery/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
