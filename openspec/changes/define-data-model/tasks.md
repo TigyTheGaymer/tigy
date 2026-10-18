@@ -1,6 +1,6 @@
 # Tasks
 
-Build order: this change provides the stored data and the server endpoints that the public pages read. The pages themselves, and their look, come from `design-public-site` and the page changes that follow; the admin's editing screens come with admin sign-in, and generating thumbnails and full images comes with the upload change. Run tasks through Nx (`npx nx ...`) and test Firestore and Storage behaviour against the emulators.
+Build order: this change provides the stored data and the server endpoints that the public pages read. The pages themselves come from `add-public-pages` and their look from `design-public-site`; the admin's editing screens come with admin sign-in, and generating thumbnails and full images comes with the upload change. Run tasks through Nx (`npx nx ...`) and test Firestore and Storage behaviour against the emulators.
 
 ## 1. Shared model (`libs/models`) and gallery logic (`libs/gallery`)
 
@@ -30,13 +30,12 @@ Build order: this change provides the stored data and the server endpoints that 
 - [x] 4.2 Add `GET /api/gallery` to `apps/public/src/server.ts`, taking the URL parameters from 1.6, an `after` cursor and an NSFW flag, returning 24 rows plus whether more remain and the overview for that NSFW mode, with CDN cache headers matching the pages and `X-Robots-Tag: noindex`; verify with endpoint tests for "Changing the sort after scrolling", "Switch on", "Crawling the data endpoints", and that a request without the NSFW flag never returns an NSFW row
 - [x] 4.3 Add `GET /api/people` returning the people who appear in visible pieces for an NSFW mode, with names and avatars from `meta/people`, for the pickers and filter chips; verify with endpoint tests that a person credited only on NSFW pieces is left out with the flag off and included with it on
 - [x] 4.4 Add endpoints for one artwork (the image, its credited people in order, previous and next for an NSFW mode) and for the home header (`people/tigy`, piece count, date range, years); unpublished or missing artworks return not found and unresolvable credits are left out; verify with endpoint tests for "Unpublished artwork", "Credit order", "Missing person" and "Tigy credited as a character"
-- [ ] 4.5 Add the artwork page's head metadata: real title and `og:image` by default, the generic site card with `?safe`, `noindex` on every NSFW artwork page, and `Disallow: /api/` in `robots.txt`; verify on the SSR build for "Default link to an NSFW piece", "Safe link to an NSFW piece" and "Search engines"
-- [ ] 4.6 Add Angular data services in `apps/public` that call these endpoints with `HttpClient`, so the same code runs during server rendering and in the browser and the browser reuses the server's responses on hydration; verify on the SSR build that a filtered link's first HTML contains the right first 24 pieces and the active filters by name ("Shared filtered link"), contains no NSFW title in the gallery with the switch off, renders an NSFW artwork's details behind the confirm screen without its `<img>` ("Opening an NSFW link with the switch off"), and that hydration makes no second request for the same data
 
 ## 5. Integration
 
-- [ ] 5.1 Add an emulator seed script that creates `people/tigy`, placeholder people and the mockup's five pieces as images (one marked NSFW for testing, labelled as such, and one with a year-only date), uploads ready-made `thumb.webp`, `full.webp` and originals to the Storage emulator, and runs the rebuild; verify the seeded gallery and an artwork page render through the endpoints, and that the timeline years and header count match the seed
-- [ ] 5.2 With the seeded emulators and the SSR build, check end to end that editing a person's link, renaming a person, publishing an image and deleting an image appear on the public pages after the server cache expires ("Editing a person", "Owner edits a social link", "Renaming a person"); record the result in this change
+The page-level checks (former tasks 4.5, 4.6 and 5.2) moved to `add-public-pages`, which builds the pages they need.
+
+- [ ] 5.1 Add an emulator seed script that creates `people/tigy`, placeholder people and the mockup's five pieces as images (one marked NSFW for testing, labelled as such, and one with a year-only date), uploads ready-made `thumb.webp`, `full.webp` and originals to the Storage emulator, and runs the rebuild; verify the endpoints return the seeded gallery and artworks, and that the home header's count and years match the seed
 
 ## 6. Align other planning documents
 
@@ -48,5 +47,5 @@ Build order: this change provides the stored data and the server endpoints that 
 - Generate `thumb.webp` and `full.webp` and fill the file details from an upload in the upload change.
 - With admin sign-in: enable Firebase Authentication with Identity Platform, add Google sign-in and the `beforeUserCreated` blocking function that admits only the owner and sets the `owner` claim (design D8).
 - Renaming and merging tags, once `meta/tags` records each image's tags (design D4).
-- Filter-aware previous and next, and the person page's behaviour, come with the page changes.
+- Filter-aware previous and next, and the person page's behaviour, come with later page changes (`add-public-pages` builds only the home and artwork pages).
 - Archive the change once implemented and reviewed.

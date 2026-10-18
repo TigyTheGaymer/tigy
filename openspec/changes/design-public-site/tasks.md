@@ -1,6 +1,6 @@
 # Tasks
 
-Build order: this change styles and extends the public pages that the feature changes create (`define-data-model` for the data, and page changes not yet written), so it is implemented after them. `apps/public/DESIGN.md` is the normative visual system; the mockup in `design/mockups/` (`index.html`, `detail.html`, `design-sheet.html`) is the reference for look and behaviour. It replaces any plain paging placeholder those changes leave.
+Build order: this change styles and extends the public pages that the feature changes create (`define-data-model` for the data, `add-public-pages` for the home and artwork pages), so it is implemented after them. `apps/public/DESIGN.md` is the normative visual system; the mockup in `design/mockups/` (`index.html`, `detail.html`, `design-sheet.html`) is the reference for look and behaviour. It replaces any plain paging placeholder those changes leave.
 
 ## 1. Foundations
 

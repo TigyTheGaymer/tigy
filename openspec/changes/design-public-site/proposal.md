@@ -33,4 +33,4 @@ Out of scope: the person and tag pages and the working filters (they follow this
 - **Code:** `apps/public` (global styles and tokens, top bar, home header, gallery, timeline, artwork page, theme switch, icons).
 - **Dependencies:** `lucide-angular` for interface icons; the four Simple Icons social logos as copied SVGs; Grandstander and Nunito as self-hosted fonts.
 - **Design references:** `apps/public/DESIGN.md` and `apps/public/.impeccable/design.json` (normative visual system), `design/mockups/` (the mockup, design sheet and font alternates, with the provided art in `design/mockups/assets/`).
-- **Other changes:** needs `define-data-model`, which stores the images and serves the gallery data, and the feature changes (not yet written) that create the public pages; this change styles and extends those pages.
+- **Other changes:** needs `define-data-model`, which stores the images and serves the gallery data, and `add-public-pages`, which creates the home and artwork pages; this change styles and extends those pages.
