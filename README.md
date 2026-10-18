@@ -17,13 +17,14 @@ npm ci
 
 ## Projects
 
-| Project     | Path             | Tag        | What it is                                                      |
-| ----------- | ---------------- | ---------- | --------------------------------------------------------------- |
-| `public`    | `apps/public`    | `frontend` | Public gallery, Angular with server-side rendering              |
-| `admin`     | `apps/admin`     | `frontend` | Owner-only admin, Angular single-page app                       |
-| `functions` | `apps/functions` | `backend`  | Cloud Functions (`europe-west6`)                                |
-| `firebase`  | `firebase`       | `backend`  | `firebase.json`, Firestore and Storage rules, Firestore indexes |
-| `models`    | `libs/models`    |            | Types shared by all three apps, imported as `@tigy/models`      |
+| Project      | Path              | Tag        | What it is                                                      |
+| ------------ | ----------------- | ---------- | --------------------------------------------------------------- |
+| `public`     | `apps/public`     | `frontend` | Public gallery, Angular with server-side rendering              |
+| `admin`      | `apps/admin`      | `frontend` | Owner-only admin, Angular single-page app                       |
+| `functions`  | `apps/functions`  | `backend`  | Cloud Functions (`europe-west6`)                                |
+| `firebase`   | `firebase`        | `backend`  | `firebase.json`, Firestore and Storage rules, Firestore indexes |
+| `models`     | `libs/models`     |            | Types shared by all three apps, imported as `@tigy/models`      |
+| `public-e2e` | `apps/public-e2e` |            | End-to-end tests of the public site, Playwright                 |
 
 ## Run locally
 
@@ -71,11 +72,27 @@ Or one project at a time, for example:
 npx nx build public
 ```
 
+### End-to-end tests
+
+The public site's pages are checked in Chromium by a Playwright suite (`apps/public-e2e`). It builds the public site, starts its own Firestore and Storage emulators, seeds them, and runs the built server against them on http://localhost:4300. Stop `firebase:emulators` first, since both use the same ports. The first time, download Chromium:
+
+```bash
+npx playwright install chromium
+```
+
+Then run the suite:
+
+```bash
+npx nx e2e public-e2e
+```
+
+The server under test keeps the gallery summaries for one second instead of five minutes, so the tests see their own edits quickly. Set `SUMMARY_MAX_AGE_MS` to change that.
+
 ## Deploy
 
 Everything lives in one Firebase project, `tigy-165cc`. Every push to `main` runs [.github/workflows/deploy.yml](.github/workflows/deploy.yml), which deploys only what changed since the last successful run:
 
-1. **Gate**: `nx affected -t lint test build`. If anything fails, nothing deploys.
+1. **Gate**: `nx affected -t lint test build e2e`. If anything fails, nothing deploys. The end-to-end tests run only when the public site, its libraries, the seed or the rules change.
 2. **Stage 1, backend** (`tag:backend`): `firebase` deploys the Firestore rules and indexes and the Storage rules; `functions` deploys the Cloud Functions.
 3. **Stage 2, frontends** (`tag:frontend`): `admin` deploys to Firebase Hosting (https://tigy-165cc.web.app); `public` creates an App Hosting rollout of the pushed commit (https://public--tigy-165cc.europe-west4.hosted.app).
 

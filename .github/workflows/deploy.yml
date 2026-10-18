@@ -40,8 +40,15 @@ jobs:
       # retried by the next push.
       - uses: nrwl/nx-set-shas@v5
 
-      - name: Lint, test and build
-        run: npx nx affected -t lint test build
+      # Only when the end-to-end tests are affected.
+      - name: Install Chromium for the end-to-end tests
+        run: |
+          if [ -n "$(npx nx show projects --affected --withTarget e2e)" ]; then
+            npx playwright install --with-deps chromium
+          fi
+
+      - name: Lint, test, build and end-to-end tests
+        run: npx nx affected -t lint test build e2e
 
       - uses: google-github-actions/auth@v3
         with:
