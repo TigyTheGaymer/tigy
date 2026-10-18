@@ -117,7 +117,11 @@ Opening an NSFW artwork page with the switch off SHALL show the confirm screen, 
 - **THEN** the page shows the confirm screen, the image is not loaded, and confirming shows the piece with its credits
 
 ### Requirement: Credits keep their order and show current details
-An artwork SHALL credit one or more artists and one or more characters as people, in an order the owner sets. The artwork page SHALL show each credited person's current name and links, so editing a person changes every artwork that credits them without editing the artworks.
+An artwork SHALL credit its artists and characters as people, in an order the owner sets; either list may be empty, for example when an old commission's artist is unknown. The artwork page SHALL show each credited person's current name and links, so editing a person changes every artwork that credits them without editing the artworks, and SHALL leave out an empty list.
+
+#### Scenario: Piece without credits
+- **WHEN** the owner saves an artwork with no artists and no characters
+- **THEN** it is saved, and its artwork page shows neither an artists nor a characters section
 
 #### Scenario: Credit order
 - **WHEN** the owner credits two artists with the lead artist first

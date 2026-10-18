@@ -40,7 +40,7 @@ Constraints the mockup was designed under. They came from earlier feature change
 **Artwork detail page (D3).** It carries:
 - the image at page size, opening a **fullscreen view with zoom and pan** for detailed pieces;
 - **previous/next** in gallery date order, with arrow keys and swipe;
-- title, **artists** (one or more, each with links), **characters** (one or more, each with its links), **tags**, date, description, each only when set;
+- title, **artists** (each with links), **characters** (each with its links), **tags**, date, description, each only when set;
 - **download** of the original file;
 - **share** (the phone's share sheet) or copy link;
 - **back to the gallery**, returning to where the visitor was scrolled.
