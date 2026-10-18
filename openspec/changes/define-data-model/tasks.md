@@ -35,7 +35,7 @@ Build order: this change provides the stored data and the server endpoints that 
 
 The page-level checks (former tasks 4.5, 4.6 and 5.2) moved to `add-public-pages`, which builds the pages they need.
 
-- [ ] 5.1 Add an emulator seed script that creates `people/tigy`, placeholder people and the mockup's five pieces as images (one marked NSFW for testing, labelled as such, and one with a year-only date), uploads ready-made `thumb.webp`, `full.webp` and originals to the Storage emulator, and runs the rebuild; verify the endpoints return the seeded gallery and artworks, and that the home header's count and years match the seed
+- [x] 5.1 Add an emulator seed script that creates `people/tigy`, placeholder people and the mockup's five pieces as images (one marked NSFW for testing, labelled as such, and one with a year-only date), uploads ready-made `thumb.webp`, `full.webp` and originals to the Storage emulator, and runs the rebuild; verify the endpoints return the seeded gallery and artworks, and that the home header's count and years match the seed
 
 ## 6. Align other planning documents
 

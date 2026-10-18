@@ -35,6 +35,12 @@ npx nx run firebase:emulators
 
 The emulators use the `demo-tigy` project ID, so they never touch the real Firebase project.
 
+While they run, fill them with the mockup's content (Tigy, placeholder people and six pieces with their files, one flagged NSFW for testing). This replaces everything in the emulators and refuses to run without them:
+
+```bash
+npx nx run firebase:seed
+```
+
 The Functions emulator reloads when `dist/apps/functions` changes. To pick up code changes while it runs, rebuild on save in another terminal:
 
 ```bash

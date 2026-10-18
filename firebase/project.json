@@ -14,11 +14,28 @@
     "emulators": {
       "executor": "nx:run-commands",
       "continuous": true,
-      "dependsOn": [{ "projects": ["functions"], "target": "build" }],
+      "dependsOn": [
+        {
+          "projects": ["functions"],
+          "target": "build"
+        }
+      ],
       "inputs": ["firebaseConfig"],
       "options": {
         "command": "firebase emulators:start --project demo-tigy",
         "cwd": "{workspaceRoot}"
+      }
+    },
+    "seed": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node -r @swc-node/register firebase/seed/seed.ts",
+        "cwd": "{workspaceRoot}",
+        "env": {
+          "SWC_NODE_PROJECT": "tsconfig.base.json",
+          "FIRESTORE_EMULATOR_HOST": "127.0.0.1:8080",
+          "FIREBASE_STORAGE_EMULATOR_HOST": "127.0.0.1:9199"
+        }
       }
     },
     "test": {
@@ -29,7 +46,9 @@
         "firebaseConfig",
         "{projectRoot}/tests/**/*",
         "{projectRoot}/vitest.rules.mts",
-        { "externalDependencies": ["@firebase/rules-unit-testing", "vitest"] }
+        {
+          "externalDependencies": ["@firebase/rules-unit-testing", "vitest"]
+        }
       ],
       "options": {
         "command": "firebase emulators:exec --only firestore,storage --project demo-tigy \"vitest run --config firebase/vitest.rules.mts\"",
@@ -41,9 +60,12 @@
       "cache": true,
       "inputs": [
         "{projectRoot}/tests/**/*",
+        "{projectRoot}/seed/**/*",
         "{projectRoot}/vitest.rules.mts",
         "{projectRoot}/tsconfig.json",
-        { "externalDependencies": ["typescript"] }
+        {
+          "externalDependencies": ["typescript"]
+        }
       ],
       "options": {
         "command": "tsc -p {projectRoot}/tsconfig.json --noEmit",

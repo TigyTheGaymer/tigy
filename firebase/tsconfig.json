@@ -6,5 +6,5 @@
     "esModuleInterop": true,
     "types": ["vitest/globals", "vitest/importMeta", "node"]
   },
-  "include": ["tests/**/*.ts", "vitest.rules.mts"]
+  "include": ["tests/**/*.ts", "vitest.rules.mts", "seed/**/*.ts"]
 }
