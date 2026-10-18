@@ -17,7 +17,11 @@ const serverDistFolder = dirname(fileURLToPath(import.meta.url));
 const browserDistFolder = resolve(serverDistFolder, '../browser');
 
 const app = express();
-const angularApp = new AngularNodeAppEngine();
+// App Hosting's proxy ends HTTPS, so only its forwarded protocol tells the
+// pages their public scheme. The host is checked against allowedHosts.
+const angularApp = new AngularNodeAppEngine({
+  trustProxyHeaders: ['x-forwarded-proto'],
+});
 const catalog = firestoreCatalog();
 
 // So req.protocol and req.host give the public address behind App Hosting's proxy.

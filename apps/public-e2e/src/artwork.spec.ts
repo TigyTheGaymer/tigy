@@ -154,6 +154,20 @@ test.describe('link previews', () => {
     expect(meta(html, 'twitter:card')).toBe('summary');
   });
 
+  test('previews use the public scheme the proxy names, as on App Hosting', async ({
+    request,
+  }) => {
+    const host = new URL(test.info().project.use.baseURL!).host;
+    const headers = { 'X-Forwarded-Proto': 'https' };
+    for (const [path, image] of [
+      ['/', '/avatars/tigy.webp'],
+      ['/i/hey-pookie', '/img/hey-pookie/full.webp'],
+    ]) {
+      const html = await (await request.get(path, { headers })).text();
+      expect(meta(html, 'og:image'), path).toBe(`https://${host}${image}`);
+    }
+  });
+
   test('Title of an NSFW piece: the tab says "Tigy"', async ({ page }) => {
     await page.goto('/i/hey-pookie-nsfw-test');
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(
