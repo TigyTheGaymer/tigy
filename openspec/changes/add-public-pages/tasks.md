@@ -34,13 +34,13 @@ Build order: this change needs the endpoints from the archived `define-data-mode
 ## 6. Integration
 
 - [x] 6.1 Add the e2e scenarios that span the pages: "Hydration" (no `/api/` request while an artwork page becomes interactive), and, with the summary cache shortened, `gallery-catalog`'s "Editing a person", "Owner edits a social link", "Renaming a person", "Publishing later" and "Deleting a published artwork" (its files return 404); verify the whole suite passes locally and in CI
-- [ ] 6.2 After deploying, check on the live site that an artwork page's `og:image`, the sitemap's addresses and `robots.txt`'s sitemap line use the public host, and that `/avatars/tigy.webp` loads once Tigy has an avatar; record the result here
+- [x] 6.2 After deploying, check on the live site that an artwork page's `og:image`, the sitemap's addresses and `robots.txt`'s sitemap line use the public host, and that `/avatars/tigy.webp` loads once Tigy has an avatar; record the result here
   - 2026-10-19, on public--tigy-165cc.europe-west4.hosted.app:
     - `robots.txt` and `/sitemap.xml`: OK, both name the public host over https. The sitemap lists only the home page; nothing is published yet.
     - A forged `X-Forwarded-Host` is replaced by App Hosting's proxy, so it never reaches the server.
     - `og:image`: wrong scheme. The home page's site card says `http://public--tigy-165cc...`, because Angular trusts no proxy headers by default and the proxy forwards plain HTTP. Fixed by trusting `x-forwarded-host` and `x-forwarded-proto` in the Angular engine (passing `trustProxyHeaders` replaces App Hosting's own `NG_TRUST_PROXY_HEADERS`); after that deploy the home page's `og:image` is `https://public--tigy-165cc.europe-west4.hosted.app/avatars/tigy.webp`. An artwork page's `og:image` can only be checked once a piece is published.
     - `/avatars/tigy.webp`: OK. After uploading Tigy's avatar and creating `people/tigy` with it, the address returns the 512 px WebP, which also proves the server reads the production bucket, and the home header shows it.
-    - Still to check: an artwork page's `og:image`, once a piece is published.
+    - Artwork page: OK. After publishing "Hey Pookie!" as `oCeWPnKFyUap2FwrAHEB`, its page has the piece's title and description, `og:image` `https://public--tigy-165cc.europe-west4.hosted.app/img/oCeWPnKFyUap2FwrAHEB/full.webp` (which loads) and the matching `og:url`. The thumbnail, full image and original load, the original downloads as `hey-pookie.png`, and the sitemap lists the piece.
 
 ## Workflow follow-up
 
