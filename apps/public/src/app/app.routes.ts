@@ -1,3 +1,20 @@
 import { Route } from '@angular/router';
 
-export const appRoutes: Route[] = [];
+// People and tags have no pages: people are credits, tags are filters.
+export const appRoutes: Route[] = [
+  {
+    path: '',
+    pathMatch: 'full',
+    loadComponent: () => import('./pages/home/home').then((m) => m.HomePage),
+  },
+  {
+    path: 'i/:id',
+    loadComponent: () =>
+      import('./pages/artwork/artwork').then((m) => m.ArtworkPage),
+  },
+  {
+    path: '**',
+    loadComponent: () =>
+      import('./pages/not-found/not-found').then((m) => m.NotFoundPage),
+  },
+];

@@ -5,9 +5,11 @@ import {
   type Person,
   type WithId,
 } from '@tigy/models';
-import { getApp, getApps, initializeApp } from 'firebase-admin/app';
+import { getApp, getApps, initializeApp, type App } from 'firebase-admin/app';
 import { getFirestore, type Firestore } from 'firebase-admin/firestore';
-import { SummaryCache } from './summary-cache';
+import { getStorage } from 'firebase-admin/storage';
+import type { FileStore } from './files';
+import { SUMMARY_MAX_AGE_MS, SummaryCache } from './summary-cache';
 
 /** Everything the data endpoints read. */
 export interface Catalog {
@@ -18,21 +20,26 @@ export interface Catalog {
   people(ids: readonly string[]): Promise<Map<string, WithId<Person>>>;
 }
 
-/**
- * Reads Firestore with the Admin SDK, which the security rules do not apply to
- * (design D8). The app is initialised on first use, from the server's own
- * credentials and project.
- */
+/** The security rules do not apply to the Admin SDK (define-data-model, D8). */
+function firebaseApp(): App {
+  return getApps().length ? getApp() : initializeApp();
+}
+
+/** Only the end-to-end tests set `SUMMARY_MAX_AGE_MS`. */
+export function summaryMaxAge(env: NodeJS.ProcessEnv = process.env): number {
+  const value = Number(env['SUMMARY_MAX_AGE_MS']);
+  return Number.isFinite(value) && value >= 0 ? value : SUMMARY_MAX_AGE_MS;
+}
+
 export function firestoreCatalog(): Catalog {
   let db: Firestore | undefined;
-  const firestore = () =>
-    (db ??= getFirestore(getApps().length ? getApp() : initializeApp()));
+  const firestore = () => (db ??= getFirestore(firebaseApp()));
 
   return {
     summaries: new SummaryCache(async (path) => {
       const snap = await firestore().doc(path).get();
       return snap.exists ? (snap.get('items') as string) : null;
-    }),
+    }, summaryMaxAge()),
 
     async image(id) {
       const snap = await firestore()
@@ -56,6 +63,37 @@ export function firestoreCatalog(): Catalog {
         }
       }
       return people;
+    },
+  };
+}
+
+/** Falls back to the project's default bucket, `{project}.appspot.com`. */
+export function storageFiles(): FileStore {
+  const bucket = () => {
+    const app = firebaseApp();
+    const project =
+      app.options.projectId ??
+      process.env['GOOGLE_CLOUD_PROJECT'] ??
+      process.env['GCLOUD_PROJECT'];
+    return getStorage(app).bucket(
+      app.options.storageBucket ?? `${project}.appspot.com`,
+    );
+  };
+
+  return {
+    async open(path) {
+      const file = bucket().file(path);
+      try {
+        const [metadata] = await file.getMetadata();
+        return {
+          contentType: metadata.contentType ?? 'application/octet-stream',
+          size: Number(metadata.size ?? 0),
+          read: () => file.createReadStream(),
+        };
+      } catch (error: unknown) {
+        if ((error as { code?: unknown }).code === 404) return null;
+        throw error;
+      }
     },
   };
 }

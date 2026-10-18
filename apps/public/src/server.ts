@@ -7,20 +7,30 @@ import {
 import express from 'express';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import type { RenderContext } from './app/catalog/loopback-backend.service';
 import { apiRouter } from './server/api';
-import { firestoreCatalog } from './server/catalog';
+import { firestoreCatalog, storageFiles } from './server/catalog';
+import { crawlingRouter } from './server/crawling';
+import { filesRouter } from './server/files';
 
 const serverDistFolder = dirname(fileURLToPath(import.meta.url));
 const browserDistFolder = resolve(serverDistFolder, '../browser');
 
 const app = express();
 const angularApp = new AngularNodeAppEngine();
+const catalog = firestoreCatalog();
+
+// So req.protocol and req.host give the public address behind App Hosting's proxy.
+app.set('trust proxy', true);
 
 /**
  * The data endpoints the pages read, during server rendering and in the
  * browser (define-data-model, design D5 to D7).
  */
-app.use('/api', apiRouter(firestoreCatalog()));
+app.use('/api', apiRouter(catalog));
+
+app.use(crawlingRouter(catalog.summaries));
+app.use(filesRouter(storageFiles(), catalog.summaries));
 
 /**
  * Serve static files from /browser
@@ -37,8 +47,11 @@ app.use(
  * Handle all other requests by rendering the Angular application.
  */
 app.use((req, res, next) => {
+  const context: RenderContext = {
+    apiOrigin: `http://localhost:${req.socket.localPort}`,
+  };
   angularApp
-    .handle(req)
+    .handle(req, context)
     .then((response) =>
       response ? writeResponseToNodeResponse(response, res) : next(),
     )

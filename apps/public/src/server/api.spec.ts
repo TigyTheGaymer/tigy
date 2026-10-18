@@ -8,7 +8,8 @@ import type {
   HomeResponse,
   PeopleResponse,
 } from '../api/types';
-import { apiRouter, CDN_CACHE_CONTROL } from './api';
+import { apiRouter } from './api';
+import { CDN_CACHE_CONTROL } from './cache-control';
 import type { Catalog } from './catalog';
 import { SummaryCache } from './summary-cache';
 

@@ -1,0 +1,23 @@
+export function artworkPath(id: string): string {
+  return `/i/${encodeURIComponent(id)}`;
+}
+
+// The server streams these from Storage (see server/files.ts).
+
+export function thumbnailUrl(id: string): string {
+  return `/img/${encodeURIComponent(id)}/thumb.webp`;
+}
+
+export function fullImageUrl(id: string): string {
+  return `/img/${encodeURIComponent(id)}/full.webp`;
+}
+
+/** `storagePath` is the original's, such as `images/k3x/original.png`. */
+export function originalUrl(id: string, storagePath: string): string {
+  const name = storagePath.slice(storagePath.lastIndexOf('/') + 1);
+  return `/img/${encodeURIComponent(id)}/${name}`;
+}
+
+export function avatarUrl(personId: string): string {
+  return `/avatars/${encodeURIComponent(personId)}.webp`;
+}

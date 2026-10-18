@@ -27,13 +27,8 @@ import type {
   PeopleResponse,
   PickerPerson,
 } from '../api/types';
+import { CDN_CACHE_CONTROL } from './cache-control';
 import type { Catalog } from './catalog';
-
-/**
- * How long a CDN may keep a response: the 5 minutes the pages are cached for.
- * Browsers revalidate, so a visitor never holds a stale copy longer.
- */
-export const CDN_CACHE_CONTROL = 'public, max-age=0, s-maxage=300';
 
 /**
  * The data endpoints the pages read (design D5 and D6). Every response may be

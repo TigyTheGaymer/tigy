@@ -1,0 +1,104 @@
+@if (data(); as page) {
+  <article class="artwork">
+    @if (isImageShown()) {
+      <img
+        class="piece"
+        [src]="fullImage()"
+        [width]="page.artwork.file.w"
+        [height]="page.artwork.file.h"
+        [alt]="title()"
+      />
+    } @else {
+      <section class="confirm" aria-label="NSFW piece">
+        <p>This piece is marked NSFW.</p>
+        <button type="button" (click)="showPiece()">Show this piece</button>
+        <button type="button" (click)="showAll()">Show NSFW everywhere</button>
+      </section>
+    }
+
+    <h1>{{ title() }}</h1>
+    @if (page.artwork.description) {
+      <p class="description">{{ page.artwork.description }}</p>
+    }
+    @if (date(); as date) {
+      <p class="date">
+        <time [attr.datetime]="page.artwork.date">{{ date }}</time>
+      </p>
+    }
+    @for (section of creditSections(); track section.className) {
+      <section class="credits" [class]="section.className">
+        <h2>{{ section.heading }}</h2>
+        <ul>
+          @for (person of section.people; track person.id) {
+            <li>
+              <a routerLink="/" [queryParams]="person.queryParams">{{
+                person.name
+              }}</a>
+              @if (person.links.length) {
+                <ul class="links">
+                  @for (link of person.links; track link.url) {
+                    <li>
+                      <a [href]="link.url" rel="noopener">{{ link.network }}</a>
+                    </li>
+                  }
+                </ul>
+              }
+            </li>
+          }
+        </ul>
+      </section>
+    }
+    @if (page.artwork.tags.length) {
+      <section class="tags">
+        <h2>Tags</h2>
+        <ul>
+          @for (tag of page.artwork.tags; track tag) {
+            <li>
+              <a routerLink="/" [queryParams]="{ tag: tag }">{{ tag }}</a>
+            </li>
+          }
+        </ul>
+      </section>
+    }
+    @if (original(); as file) {
+      <section class="file">
+        <h2>Original</h2>
+        <p>
+          {{ file.format }}{{ file.isAnimated ? ' (animated)' : '' }} ·
+          {{ file.dimensions }} · {{ file.size }}
+        </p>
+        <p><a class="download" [href]="file.href" download>Download</a></p>
+      </section>
+    }
+    @if (page.artwork.nsfw) {
+      <section class="share">
+        <h2>Links</h2>
+        <p>
+          Link: <a [href]="links().link">{{ links().link }}</a>
+        </p>
+        <p>
+          Safe link, previewed without the piece:
+          <a [href]="links().safe">{{ links().safe }}</a>
+        </p>
+      </section>
+    }
+
+    <nav class="neighbours" aria-label="More pieces">
+      @if (page.previous; as previous) {
+        <a class="previous" rel="prev" [routerLink]="['/i', previous.id]"
+          >Previous: {{ previous.title ?? 'Untitled' }}</a
+        >
+      }
+      @if (page.next; as next) {
+        <a class="next" rel="next" [routerLink]="['/i', next.id]"
+          >Next: {{ next.title ?? 'Untitled' }}</a
+        >
+      }
+      <a class="back" [routerLink]="backTree()">Back to the gallery</a>
+    </nav>
+  </article>
+} @else if (isMissing()) {
+  <app-not-found />
+} @else if (hasFailed()) {
+  <p class="error">Could not load this piece.</p>
+}

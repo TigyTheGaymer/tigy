@@ -1,0 +1,92 @@
+<header class="home-header">
+  @if (ownerAvatar(); as src) {
+    <img class="avatar" [src]="src" alt="" width="96" height="96" />
+  }
+  <h1>{{ ownerName() }}</h1>
+  @if (socialLinks().length) {
+    <ul class="social">
+      @for (link of socialLinks(); track link.url) {
+        <li>
+          <a [href]="link.url" rel="me noopener">{{ link.network }}</a>
+        </li>
+      }
+    </ul>
+  }
+  @if (overview(); as text) {
+    <p class="overview">{{ text }}</p>
+  }
+</header>
+
+<nav class="filters" aria-label="Filters and sort">
+  @if (filters().length) {
+    <ul class="active-filters">
+      @for (filter of filters(); track filter.key) {
+        <li>
+          <a
+            routerLink="/"
+            [queryParams]="filter.remove"
+            [attr.aria-label]="
+              'Remove filter ' + filter.kind + ': ' + filter.name
+            "
+            >{{ filter.kind }}: {{ filter.name }} ×</a
+          >
+        </li>
+      }
+    </ul>
+  }
+  <p class="sort">
+    Sort:
+    @if (query().sort === 'newest') {
+      <strong aria-current="true">Newest first</strong>
+      · <a routerLink="/" [queryParams]="oldest()">Oldest first</a>
+    } @else {
+      <a routerLink="/" [queryParams]="newest()">Newest first</a> ·
+      <strong aria-current="true">Oldest first</strong>
+    }
+  </p>
+</nav>
+
+<section class="gallery" aria-label="Gallery">
+  @if (tiles().length) {
+    <ul class="tiles">
+      @for (tile of tiles(); track tile.id) {
+        <li class="tile">
+          <a [routerLink]="['/i', tile.id]">
+            <img
+              [src]="tile.src"
+              [width]="tile.width"
+              [height]="tile.height"
+              [alt]="tile.alt"
+            />
+          </a>
+        </li>
+      }
+    </ul>
+    @if (hasMore()) {
+      <button
+        type="button"
+        class="load-more"
+        [disabled]="!canLoadMore()"
+        (click)="loadMore()"
+      >
+        {{ isLoadingMore() ? 'Loading…' : 'Load more' }}
+      </button>
+      @if (hasLoadMoreFailed()) {
+        <p class="error">Could not load more pieces. Try again.</p>
+      }
+    } @else {
+      <p class="end">That's every piece.</p>
+    }
+  } @else if (gallery(); as page) {
+    @if (!page.overview.count) {
+      <p class="empty">No art yet.</p>
+    } @else {
+      <p class="empty">
+        Nothing matches these filters.
+        <a routerLink="/" [queryParams]="cleared()">Clear the filters</a>
+      </p>
+    }
+  } @else if (hasGalleryFailed()) {
+    <p class="error">Could not load the gallery.</p>
+  }
+</section>
