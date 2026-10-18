@@ -33,6 +33,8 @@ beforeEach(async () => {
     const storage = admin.storage();
     await storage.ref('images/k3x/thumb.webp').put(bytes);
     await storage.ref('images/k3x/full.webp').put(bytes);
+    await storage.ref('people/tigy/avatar.webp').put(bytes);
+    await storage.ref('people/tigy/notes.txt').put(bytes);
     await storage.ref('private/notes.txt').put(bytes);
   });
 });
@@ -52,7 +54,19 @@ describe.each([...OTHERS, 'owner'] as Who[])('%s', (who) => {
     await assertFails(storage().ref('images/k3x').listAll());
   });
 
-  it('cannot read or write outside images/', async () => {
+  it("can fetch a person's avatar", async () => {
+    await assertSucceeds(
+      storage().ref('people/tigy/avatar.webp').getDownloadURL(),
+    );
+  });
+
+  it('cannot list the avatars, or read anything else under people/', async () => {
+    await assertFails(storage().ref('people').listAll());
+    await assertFails(storage().ref('people/tigy').listAll());
+    await assertFails(storage().ref('people/tigy/notes.txt').getDownloadURL());
+  });
+
+  it('cannot read or write outside images/ and the avatars', async () => {
     await assertFails(storage().ref('private/notes.txt').getDownloadURL());
     await assertFails(upload(as[who], 'private/new.txt'));
   });
@@ -66,6 +80,12 @@ describe.each(OTHERS)('%s', (who) => {
     await assertFails(upload(as[who], 'images/k3x/thumb.webp'));
     await assertFails(storage().ref('images/k3x/full.webp').delete());
   });
+
+  it('cannot upload, replace or delete an avatar', async () => {
+    await assertFails(upload(as[who], 'people/ann/avatar.webp'));
+    await assertFails(upload(as[who], 'people/tigy/avatar.webp'));
+    await assertFails(storage().ref('people/tigy/avatar.webp').delete());
+  });
 });
 
 describe('owner', () => {
@@ -75,5 +95,12 @@ describe('owner', () => {
     await assertSucceeds(upload(as.owner, 'images/new/original.png'));
     await assertSucceeds(upload(as.owner, 'images/k3x/thumb.webp'));
     await assertSucceeds(storage().ref('images/k3x/full.webp').delete());
+  });
+
+  it('uploads, replaces and deletes an avatar, and nothing else under people/', async () => {
+    await assertSucceeds(upload(as.owner, 'people/ann/avatar.webp'));
+    await assertSucceeds(upload(as.owner, 'people/tigy/avatar.webp'));
+    await assertSucceeds(storage().ref('people/tigy/avatar.webp').delete());
+    await assertFails(upload(as.owner, 'people/tigy/notes.txt'));
   });
 });

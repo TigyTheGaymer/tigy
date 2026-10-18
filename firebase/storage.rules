@@ -14,5 +14,11 @@ service firebase.storage {
       allow get;
       allow write: if isOwner();
     }
+
+    // One avatar per person, fetchable but not listable, like the images.
+    match /people/{personId}/avatar.webp {
+      allow get;
+      allow write: if isOwner();
+    }
   }
 }

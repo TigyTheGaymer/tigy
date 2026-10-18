@@ -16,6 +16,7 @@ import {
   META_PEOPLE_DOC,
   META_TAGS_DOC,
   PEOPLE_COLLECTION,
+  personPaths,
   TIGY_ID,
   type Image,
   type Person,
@@ -52,7 +53,7 @@ const placeholderLink = (network: string) => ({
 const PEOPLE: Record<string, Omit<Person, 'createdAt' | 'updatedAt'>> = {
   [TIGY_ID]: {
     name: 'Tigy',
-    avatar: imagePaths.full('tigy-portrait'),
+    avatar: personPaths.avatar(TIGY_ID),
     links: ['bluesky', 'telegram', 'twitter', 'furaffinity'].map(
       placeholderLink,
     ),
@@ -171,6 +172,18 @@ async function main(): Promise<void> {
   try {
     await clearFirestore();
     await bucket.deleteFiles({ force: true });
+
+    // Tigy's avatar: a 512 px square from the top of the portrait.
+    const portrait = await readFile(resolve(ASSETS, 'tigy-portrait.gif'));
+    await bucket
+      .file(personPaths.avatar(TIGY_ID))
+      .save(
+        await sharp(portrait)
+          .resize({ width: 512, height: 512, fit: 'cover', position: 'top' })
+          .webp({ quality: 82 })
+          .toBuffer(),
+        { contentType: 'image/webp', resumable: false },
+      );
 
     const people: WithId<Person>[] = [];
     for (const [id, fields] of Object.entries(PEOPLE)) {
