@@ -105,10 +105,10 @@ One document holds a row for every **published** image:
 - **People.** A trigger on `people/{personId}` writes adds, replaces or removes that person's entry in `meta/people`.
 - **Deleting an image.** The owner may delete an image from the admin. The image trigger removes its row and tag counts, and also deletes everything under `images/{id}/` in Storage, so no public file outlives its image.
 - **Full rebuild.** An owner-only callable rebuilds `meta/gallery`, `meta/people` and `meta/tags` from every image and person. It is the recovery path if a summary drifts.
-- **Bulk writes end with a rebuild.** The first import and a tag rename change many images at once, and their triggers contend on the same documents; some may fail after their retries. Both operations finish by running the full rebuild, so failures in between do not matter.
-- **Renaming a tag.** An owner-only callable takes `from` and `to` and rewrites the tag on every image, published or not, in batches. When `to` already exists it is a merge and duplicates are removed. It then runs the full rebuild.
+- **Bulk writes and the rebuild.** The first import changes many images at once, and its triggers contend on the same documents; some may fail after their retries. Run the full rebuild once the import's triggers have finished: rows are replaced, so a late trigger cannot spoil them, but tag counts are adjusted by differences, so a trigger that arrives after a rebuild adds its difference to counts that already include it.
+- **Renaming tags is deferred.** A rename would rewrite every image carrying the tag and then rebuild, and the triggers arriving after that rebuild would count each renamed tag twice. Renaming needs `meta/tags` to record each image's tags, so that a trigger replaces that image's entry and recounts instead of adding a difference; it comes with a later change. Until then the owner fixes a tag by editing the artworks that carry it.
 - *Alternative:* rebuild the whole document on every save. Simpler and self-healing, but it reads every image on each save; kept only as the manual rebuild.
-- *Alternative:* bulk writes mark themselves so the trigger skips them. Cleaner, but every write path would have to respect the mark; the closing rebuild already covers it.
+- *Alternative:* bulk writes mark themselves so the trigger skips them. Cleaner, but every write path would have to respect the mark.
 
 ### D5. Filtering, sorting and paging run on the public server
 

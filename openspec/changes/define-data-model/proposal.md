@@ -11,7 +11,7 @@ The public site and the admin need a Firestore data model before any feature can
 - **Derived summaries, written only by Cloud Functions.** `meta/gallery` holds a small row for every published image (as one JSON text field). `meta/people` holds every person's ID, name and avatar for the filter pickers. `meta/tags` holds every tag in use with its count, for the admin only. No counts, date ranges or tag lists are stored: the public server computes them from the rows for what the visitor may see.
 - **Filtering and paging.** The public server filters and sorts all rows in memory and returns the matching pieces 24 at a time, continuing after the last piece the visitor has, so any combination of filters works with lazy loading at the cost of one Firestore read per cache refresh.
 - **NSFW in shared links.** An artwork link shows its real title and image in link previews by default, NSFW pieces included; a "safe" variant of the link shows a generic card. On the site, an NSFW piece still waits behind the confirm screen unless the visitor has the NSFW switch on, and NSFW artwork pages are never indexed.
-- **Owner tools.** The owner can delete an artwork (its row and files go with it) and rename or merge a tag across every artwork.
+- **Owner tools.** The owner can delete an artwork (its row and files go with it). Renaming or merging a tag across every artwork is deferred to a later change (design D4).
 - **Removed from the design: sets and "other versions".** A clean and an NSFW version of a piece are two separate images. The artwork page drops its "other versions" section.
 - **Removed from the design: copies of people on images.** The artwork page loads its people by ID; this supersedes the data-model notes in `design-public-site`.
 
@@ -29,7 +29,7 @@ The public site and the admin need a Firestore data model before any feature can
 
 - **Firestore:** new collections `people` and `images` and the documents `meta/gallery`, `meta/people` and `meta/tags`; Firestore rules (public reads go through the server, writes are owner-only, `meta` is written only by functions) and an index exemption for the summaries' text fields.
 - **Storage:** public reads under `images/{id}/`, no client writes outside the owner. Generating thumbnails and full images from an upload is a later change.
-- **Cloud Functions (`apps/functions`):** triggers on image and person writes that keep the `meta` documents current, a trigger that deletes an image's files, and owner-only callables for a full rebuild, deleting a person and renaming a tag.
+- **Cloud Functions (`apps/functions`):** triggers on image and person writes that keep the `meta` documents current, a trigger that deletes an image's files, and owner-only callables for a full rebuild and deleting a person.
 - **Public site (`apps/public`):** server-side gallery, artwork and people endpoints with an in-memory cache of the summaries, link-preview metadata, and `noindex` on the API and on NSFW artwork pages.
 - **Admin (`apps/admin`):** edits people and images only; tag suggestions from `meta/tags`; SFW, NSFW and unpublished counts from its own image query.
 - **Other changes:** `design-public-site` must drop sets and "other versions" from its proposal, design, `public-gallery` spec and task 4.3, replace its data-model notes with a pointer to this change, and take the NSFW link-preview behaviour from this change. `PRODUCT.md` must mark the data model as decided and reword the NSFW preview rule.

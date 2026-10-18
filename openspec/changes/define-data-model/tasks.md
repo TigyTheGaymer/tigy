@@ -23,7 +23,6 @@ Build order: this change provides the stored data and the server endpoints that 
 - [ ] 3.2 Add a trigger on `people/{personId}` writes that adds, replaces or removes the person's entry in `meta/people`; verify with emulator tests for creating, renaming and deleting a person
 - [ ] 3.3 Add an owner-only callable that rebuilds `meta/gallery`, `meta/people` and `meta/tags` from every image and person; verify with an emulator test that deliberately corrupted summaries are restored and that a non-owner call is refused
 - [ ] 3.4 Add an owner-only callable that deletes a person only when no image, published or not, credits them, and otherwise returns the crediting images; verify with emulator tests for "Deleting a credited artist" and for deleting an uncredited person
-- [ ] 3.5 Add an owner-only callable that renames or merges a tag across every image in batches and then runs the full rebuild; verify with emulator tests for "Merging two spellings", a plain rename and a non-owner call refused
 
 ## 4. Public server endpoints (`apps/public`)
 
@@ -48,5 +47,6 @@ Build order: this change provides the stored data and the server endpoints that 
 
 - Generate `thumb.webp` and `full.webp` and fill the file details from an upload in the upload change.
 - With admin sign-in: enable Firebase Authentication with Identity Platform, add Google sign-in and the `beforeUserCreated` blocking function that admits only the owner and sets the `owner` claim (design D8).
+- Renaming and merging tags, once `meta/tags` records each image's tags (design D4).
 - Filter-aware previous and next, and the person page's behaviour, come with the page changes.
 - Archive the change once implemented and reviewed.

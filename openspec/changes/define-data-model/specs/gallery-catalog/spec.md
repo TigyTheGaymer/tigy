@@ -181,13 +181,6 @@ Tags SHALL be plain words or phrases with no groups, stored trimmed, single-spac
 - **WHEN** the owner enters " Reference  Sheet" on an artwork
 - **THEN** it is saved as the existing tag "reference sheet"
 
-### Requirement: Tags can be renamed and merged
-The owner SHALL be able to rename a tag on every artwork at once, published or not. Renaming a tag to one that already exists SHALL merge them, leaving no artwork with the tag twice.
-
-#### Scenario: Merging two spellings
-- **WHEN** the owner renames "ref sheet" to the existing tag "reference sheet"
-- **THEN** every artwork that had "ref sheet" now has "reference sheet" once, and "ref sheet" is no longer suggested or offered as a filter
-
 ### Requirement: The owner sees full counts
 The admin SHALL show how many artworks are published and not NSFW, published and NSFW, and unpublished.
 
