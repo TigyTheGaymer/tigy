@@ -132,11 +132,11 @@ An artwork SHALL credit its artists and characters as people, in an order the ow
 - **THEN** every artwork crediting that artist shows the new link within 10 minutes
 
 ### Requirement: People and artworks are addressed by ID
-A person's page address and a person filter SHALL identify the person by a stable ID, and an artwork's address SHALL identify the artwork by its ID, so renaming a person or retitling an artwork never breaks a shared link.
+A person filter SHALL identify the person by a stable ID, and an artwork's address SHALL identify the artwork by its ID, so renaming a person or retitling an artwork never breaks a shared link. People SHALL NOT have pages of their own: they appear only as credits on artworks.
 
 #### Scenario: Renaming a person
-- **WHEN** the owner renames a character whose page and gallery filter were shared earlier
-- **THEN** both shared links still open that character, showing the new name
+- **WHEN** the owner renames a character whose gallery filter link was shared earlier
+- **THEN** the shared link still filters by that character, showing the new name
 
 ### Requirement: Credited people cannot be deleted
 The admin SHALL refuse to delete a person who is credited on any artwork, published or not, and SHALL say which artworks credit them. If an artwork still references a person who no longer exists, the artwork page SHALL leave that credit out and still render.
@@ -157,7 +157,7 @@ The owner SHALL be able to delete an artwork. Deleting it SHALL remove it from e
 - **THEN** within 10 minutes it is gone from the gallery and its page shows not found, and its thumbnail, full image and original no longer load
 
 ### Requirement: Tigy is the site's own person
-Exactly one person SHALL be the site's own: Tigy. A credit for Tigy SHALL link to the home page and show no social links, and Tigy's person page address SHALL lead to the home page. The home header's avatar and the owner's social links SHALL come from that person.
+Exactly one person SHALL be the site's own: Tigy. A credit for Tigy SHALL link to the home page and show no social links. The home header's avatar and the owner's social links SHALL come from that person.
 
 #### Scenario: Tigy credited as a character
 - **WHEN** an artwork credits Tigy as a character
