@@ -38,7 +38,7 @@ Build order: this change needs the endpoints from the archived `define-data-mode
   - 2026-10-19, on public--tigy-165cc.europe-west4.hosted.app:
     - `robots.txt` and `/sitemap.xml`: OK, both name the public host over https. The sitemap lists only the home page; nothing is published yet.
     - A forged `X-Forwarded-Host` is replaced by App Hosting's proxy, so it never reaches the server.
-    - `og:image`: wrong scheme. The home page's site card says `http://public--tigy-165cc...`, because Angular trusts no proxy headers by default and the proxy forwards plain HTTP. Fixed by trusting `x-forwarded-proto` in the Angular engine; recheck after that deploy. An artwork page's `og:image` can only be checked once a piece is published.
+    - `og:image`: wrong scheme. The home page's site card says `http://public--tigy-165cc...`, because Angular trusts no proxy headers by default and the proxy forwards plain HTTP. Fixed by trusting `x-forwarded-host` and `x-forwarded-proto` in the Angular engine (passing `trustProxyHeaders` replaces App Hosting's own `NG_TRUST_PROXY_HEADERS`); after that deploy the home page's `og:image` is `https://public--tigy-165cc.europe-west4.hosted.app/avatars/tigy.webp`. An artwork page's `og:image` can only be checked once a piece is published.
     - `/avatars/tigy.webp`: 404, as expected; Tigy has no avatar yet. Storage access is unproven until a file exists.
 
 ## Workflow follow-up
