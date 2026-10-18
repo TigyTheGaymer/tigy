@@ -25,6 +25,7 @@
         "ssr": {
           "entry": "apps/public/src/server.ts"
         },
+        "externalDependencies": ["firebase-admin"],
         "outputMode": "server",
         "security": {
           "allowedHosts": ["localhost", "*.hosted.app"]
@@ -66,11 +67,28 @@
         }
       }
     },
+    "test-server": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "inputs": [
+        "default",
+        "^production",
+        {
+          "externalDependencies": ["vitest"]
+        }
+      ],
+      "options": {
+        "command": "vitest run --config apps/public/vitest.server.mts",
+        "cwd": "{workspaceRoot}"
+      }
+    },
     "test": {
       "executor": "@angular/build:unit-test",
       "options": {
-        "watch": false
-      }
+        "watch": false,
+        "exclude": ["apps/public/src/server/**"]
+      },
+      "dependsOn": ["test-server"]
     },
     "serve-static": {
       "continuous": true,

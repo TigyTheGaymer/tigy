@@ -7,6 +7,8 @@ import {
 import express from 'express';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { apiRouter } from './server/api';
+import { firestoreCatalog } from './server/catalog';
 
 const serverDistFolder = dirname(fileURLToPath(import.meta.url));
 const browserDistFolder = resolve(serverDistFolder, '../browser');
@@ -15,16 +17,10 @@ const app = express();
 const angularApp = new AngularNodeAppEngine();
 
 /**
- * Example Express Rest API endpoints can be defined here.
- * Uncomment and define endpoints as necessary.
- *
- * Example:
- * ```ts
- * app.get('/api/**', (req, res) => {
- *   // Handle API request
- * });
- * ```
+ * The data endpoints the pages read, during server rendering and in the
+ * browser (define-data-model, design D5 to D7).
  */
+app.use('/api', apiRouter(firestoreCatalog()));
 
 /**
  * Serve static files from /browser
