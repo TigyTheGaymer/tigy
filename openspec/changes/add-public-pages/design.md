@@ -24,9 +24,9 @@ See proposal.md for why. The public app (`apps/public`) is Angular 22 with serve
 
 Angular routes: `/` (home), `/i/:id` (artwork) and `**` (not found), each a lazily loaded standalone component. The not-found page sets status 404 through `RESPONSE_INIT`. `server.ts` handles `/robots.txt`, `/sitemap.xml`, `/img/...` and `/avatars/...` before the Angular handler. Query parameters are the source of truth for filters and sort: the home page reads them with `galleryQueryFromParams` and writes links with `galleryQueryToParams` through `routerLink`'s `queryParams`. `/p/...` and tag addresses fall through to not found like any other unknown address.
 
-### P2. Data services call the endpoints through `HttpClient`
+### P2. Data services read the endpoints with `httpResource`
 
-One `CatalogService` wraps the four endpoints with typed `HttpClient` calls. Angular's HTTP transfer cache (on by default with `provideClientHydration`) stores the server's responses in the page and replays them during hydration, so the browser makes no second request. On the server, an interceptor rewrites `/api/...` to the server's own port on `localhost`, so rendering never leaves the instance or passes back through the CDN.
+One `CatalogService` returns the four endpoints as typed `httpResource`s, which read through `HttpClient`: each takes a function of signals, reloads when they change and stays idle while it returns undefined. Angular's HTTP transfer cache (on by default with `provideClientHydration`) stores the server's responses in the page and replays them during hydration, so the browser makes no second request. On the server, a server-only `HttpBackend` rewrites `/api/...` to the server's own port on `localhost` (the port the request arrived on, which `server.ts` passes in the render context), so rendering never leaves the instance or passes back through the CDN. It is a backend rather than an interceptor because Angular runs app interceptors before the transfer cache: an interceptor would store each response under the loopback address, which the browser never asks for, and hydration would fetch everything again.
 
 - _Alternative:_ call the catalog directly on the server and pass the result through `TransferState` by hand: two code paths and a hand-written hand-off.
 - _Alternative:_ call the public address from the server: slower, and the CDN could hand the server stale data.
@@ -47,7 +47,7 @@ An `NsfwSwitch` service holds the choice in `localStorage` (guarded, since stora
 
 ### P6. Page caching
 
-Every page, the sitemap and `robots.txt` send `Cache-Control: public, max-age=0, s-maxage=300`, the same as the endpoints (`CDN_CACHE_CONTROL`): pages through `RESPONSE_INIT` headers, the server routes directly.
+Every page, the sitemap and `robots.txt` send `Cache-Control: public, max-age=0, s-maxage=300`, the same as the endpoints (`CDN_CACHE_CONTROL`): pages through the server route headers in `app.routes.server.ts`, the server routes directly. A page whose data fails to load is sent with status 503 and `no-store` through `RESPONSE_INIT`, so the CDN never keeps a passing failure.
 
 ### P7. Markup for the design to style
 
