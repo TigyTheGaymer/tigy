@@ -14,10 +14,15 @@ export interface SocialLink {
 /** `people/{personId}`: an artist, a character, or both. */
 export interface Person {
   name: string;
-  /** Storage path. */
+  /** Storage path, {@link personPaths.avatar}. */
   avatar?: string;
   /** Ordered as the owner set them. */
   links: SocialLink[];
   createdAt: TimestampLike;
   updatedAt: TimestampLike;
 }
+
+export const personPaths = {
+  /** Served at `/avatars/{personId}.webp`. */
+  avatar: (personId: string) => `people/${personId}/avatar.webp`,
+};

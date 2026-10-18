@@ -7,7 +7,8 @@ import { normaliseTags } from '../tags/tags';
 /** Query parameters as a router or a server framework hands them over. */
 export type ParamsInput = URLSearchParams | Readonly<Record<string, unknown>>;
 
-const PERSON_ID = /^[A-Za-z0-9_-]{1,128}$/;
+/** A person or artwork ID as an address may carry it. */
+export const ID_PATTERN = /^[A-Za-z0-9_-]{1,128}$/;
 const YEAR = /^\d{4}$/;
 
 /**
@@ -34,10 +35,10 @@ export function galleryQueryToParams(
 export function galleryQueryFromParams(params: ParamsInput): GalleryQuery {
   const query: GalleryQuery = {
     characterIds: unique(
-      values(params, 'character').filter((id) => PERSON_ID.test(id)),
+      values(params, 'character').filter((id) => ID_PATTERN.test(id)),
     ),
     artistIds: unique(
-      values(params, 'artist').filter((id) => PERSON_ID.test(id)),
+      values(params, 'artist').filter((id) => ID_PATTERN.test(id)),
     ),
     tags: normaliseTags(values(params, 'tag')),
     sort:
