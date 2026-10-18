@@ -21,6 +21,34 @@
         "cwd": "{workspaceRoot}"
       }
     },
+    "test": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "inputs": [
+        "firebaseConfig",
+        "{projectRoot}/tests/**/*",
+        "{projectRoot}/vitest.rules.mts",
+        { "externalDependencies": ["@firebase/rules-unit-testing", "vitest"] }
+      ],
+      "options": {
+        "command": "firebase emulators:exec --only firestore,storage --project demo-tigy \"vitest run --config firebase/vitest.rules.mts\"",
+        "cwd": "{workspaceRoot}"
+      }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "inputs": [
+        "{projectRoot}/tests/**/*",
+        "{projectRoot}/vitest.rules.mts",
+        "{projectRoot}/tsconfig.json",
+        { "externalDependencies": ["typescript"] }
+      ],
+      "options": {
+        "command": "tsc -p {projectRoot}/tsconfig.json --noEmit",
+        "cwd": "{workspaceRoot}"
+      }
+    },
     "deploy": {
       "executor": "nx:run-commands",
       "options": {

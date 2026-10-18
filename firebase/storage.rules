@@ -1,10 +1,18 @@
 rules_version = '2';
 
-// Placeholder: everything is denied until the upload rules land (task 7.1).
+// Anyone may fetch an image's files; only the owner (custom claim
+// `owner: true`) may write them. Listing is not public, so the IDs of
+// unpublished images stay unknown. Everything else is denied.
+// See openspec/changes/define-data-model/design.md, D8.
 service firebase.storage {
   match /b/{bucket}/o {
-    match /{allPaths=**} {
-      allow read, write: if false;
+    function isOwner() {
+      return request.auth != null && request.auth.token.get('owner', false) == true;
+    }
+
+    match /images/{imageId}/{fileName} {
+      allow get;
+      allow write: if isOwner();
     }
   }
 }

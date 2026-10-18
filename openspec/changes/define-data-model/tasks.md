@@ -13,9 +13,9 @@ Build order: this change provides the stored data and the server endpoints that 
 
 ## 2. Firestore and Storage rules and indexes
 
-- [ ] 2.1 Replace the placeholder `firebase/firestore.rules` with the rules from design D8 behind one `isOwner()` check: no access for anyone else, owner reads everything, owner creates and updates `people` and `images` and deletes `images`, no client deletes of `people`, no client writes under `meta`, `meta/tags` readable only by the owner; verify with rules tests against the Firestore emulator, including "Direct database read"
-- [ ] 2.2 Replace the placeholder `firebase/storage.rules` with public reads under `images/{id}/` and owner-only writes, everything else denied; verify with rules tests against the Storage emulator that a visitor can read a thumbnail and cannot write or read outside `images/`
-- [ ] 2.3 Exempt the `items` fields of `meta/gallery` and `meta/people` from indexing in `firebase/firestore.indexes.json`; verify the emulator loads the file and that writing a summary near 1 MiB succeeds
+- [x] 2.1 Replace the placeholder `firebase/firestore.rules` with the rules from design D8 behind one `isOwner()` check: no access for anyone else, owner reads everything, owner creates and updates `people` and `images` and deletes `images`, no client deletes of `people`, no client writes under `meta`, `meta/tags` readable only by the owner; verify with rules tests against the Firestore emulator, including "Direct database read"
+- [x] 2.2 Replace the placeholder `firebase/storage.rules` with public reads under `images/{id}/` and owner-only writes, everything else denied; verify with rules tests against the Storage emulator that a visitor can read a thumbnail and cannot write or read outside `images/`
+- [x] 2.3 Exempt the `items` fields of `meta/gallery` and `meta/people` from indexing in `firebase/firestore.indexes.json`; verify the emulator loads the file and that writing a summary near 1 MiB succeeds
 
 ## 3. Cloud Functions (`apps/functions`)
 

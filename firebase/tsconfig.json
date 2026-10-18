@@ -1,0 +1,10 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "types": ["vitest/globals", "vitest/importMeta", "node"]
+  },
+  "include": ["tests/**/*.ts", "vitest.rules.mts"]
+}
