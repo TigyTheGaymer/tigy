@@ -31,7 +31,6 @@
     users: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
     tag: '<path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"/><circle cx="7.5" cy="7.5" r=".5" fill="currentColor"/>',
     image: '<rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>',
-    layers: '<path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/>',
   };
 
   function icon(name, cls) {
@@ -103,14 +102,6 @@
       prev: i > 0 ? list[i - 1] : null,
       next: i >= 0 && i < list.length - 1 ? list[i + 1] : null,
     };
-  }
-
-  function otherVersions(piece) {
-    if (!piece.set) return [];
-    var show = showNsfw();
-    return ordered().filter(function (p) {
-      return p.set === piece.set && p.id !== piece.id && (show || !p.nsfw);
-    });
   }
 
   /* ---------- NSFW switch (browser-only, off by default) ---------- */
@@ -451,7 +442,6 @@
     visible: visible,
     byId: byId,
     neighbours: neighbours,
-    otherVersions: otherVersions,
     showNsfw: showNsfw,
     setShowNsfw: setShowNsfw,
     confirmedOnce: confirmedOnce,

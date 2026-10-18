@@ -479,7 +479,6 @@
     var nb = U.neighbours(p.id);
     var f = p.file;
     var title = p.title || 'Untitled';
-    var versions = U.otherVersions(p);
     var ext = f.master.split('.').pop();
     document.title = title + ' · Tigy';
 
@@ -513,16 +512,6 @@
       row('users', 'Characters', peopleHTML(p.characters)) +
       row('tag', 'Tags', tags) +
       row('calendar', 'Date', p.date ? '<div class="ph" title="Placeholder for the mockup">' + U.formatDate(p.date) + '</div>' : '<div>Added ' + U.formatDate(p.added) + '</div>') +
-      row(
-        'layers',
-        'Set',
-        p.set
-          ? '<div>' + esc(p.set) + ' · ' + (versions.length + 1) + (versions.length ? ' versions' : ' version') + '</div>' +
-            (versions.length
-              ? '<div class="versions">' + versions.map(function (v) { return '<a href="' + U.detailHref(v) + '" aria-label="' + esc(v.title || 'Other version') + '"><img src="' + esc(v.file.thumb) + '" alt=""></a>'; }).join('') + '</div>'
-              : '')
-          : ''
-      ) +
       row('image', 'Original file', '<div>' + esc(f.masterLabel) + '</div>') +
       '<div class="info-actions">' +
       '<a class="pad dark" href="' + esc(f.master) + '" download="' + slug(p.title) + '.' + ext + '"><span style="display:inline-flex;gap:8px;align-items:center">' + PAW + 'Download original</span></a>' +

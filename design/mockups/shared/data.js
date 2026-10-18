@@ -87,7 +87,6 @@
       file: FILES.pookie,
       title: 'Hey Pookie!',
       date: '2026-02-14',
-      set: 'Hey Pookie',
       artists: [{ name: 'Artist name', links: links(), placeholder: true }],
       characters: [TIGY_PERSON, FRIEND],
       tags: ['comic', 'couple'],
@@ -99,7 +98,6 @@
       file: FILES.pookie,
       title: 'Hey Pookie! (alternate)',
       date: '2026-02-14',
-      set: 'Hey Pookie',
       artists: [{ name: 'Artist name', links: links(), placeholder: true }],
       characters: [TIGY_PERSON, FRIEND],
       tags: ['comic', 'couple'],
@@ -137,7 +135,6 @@
     var copy = Object.assign({}, src, {
       id: src.id + '-r' + (i + 1),
       repeat: true,
-      set: undefined,
       nsfw: false,
       mock: undefined,
     });
