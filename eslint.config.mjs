@@ -28,6 +28,10 @@ export default [
               sourceTag: 'shared',
               onlyDependOnLibsWithTags: ['shared'],
             },
+            {
+              sourceTag: 'e2e',
+              onlyDependOnLibsWithTags: ['shared'],
+            },
           ],
         },
       ],
