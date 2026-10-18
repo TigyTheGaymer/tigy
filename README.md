@@ -91,6 +91,23 @@ The workflow is the only thing that ships the public site: App Hosting's own aut
 
 The workflow signs in to Google Cloud with Workload Identity Federation (pool `github`, provider `tigy-repo`, service account `github-deploy`), so no key is stored in GitHub.
 
+`github-deploy` holds only the roles the deploys need. A deploy that fails with HTTP 403 usually names the missing permission; grant the narrowest role that has it, on the narrowest resource, and add it here.
+
+| Role                                       | Granted on                                                                        | Needed for                                                    |
+| ------------------------------------------ | --------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| `roles/firebaserules.admin`                | project                                                                           | Firestore and Storage rules                                   |
+| `roles/datastore.indexAdmin`               | project                                                                           | Firestore indexes and field overrides                         |
+| `roles/firebasestorage.viewer`             | project                                                                           | finding the default Storage bucket before releasing its rules |
+| `roles/storage.bucketViewer`               | bucket `tigy-165cc.appspot.com`                                                   | reading that bucket's metadata (no access to its files)       |
+| `roles/cloudfunctions.admin`               | project                                                                           | Cloud Functions                                               |
+| `roles/iam.serviceAccountUser`             | service account `tigy-165cc@appspot.gserviceaccount.com`                          | deploying functions that run as it                            |
+| `roles/artifactregistry.reader`            | project                                                                           | Cloud Functions images                                        |
+| `roles/firebasehosting.admin`              | project                                                                           | the admin on Firebase Hosting                                 |
+| `roles/firebaseapphosting.admin`           | project                                                                           | public site rollouts on App Hosting                           |
+| `roles/developerconnect.readTokenAccessor` | project                                                                           | App Hosting reading the commit through the GitHub connection  |
+| `roles/iam.serviceAccountUser`             | service account `firebase-app-hosting-compute@tigy-165cc.iam.gserviceaccount.com` | starting App Hosting builds, which run as it                  |
+| `roles/serviceusage.serviceUsageConsumer`  | project                                                                           | checking that the needed APIs are enabled                     |
+
 Changing only the `hosting` section of `firebase.json` marks the `firebase` project, not `admin`. Deploy the admin by hand afterwards (see below).
 
 ### Deploy by hand
