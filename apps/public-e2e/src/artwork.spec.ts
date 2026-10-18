@@ -154,17 +154,20 @@ test.describe('link previews', () => {
     expect(meta(html, 'twitter:card')).toBe('summary');
   });
 
-  test('previews use the public scheme the proxy names, as on App Hosting', async ({
+  test('previews use the public address the proxy names, as on App Hosting', async ({
     request,
   }) => {
-    const host = new URL(test.info().project.use.baseURL!).host;
-    const headers = { 'X-Forwarded-Proto': 'https' };
+    // Unlike the address the server is reached on, which has a port.
+    const headers = {
+      'X-Forwarded-Host': 'localhost',
+      'X-Forwarded-Proto': 'https',
+    };
     for (const [path, image] of [
       ['/', '/avatars/tigy.webp'],
       ['/i/hey-pookie', '/img/hey-pookie/full.webp'],
     ]) {
       const html = await (await request.get(path, { headers })).text();
-      expect(meta(html, 'og:image'), path).toBe(`https://${host}${image}`);
+      expect(meta(html, 'og:image'), path).toBe(`https://localhost${image}`);
     }
   });
 

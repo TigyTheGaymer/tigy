@@ -17,10 +17,11 @@ const serverDistFolder = dirname(fileURLToPath(import.meta.url));
 const browserDistFolder = resolve(serverDistFolder, '../browser');
 
 const app = express();
-// App Hosting's proxy ends HTTPS, so only its forwarded protocol tells the
-// pages their public scheme. The host is checked against allowedHosts.
+// Behind App Hosting the request arrives over HTTP at the Cloud Run host, so
+// only the proxy's forwarded headers name the public address. The proxy
+// overwrites them, and Angular still checks the host against allowedHosts.
 const angularApp = new AngularNodeAppEngine({
-  trustProxyHeaders: ['x-forwarded-proto'],
+  trustProxyHeaders: ['x-forwarded-host', 'x-forwarded-proto'],
 });
 const catalog = firestoreCatalog();
 
