@@ -1,6 +1,6 @@
 # Tasks
 
-Build order: this change styles and extends the public pages that the feature changes (not yet written) create, so it is implemented after them. `apps/public/DESIGN.md` is the normative visual system; the mockup in `design/mockups/` (`index.html`, `detail.html`, `design-sheet.html`) is the reference for look and behaviour. It replaces any plain paging placeholder those changes leave.
+Build order: this change styles and extends the public pages that the feature changes create (`define-data-model` for the data, and page changes not yet written), so it is implemented after them. `apps/public/DESIGN.md` is the normative visual system; the mockup in `design/mockups/` (`index.html`, `detail.html`, `design-sheet.html`) is the reference for look and behaviour. It replaces any plain paging placeholder those changes leave.
 
 ## 1. Foundations
 
@@ -12,7 +12,7 @@ Build order: this change styles and extends the public pages that the feature ch
 ## 2. Site chrome
 
 - [ ] 2.1 Build the sticky top bar (forehead mark and wordmark, theme button, "Show NSFW" switch with the paw thumb) and remove any footer; verify against the spec scenarios "No footer" and "Choosing Dark", and with keyboard-only use of both controls
-- [ ] 2.2 Add the owner's social links as site configuration (network, handle, address) until the people data model exists, and render them with logos and handles, logo-only on phones, each with a "Network: handle" accessible name; verify the spec scenarios "Wide screen" and "Phone" for social links, including with a screen reader name check
+- [ ] 2.2 Read the owner's social links (network, handle, address) from `people/tigy` through the home header data that `define-data-model` serves, and render them with logos and handles, logo-only on phones, each with a "Network: handle" accessible name; verify the spec scenarios "Wide screen" and "Phone" for social links, including with a screen reader name check
 
 ## 3. Home page
 
@@ -28,7 +28,7 @@ Build order: this change styles and extends the public pages that the feature ch
 
 - [ ] 4.1 Build the viewer layout: full-height dark stage with the piece, a top bar with back, logo, theme button, NSFW switch, share, full view, credits and download; verify on a phone and a desktop screen in both themes
 - [ ] 4.2 Add previous/next through buttons, arrow keys and swipe, and Escape back to the gallery; verify the spec scenarios "Arrow key", "Swipe on a phone" and "First piece"
-- [ ] 4.3 Build the flat credits panel (title, description, date, artists, characters with their links, tags, set and other versions, original file), beside the stage and closable on wide screens, below it at 1100px and narrower; verify the spec scenarios "Wide screen" and "Piece with only an image" for the credits panel
+- [ ] 4.3 Build the flat credits panel (title, description, date, artists, characters with their links, tags, original file), beside the stage and closable on wide screens, below it at 1100px and narrower; verify the spec scenarios "Wide screen" and "Piece with only an image" for the credits panel
 - [ ] 4.4 Build the full view with zoom in and out, fit, drag, pinch and Escape to close; verify the spec scenarios "Zooming into a reference sheet" and "Closing"
 - [ ] 4.5 Add sharing through the share sheet, with a copy-and-confirm fallback; verify the spec scenario "Desktop without a share sheet"
 - [ ] 4.6 Style the NSFW confirm and not-found screens as plain panels on the stage; verify the NSFW scenarios from the feature changes still pass
@@ -42,4 +42,4 @@ Build order: this change styles and extends the public pages that the feature ch
 ## Workflow follow-up
 
 - Archive this change after the feature changes that create the public pages, so its requirements land on top of theirs.
-- The credits panel shows real artists and characters once the new data model is built.
+- The credits panel shows real artists and characters once `define-data-model` is built.

@@ -29,7 +29,7 @@ One character's own home, not a feed: every piece is shown with full credit to i
 - Visitors usually land on the home page or directly on one artwork's page (`/i/{id}`) from a social post.
 - Artwork ranges from transparent sticker-style pieces (square) to tall comics with text and wide, detailed reference sheets; some pieces are animated.
 - Pieces can show several characters and can be collaborations of several artists. Artists and characters are both people: one person can be credited as an artist, as a character, or both, and characters have no separate owner.
-- Some art is NSFW. It is hidden by default behind a visitor-side "show NSFW" switch, a direct link to it asks for confirmation first, and it never appears in link previews or search.
+- Some art is NSFW. It stays out of the gallery by default, behind a visitor-side "show NSFW" switch; a direct link to it asks for confirmation first; and it is never indexed by search engines. A shared artwork link previews the piece's title and image by default, NSFW included; the "safe" link shows only a generic site card.
 
 ## Capabilities and Constraints
 
@@ -37,8 +37,8 @@ One character's own home, not a feed: every piece is shown with full credit to i
 - The gallery lists published art newest first, 24 at a time. Images without a date sort by the day they were added.
 - Artwork pages offer a fullscreen view with zoom, previous/next, share, download of the original, and back to the gallery.
 - Site copy is in English only. The site goes by the name **Tigy**.
-- **Undecided:** the data model for people and tags (starting notes in `openspec/changes/design-public-site/design.md`, being designed from scratch); whether tags are flat or typed; whether people carry a reference sheet or bio.
-- Planning follows the OpenSpec spec-driven workflow (`openspec/`); the public site's design work is the change `design-public-site`.
+- **Data model (decided, `openspec/changes/define-data-model`):** artworks and people, both addressed by ID. People have a name, an avatar and links, with no bio, reference sheet or slug; Tigy is the fixed person `tigy`. Tags are flat, lowercase words or phrases. A clean and an NSFW version of a piece are two separate artworks.
+- Planning follows the OpenSpec spec-driven workflow (`openspec/`); the public site's design work is the change `design-public-site`, and its data is the change `define-data-model`.
 
 ## Brand Commitments
 
@@ -49,11 +49,11 @@ One character's own home, not a feed: every piece is shown with full credit to i
 
 - Five real pieces provided by the owner, listed with paths and dimensions in `openspec/changes/design-public-site/design.md`: two transparent chibi stickers, a three-panel comic of Tigy with another character, Tigy's reference sheet, and an animated GIF portrait. The reference sheet is SFW.
 - Tigy's interests, from the reference sheet: gaming, plants, photography.
-- Not provided: artist names and links, the other characters' names and owners, the owner's social links. Mockups use clearly marked placeholders; never invent them.
+- Not provided: artist names and links, the other characters' names and links, the owner's social links. Mockups use clearly marked placeholders; never invent them.
 
 ## Product Principles
 
 1. The art leads. Interface recedes wherever a piece is on screen.
 2. Credit is first-class: artists and characters are always shown with their links.
 3. Built for the shared link: a visitor landing on one artwork, on a phone, gets everything they need there.
-4. Safe by default: NSFW stays out of sight, previews and search unless the visitor chooses otherwise.
+4. Safe by default: NSFW stays out of the gallery and search unless the visitor chooses otherwise, and when shared with the safe link it stays out of link previews too.

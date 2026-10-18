@@ -20,7 +20,7 @@ Constraints the mockup was designed under. They came from earlier feature change
 
 **Non-Goals:**
 - The person and tag pages, and working filters. They follow this design later.
-- The data model for people and tags (below).
+- The data model for artworks, people and tags; it is defined in the `define-data-model` change (see "Data model" below).
 - Final copy or real credits; the mockup's placeholders stay placeholders until real content exists.
 
 ## Decisions
@@ -41,14 +41,15 @@ Constraints the mockup was designed under. They came from earlier feature change
 - the image at page size, opening a **fullscreen view with zoom and pan** for detailed pieces;
 - **previous/next** in gallery date order, with arrow keys and swipe;
 - title, **artists** (one or more, each with links), **characters** (one or more, each with its links), **tags**, date, description, each only when set;
-- **other versions** in the same set (for example a clean and an NSFW version of one piece);
 - **download** of the original file;
 - **share** (the phone's share sheet) or copy link;
 - **back to the gallery**, returning to where the visitor was scrolled.
 
-**NSFW (D4).** A "show NSFW" switch, off by default and remembered in the browser, lives in the site chrome. With it off, NSFW images are left out of every list. A direct link to an NSFW image shows a confirm screen without the image until the visitor confirms or turns the switch on. The switch lives in the top bar, and the confirm screen is a plain panel on the artwork page's stage. Hidden images are left out entirely.
+There is no section for other versions of a piece: `define-data-model` drops sets, so a clean and an NSFW version of a piece are two separate artworks. The mockup's "Set" section was removed with it.
 
-**Content for the mockups (D5).** The mockups use the real art the owner provided (below). Anything not provided (artist names and links, the other character's name and owner, the owner's social links) is a clearly marked placeholder, never an invented name, link or bio. The data is a small JavaScript array shaped like the image entries (title, date, set, nsfw, description, tags, artists with links, characters with owners), so every page renders the same content.
+**NSFW (D4).** A "show NSFW" switch, off by default and remembered in the browser, lives in the site chrome. With it off, NSFW images are left out of every list. A direct link to an NSFW image shows a confirm screen without the image until the visitor confirms or turns the switch on. The switch lives in the top bar, and the confirm screen is a plain panel on the artwork page's stage. Hidden images are left out entirely. How a shared artwork link previews (the real title and image by default, NSFW included; a generic card with the safe link), what the confirm screen's first HTML carries, and `noindex` on NSFW pages are defined in `define-data-model` (its D6).
+
+**Content for the mockups (D5).** The mockups use the real art the owner provided (below). Anything not provided (artist names and links, the other character's name and links, the owner's social links) is a clearly marked placeholder, never an invented name, link or bio. The data is a small JavaScript array shaped like the image entries (title, date, nsfw, description, tags, artists and characters with links), so every page renders the same content.
 
 **The provided art.** Five pieces, shared by the owner in this change's discussion and saved on the owner's machine under `C:\Users\phong\.claude\uploads\f15fb155-dcd5-43a3-bf39-04247839cba9\`. The mockup copies them into `design/mockups/assets/`, together with web-sized versions of the two large pieces, and they are committed there so the mockup works from the repository.
 
@@ -74,11 +75,11 @@ Owner feedback from the round, to carry into the build:
 - The logo mark is Tigy's forehead marking (one long stroke crossed by two shorter ones), next to the "Tigy" wordmark. Alternatives were compared and not chosen: a paw, stripes, the wordmark alone, and three takes on Tigy's one tooth.
 - Corners use three steps: 6px for tags, badges and labels; 8px for gallery tiles, the artwork, thumbnails, buttons, dropdowns, chips and icon buttons; 16px for panels. Only faces, the tail and the paw thumb are fully round. The ears were tried and removed.
 - Display font: Grandstander for now, with Fredoka and Sour Gummy kept as alternates (both have a standard lowercase "g"); compared in `design/mockups/fonts.html`.
-- Filters are future work. Their planned place is a row of chips (Characters, Artists, Tags, Year) between the gallery heading and the grid, sticking under the top bar while scrolling; each chip opens a picker (a dropdown on desktop, a bottom sheet on phones), active filters show as removable chips, and the URL carries the filters. The mockup shows the row as design only. A single filter can be one Firestore query; combined filters are applied in the browser, since Firestore allows one `array-contains` per query.
+- Filters are future work. Their planned place is a row of chips (Characters, Artists, Tags, Year) between the gallery heading and the grid, sticking under the top bar while scrolling; each chip opens a picker (a dropdown on desktop, a bottom sheet on phones), active filters show as removable chips, and the URL carries the filters. The mockup shows the row as design only. How filters combine, sort and page is defined in `define-data-model` (its D5).
 
 **The reference sheet is SFW (D7).** The owner does not flag it NSFW, so it may serve as the home intro piece and appear in link previews. To show the NSFW states (confirm screen, switch on and off), the mockups mark one of the other pieces NSFW for the mockup only, labelled so it is not mistaken for a real flag.
 
-**Credits stay placeholders (D8).** The owner chose not to supply artist names, links or the comic's other character for the mockup round. Credits are clearly marked placeholders shaped like real ones (one or more artists with links; characters with an owner), which is enough to judge the layout.
+**Credits stay placeholders (D8).** The owner chose not to supply artist names, links or the comic's other character for the mockup round. Credits are clearly marked placeholders shaped like real ones (one or more artists and characters, each with links), which is enough to judge the layout.
 
 **The chosen design, Tigy's Album (D9).** Tigy's coat on a photo album. The normative description is `apps/public/DESIGN.md`; these are the decisions that shape the build.
 - **Header:** open, straight on the page, no card: the animated avatar, the name with the forehead mark, "A tiger", the piece count and date range, the social links.
@@ -92,18 +93,13 @@ Owner feedback from the round, to carry into the build:
 
 **Content ranges.** The number of published images is not confirmed. The design must hold up with about 10 images and with several hundred. Credits range from one artist and only Tigy up to several artists and four or more characters on one piece. Titles, descriptions and tags may all be missing.
 
-**States to show.** Gallery loading the next page; an artwork with every field set and one with only the image; a set with other versions; an animated image; a transparent sticker; the NSFW confirm screen; NSFW switch on and off. With four real pieces, a gallery of several hundred is shown by repeating them, marked as such.
+**States to show.** Gallery loading the next page; an artwork with every field filled and one with only the image; an animated image; a transparent sticker; the NSFW confirm screen; NSFW switch on and off. With four real pieces, a gallery of several hundred is shown by repeating them, marked as such.
 
 **Deliverable layout (D6).** After the round, `design/mockups/` holds only the chosen design: `index.html` (home) and `detail.html` (artwork page) with their `style.css` and `app.js`, the shared content and behaviour in `shared/`, `design-sheet.html` (the visual summary), `fonts.html` (the display font and its alternates) and the art in `assets/`. The other directions were removed. `node design/mockups/serve.mjs` serves them at http://localhost:4321; there is no build step, and nothing lives in the Nx projects.
 
-### Data model (input for the new feature changes)
+### Data model
 
-Explored in this change's discussion, not decided, and not part of the mockup round. The data model is designed from scratch in the new feature changes; these notes and the mockup's content (`design/mockups/shared/data.js`) are their starting point. It only matters to the mockups as the shape of the credits on the detail page.
-
-- **People** are one directory: name plus public links. A person is credited on an image as an **artist**, as a **character**, or both. Characters have no separate owner: the character is the person, with that person's links.
-- **Tigy** is a person too, the site's own: credited without links, linking to the home page.
-- **Images** keep copies of their artists and characters (name and links) for display, plus ID arrays for queries: when a person is edited, every image's copy is updated. Artists and characters are arrays, so collaborations and multi-character pieces fit.
-- **Tags** are on images, picked with autocomplete so typos can't split them. Flat or typed is not decided.
+Defined in the `define-data-model` change, which supersedes the notes this section used to hold. Its `gallery-catalog` spec and design are the reference for how artworks, people and tags are stored and how the gallery filters, sorts and pages; this change only shows that data.
 
 ## Risks / Trade-offs
 
@@ -114,5 +110,4 @@ Explored in this change's discussion, not decided, and not part of the mockup ro
 
 ## Open Questions
 
-- Tags flat or typed (for example "type: icon"); and whether people carry a reference sheet or short bio. Neither changes the two mockup pages much.
 - Context-aware previous/next (for example "next by this artist" when the visitor came from an artist's page) and a "more by this artist" row on the detail page. Both were deferred and can be added later.
