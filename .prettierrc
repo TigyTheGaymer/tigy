@@ -1,3 +1,9 @@
 {
-  "singleQuote": true
+  "singleQuote": true,
+  "overrides": [
+    {
+      "files": "apps/*/src/app/**/*.html",
+      "options": { "parser": "angular" }
+    }
+  ]
 }
