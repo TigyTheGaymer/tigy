@@ -156,6 +156,7 @@ Gallery tiles need no image documents: a row carries the ID, title and shape, an
 ### D8. Security
 
 - Public pages read Firestore only through the server with the Admin SDK, so Firestore rules deny every client except the signed-in owner. The public site's browser code never talks to Firestore; it calls the server's endpoints.
+- **The owner is the account with the custom claim `owner: true`.** The Firestore rules, the Storage rules and the owner-only callables check that one claim (`isOwner()` in the rules). The admin signs in with Google only and has no registration: a `beforeUserCreated` blocking function refuses every Google account except the owner's email, kept as a Cloud Functions parameter rather than in the repository, and sets the claim when the owner's account is created. With Firebase, a first Google sign-in creates the account, so leaving out a register page alone would not stop strangers' accounts. Blocking functions need Firebase Authentication with Identity Platform, which the owner enables in the console with admin sign-in; one owner stays far inside its free tier. *Alternatives:* a fixed UID or the owner's email in the rules (ties the rules to one account, and the email would sit in the repository); a claim set once by a script, without the blocking function (strangers' accounts could still be created, though the rules refuse them everything).
 - The owner, in the admin, may read everything, create and update `people` and `images`, and delete `images`. Deleting a person goes through a callable function that refuses while the person is credited on any image, published or not, so the rules deny client deletes of `people`.
 - Everything under `meta` is written only by Cloud Functions; the rules deny all client writes to it. Only the owner may read `meta/tags`, since it includes tags of unpublished and NSFW pieces; the public pickers come from the visible rows instead.
 - **Storage** allows public reads under `images/{id}/` and writes only by the owner and functions. An unpublished piece's files are protected only by its ID: Firestore auto-IDs are 20 random characters and an unpublished ID never appears on the public site. *Alternative:* a private drafts folder, moved on publish. Truly private, but every publish change would move files; not worth it for a single-owner art site.
@@ -179,4 +180,4 @@ There is no existing data. Deploy the Firestore and Storage rules and the index 
 
 ## Open Questions
 
-- How the rules recognise the owner (a fixed UID or a custom claim). The rules use one `isOwner()` check, so only that function changes; it is settled with admin sign-in.
+- None. How the rules recognise the owner is decided in D8; the blocking function and the Google sign-in are built with admin sign-in.

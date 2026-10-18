@@ -47,6 +47,6 @@ Build order: this change provides the stored data and the server endpoints that 
 ## Workflow follow-up
 
 - Generate `thumb.webp` and `full.webp` and fill the file details from an upload in the upload change.
-- Settle the owner check with admin sign-in (design Open Questions).
+- With admin sign-in: enable Firebase Authentication with Identity Platform, add Google sign-in and the `beforeUserCreated` blocking function that admits only the owner and sets the `owner` claim (design D8).
 - Filter-aware previous and next, and the person page's behaviour, come with the page changes.
 - Archive the change once implemented and reviewed.
