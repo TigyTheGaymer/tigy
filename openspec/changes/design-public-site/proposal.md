@@ -16,7 +16,7 @@ This change is the public site's visual design and browsing controls. The featur
 - **NSFW in the chrome.** The "Show NSFW" switch sits in the top bar; a direct link to an NSFW piece shows a plain confirm panel without the image.
 - **Filter row, design only.** A row of filter chips (Characters, Artists, Tags, Year) sits above the gallery, marked as coming later. It does not filter yet.
 
-Out of scope: the person and tag pages and the working filters (they follow this design later); the admin site; the data model for artworks, people and tags (defined in the `define-data-model` change).
+Out of scope: the filter pickers (they follow this design later; filters from the address come from `add-public-pages`, and people and tags have no pages of their own); the admin site; the data model for artworks, people and tags (defined in the `define-data-model` change).
 
 ## Capabilities
 

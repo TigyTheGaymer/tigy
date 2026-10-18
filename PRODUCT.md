@@ -33,7 +33,7 @@ One character's own home, not a feed: every piece is shown with full credit to i
 
 ## Capabilities and Constraints
 
-- Planned public pages: home (Tigy intro, socials, gallery by date), artwork detail, person (for artists and characters alike), tag, and not found. Pages are server-rendered and CDN-cached for up to 5 minutes; the first HTML is always the NSFW-hidden view.
+- Public pages: home (Tigy intro, socials, gallery by date), artwork detail, and not found (`add-public-pages`). People and tags have no pages of their own: people appear as credits and tags are gallery filters. Pages are server-rendered and CDN-cached for up to 5 minutes; the first HTML is always the NSFW-hidden view.
 - The gallery lists published art newest first, 24 at a time. Images without a date sort by the day they were added.
 - Artwork pages offer a fullscreen view with zoom, previous/next, share, download of the original, and back to the gallery.
 - Site copy is in English only. The site goes by the name **Tigy**.

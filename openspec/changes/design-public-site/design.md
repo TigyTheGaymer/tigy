@@ -19,7 +19,7 @@ Constraints the mockup was designed under. They came from earlier feature change
 - Keep the server-rendered, CDN-cached, SFW-first pages intact; nothing the design adds in the browser may shift the layout or flash the wrong theme.
 
 **Non-Goals:**
-- The person and tag pages, and working filters. They follow this design later.
+- The filter pickers; they follow this design later. Filters from the address come from `add-public-pages`, and people and tags have no pages of their own.
 - The data model for artworks, people and tags; it is defined in the `define-data-model` change (see "Data model" below).
 - Final copy or real credits; the mockup's placeholders stay placeholders until real content exists.
 
