@@ -1,7 +1,7 @@
 /* Sticks under the top bar while the gallery scrolls */
 .bar {
   position: sticky;
-  top: var(--bar-h, 66px);
+  top: var(--bar-h);
   z-index: 25;
   margin-bottom: 14px;
   padding: 8px 0 10px;
