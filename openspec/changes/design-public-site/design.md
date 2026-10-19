@@ -2,14 +2,15 @@
 
 ## Context
 
-See proposal.md for motivation and scope. The public site's data and behaviour will be defined by feature changes written from scratch after this mockup; none exist yet. This document started as the brief for the mockup round; the round is finished and the owner chose **Tigy's Album** (D9). It now records that design and the decisions behind it. The visual system itself is normative in `apps/public/DESIGN.md`.
+See proposal.md for motivation and scope. This document started as the brief for the mockup round; the round is finished and the owner chose **Tigy's Album** (D9). It records that design and the decisions behind it, including those taken when fitting it onto the built pages (D10). The visual system itself is normative in `apps/public/DESIGN.md`.
 
-Constraints the mockup was designed under. They came from earlier feature changes that were removed, so the new feature changes confirm or replace them:
+The feature changes beneath it are built and archived. `define-data-model` stores the art and serves the gallery data; `add-public-pages` built plain home, artwork and not-found pages on it (the `public-pages` spec). What this change builds on:
 
 - **Server-rendered, CDN-cached pages**: every page arrives as complete HTML, and that first HTML is always the NSFW-hidden view. The visitor's NSFW choice is applied in the browser after load.
-- **The gallery pages 24 images at a time**, newest first. How further pages load (pages, a "load more" button, infinite scroll) is open for the design.
-- **Artwork comes in any aspect ratio**: tall reference sheets, wide scenes, square icons and badges, and animated GIF/APNG/WebP. The gallery and detail page must handle all of them.
-- **Images without a date** sort by the day they were added, so the design should not assume every image shows a date.
+- **Data as signal resources**: the pages read `/api/gallery`, `/api/artworks/:id`, `/api/home` and `/api/people` through `CatalogService`, and the browser reuses the server's responses while it hydrates.
+- **The gallery pages 24 pieces at a time** (`PAGE_SIZE`), newest first, after a cursor, with filters and sort from the address. `add-public-pages` appends pages with a "Load more" button, which this change replaces.
+- **Artwork comes in any aspect ratio**: tall reference sheets, wide scenes, square icons and badges, and animated GIF/APNG/WebP. Each piece has a 720px `thumb.webp`, a 2048px `full.webp` and its original, served at `/img/{id}/{file}`; avatars at `/avatars/{id}.webp`.
+- **Pieces without a date** sort by the day they were added, so the design should not assume every piece shows a date.
 
 ## Goals / Non-Goals
 
@@ -42,7 +43,7 @@ Constraints the mockup was designed under. They came from earlier feature change
 - **previous/next** in gallery date order, with arrow keys and swipe;
 - title, **artists** (each with links), **characters** (each with its links), **tags**, date, description, each only when set;
 - **download** of the original file;
-- **share** (the phone's share sheet) or copy link;
+- **share** (the phone's share sheet) or copy link, and for an NSFW piece a way to copy its safe link (D10);
 - **back to the gallery**, returning to where the visitor was scrolled.
 
 There is no section for other versions of a piece: `define-data-model` drops sets, so a clean and an NSFW version of a piece are two separate artworks. The mockup's "Set" section was removed with it.
@@ -74,7 +75,7 @@ Owner feedback from the round, to carry into the build:
 - The gallery is one continuous run, newest first, with no grouping by year or month.
 - The logo mark is Tigy's forehead marking (one long stroke crossed by two shorter ones), next to the "Tigy" wordmark. Alternatives were compared and not chosen: a paw, stripes, the wordmark alone, and three takes on Tigy's one tooth.
 - Corners use three steps: 6px for tags, badges and labels; 8px for gallery tiles, the artwork, thumbnails, buttons, dropdowns, chips and icon buttons; 16px for panels. Only faces, the tail and the paw thumb are fully round. The ears were tried and removed.
-- Display font: Grandstander for now, with Fredoka and Sour Gummy kept as alternates (both have a standard lowercase "g"); compared in `design/mockups/fonts.html`.
+- Display font: Grandstander, with Fredoka and Sour Gummy kept as alternates (both have a standard lowercase "g"); compared in `design/mockups/fonts.html`. Settled as final for the build, with the alternates kept ready (D10).
 - Filters are future work. Their planned place is a row of chips (Characters, Artists, Tags, Year) between the gallery heading and the grid, sticking under the top bar while scrolling; each chip opens a picker (a dropdown on desktop, a bottom sheet on phones), active filters show as removable chips, and the URL carries the filters. The mockup shows the row as design only. How filters combine, sort and page is defined in `define-data-model` (its D5).
 
 **The reference sheet is SFW (D7).** The owner does not flag it NSFW, so it may serve as the home intro piece and appear in link previews. To show the NSFW states (confirm screen, switch on and off), the mockups mark one of the other pieces NSFW for the mockup only, labelled so it is not mistaken for a real flag.
@@ -85,11 +86,28 @@ Owner feedback from the round, to carry into the build:
 - **Header:** open, straight on the page, no card: the animated avatar, the name with the forehead mark, "A tiger", the piece count and date range, the social links.
 - **Social links:** Simple Icons logos in the text colour with the handle; logo-only 46px buttons on phones, with "Network: handle" as the accessible name. Twitter uses the bird logo.
 - **Gallery:** justified rows at each piece's real shape, newest first, one continuous run. Target row height 340px on desktop, 270px on tablets and 200px on phones; a row never squeezes a piece below 75% of the target, so on phones wide and square pieces get a row of their own. Pages of 24 load automatically when the end of the gallery is within 300px of the screen; returning from an artwork restores the loaded pages and the scroll position. Hovering a tile lifts it, shows its title and walks three paw prints up its corner.
-- **Tail timeline:** a ringed tail on the right edge (desktop) that fills with scroll progress, marks where each year starts, shows the month while hovering, and scrolls when dragged or clicked. It sits beside the browser's scrollbar, not instead of it. On phones it is a thin ringed bar along the bottom.
+- **Tail timeline:** a ringed tail on the right edge (desktop) that fills with scroll progress, marks where each year starts, and scrolls when dragged or clicked. It stands for the whole gallery as filtered, not just the loaded pages, and shows years only (D10). It sits beside the browser's scrollbar, not instead of it. On phones it is a thin ringed bar along the bottom.
 - **Artwork page:** a full-height dark stage with the piece and previous/next arrows, and a top bar with back, the logo, the theme button, the NSFW switch, share, full view, credits and download. The credits panel is a flat 380px side panel, open by default on wide screens and below the stage at 1100px and narrower. Escape returns to the gallery; arrow keys and swipe move between pieces.
 - **Theme switch:** Automatic, Light and Dark, cycled by one button and remembered in the visitor's browser. Light is the fur-orange page; dark is the stripe-maroon page with fur as the accent. Because pages are CDN-cached server HTML, the stored choice is applied by a small inline script before first paint, and the server renders without a theme attribute.
-- **Filter row:** design only, marked "coming later"; the planned behaviour is under the owner feedback above.
+- **Filter row:** the four pickers are design only, marked "coming later"; the planned behaviour is under the owner feedback above. The active filters and the sort, which already work through the address, are live chips in the row (D10).
 - **Icons:** Lucide only for interface icons; Simple Icons for social logos; the forehead mark, paw print and stripes are custom drawings.
+
+**Fitting the design onto the built pages (D10).** The design came before the pages existed. Building it onto the pages from `add-public-pages` raised questions the owner settled in a review on 2026-10-19:
+
+1. **Bio.** "A tiger" is fixed in the home page; Tigy's person record gets no bio field.
+   - *Alternative:* a `bio` field on `people/tigy`, editable with the links. Not worth a model change for one line.
+2. **Filter row.** The active filters from the address show as removable chips in the row, and a sort chip ("Newest first" / "Oldest first") sits at its end; only the four pickers stay inert. The plain page's filter links and sort links become these chips.
+3. **Tail timeline across unloaded pages.** The tail stands for every piece in the gallery as filtered. `/api/gallery` adds the number of matching pieces per year (newest first), and the tail places each year mark at that year's share of the pieces. Dragging or clicking to a year that is not loaded yet loads pages until its first piece arrives, then scrolls to it.
+   - *Alternatives:* a tail over the loaded pages only (its marks shift with every page); year marks that open a `?year=` gallery (leaves the continuous run).
+4. **Sharing an NSFW piece.** Share stays one button for the piece's normal link. NSFW pieces add a "Copy safe link" button in the credits panel. The `gallery-catalog` requirement now says the artwork page, not a share menu, offers both links.
+5. **Full view.** It opens on `full.webp`, which the page has already loaded, and loads the original in the background, swapping it in once it arrives, so opening is instant and deep zoom gets full detail.
+6. **Social links everywhere.** Known networks show their logo; any other network shows Lucide's generic link icon. Artists' and characters' links on the credits panel use the same logo-and-handle links as the header.
+7. **Fonts.** Grandstander (display) and Nunito (body) are used. Fredoka and Sour Gummy are self-hosted and declared too, but unused, so browsers never download them and a switch is one font variable.
+8. **The visitor's place.** The loaded pieces and the scroll position are kept in memory for the visit. Going back, with the page's back control or the browser's, restores them at once without reloading; the page's back control goes back in history when the visitor came from the gallery, and otherwise opens the tab's remembered gallery address or the home page. A reload, a new tab or a shared link starts from the first piece.
+   - *Alternative:* keeping the pieces in session storage to survive a reload. More state to keep in sync, and the page visibly grows after the server's first page.
+9. **Undated pieces.** The credits panel shows "Added" and the day the piece was added; dated pieces keep their date at the precision given.
+10. **No month bubble.** The tail shows years only; `DESIGN.md` drops the month shown while hovering.
+11. **Credits panel state.** Open by default. Closing it is remembered in the visitor's browser and applied before first paint by the same inline script as the theme, so the stage never jumps.
 
 **Content ranges.** The number of published images is not confirmed. The design must hold up with about 10 images and with several hundred. Credits range from one artist and only Tigy up to several artists and four or more characters on one piece. Titles, descriptions and tags may all be missing.
 
@@ -99,7 +117,7 @@ Owner feedback from the round, to carry into the build:
 
 ### Data model
 
-Defined in the `define-data-model` change, which supersedes the notes this section used to hold. Its `gallery-catalog` spec and design are the reference for how artworks, people and tags are stored and how the gallery filters, sorts and pages; this change only shows that data.
+Defined in the archived `define-data-model` change. Its `gallery-catalog` spec is the reference for how artworks, people and tags are stored and how the gallery filters, sorts and pages; this change only shows that data, apart from the per-year counts it adds to `/api/gallery` (D10).
 
 ## Risks / Trade-offs
 
