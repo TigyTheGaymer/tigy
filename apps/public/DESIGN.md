@@ -56,6 +56,31 @@ typography:
     fontSize: "0.78rem"
     fontWeight: 800
     lineHeight: 1.3
+  panel-heading:
+    fontFamily: "Grandstander, Nunito, system-ui, sans-serif"
+    fontSize: "clamp(2rem, 5vw, 2.8rem)"
+    fontWeight: 800
+    lineHeight: 1.05
+  logo-stage:
+    fontFamily: "Grandstander, Nunito, system-ui, sans-serif"
+    fontSize: "1.3rem"
+    fontWeight: 800
+    lineHeight: 1
+  lead:
+    fontFamily: "Nunito, system-ui, sans-serif"
+    fontSize: "clamp(1.02rem, 1.5vw, 1.15rem)"
+    fontWeight: 600
+    lineHeight: 1.55
+  small:
+    fontFamily: "Nunito, system-ui, sans-serif"
+    fontSize: "0.86rem"
+    fontWeight: 700
+    lineHeight: 1.3
+  caption:
+    fontFamily: "Nunito, system-ui, sans-serif"
+    fontSize: "0.74rem"
+    fontWeight: 800
+    lineHeight: 1.2
 rounded:
   sm: "6px"
   md: "8px"
@@ -97,8 +122,8 @@ components:
     rounded: "{rounded.sm}"
     padding: "4px 12px"
   badge:
-    backgroundColor: "{colors.stripe-maroon}"
-    textColor: "{colors.cream}"
+    backgroundColor: "{colors.paw-pink}"
+    textColor: "{colors.stripe-maroon}"
     rounded: "{rounded.sm}"
     padding: "2px 10px"
   icon-button:
@@ -149,11 +174,11 @@ Every colour is lifted from Tigy's coat; nothing is borrowed from a generic pale
 - **Light Fur** (#f9c27a): tags and other quiet fills on the fur page.
 
 ### Secondary
-- **Stripe Maroon** (#4b1416): text and icons in light mode, primary buttons, badges and the stripes in light mode. On Tigy Fur it reaches 7.4:1, and 12:1 on Muzzle Cream.
+- **Stripe Maroon** (#4b1416): text and icons in light mode, primary buttons and the stripes in light mode. On Tigy Fur it reaches 7.4:1, and 12:1 on Muzzle Cream.
 - **Soft Maroon** (#6e2422): secondary text and labels in light mode, the tail's dark rings in dark mode.
 
 ### Tertiary
-- **Paw Pink** (#f4a3ad): paw-pad buttons (Share, nav arrows), the avatar ring, the active NSFW switch, person dots, the hover paw prints.
+- **Paw Pink** (#f4a3ad): paw-pad buttons (Share, nav arrows), the NSFW badge, the avatar ring, the active NSFW switch, person dots, the hover paw prints.
 - **Deep Paw Pink** (#e07c8b): the ledge under pink buttons, the NSFW confirm accents.
 
 ### Neutral
@@ -178,16 +203,20 @@ Every colour is lifted from Tigy's coat; nothing is borrowed from a generic pale
 
 **Character:** Grandstander is chunky and playful with soft terminals, matching the chibi art without becoming childish; Nunito is a rounded, very readable sans that carries the UI quietly.
 
-**Alternates kept for a later swap:** Fredoka (700) and Sour Gummy (800). Both share Grandstander's soft, rounded, friendly feel and have a standard lowercase "g". Swapping means changing only the display font family, since every display style uses it; compare them in `design/mockups/fonts.html`.
+**Alternates kept for a later swap:** Fredoka (700) and Sour Gummy (800). Both share Grandstander's soft, rounded, friendly feel and have a standard lowercase "g". They are self-hosted and declared in `src/styles.css` but unused; swapping means changing only `--font-display`, since every display style uses it. Compare them in `design/mockups/fonts.html`.
 
 ### Hierarchy
 - **Display** (800, clamp(3.4rem, 9vw, 5.6rem), 0.9): the "Tigy" name in the home header, with the forehead mark before it.
 - **Headline** (800, clamp(2.1rem, 4.6vw, 3rem), 1): section titles such as "All the art".
-- **Title** (800, clamp(1.8rem, 2.6vw, 2.4rem), 1.05): the piece's title in the credits panel; the NSFW and not-found headings.
-- **Logo** (Grandstander 800, 1.7rem): the top-bar wordmark with the forehead mark.
-- **Body** (400, 1.02rem, 1.55): the bio, descriptions and credits.
+- **Panel heading** (800, clamp(2rem, 5vw, 2.8rem), 1.05): the NSFW, error and not-found panels.
+- **Title** (800, clamp(1.8rem, 2.6vw, 2.4rem), 1.05): the piece's title in the credits panel.
+- **Logo** (Grandstander 800, 1.7rem): the top-bar wordmark with the forehead mark; 1.3rem in the artwork page's stage bar.
+- **Lead** (600, clamp(1.02rem, 1.5vw, 1.15rem), 1.55): the bio under the name.
+- **Body** (400, 1.02rem, 1.55): descriptions and credits.
 - **Button** (800, 0.95rem): all buttons, chips and social links.
-- **Label** (800, 0.78rem): field labels in the credits panel ("Art by", "Characters"), tags and badges at 0.72–0.86rem.
+- **Label** (800, 0.78rem): field labels in the credits panel ("Art by", "Characters").
+- **Small** (700, 0.86rem): the piece count, handles, tags, the file summary, toasts, tile hover labels and the full view's zoom readout.
+- **Caption** (800, 0.74rem): tile badges and the tail's years.
 
 ### Named Rules
 **The Two Voices Rule.** Grandstander is only for names and headings (Tigy, section titles, piece titles, tile hover labels). Anything a visitor reads or presses is Nunito.
@@ -196,7 +225,7 @@ Every colour is lifted from Tigy's coat; nothing is borrowed from a generic pale
 
 A single centred column, max 1320px wide, with a fluid gutter (clamp(16px, 4vw, 48px)). The home page is: top bar, an open header (avatar, name, a short bio, piece count, social links) straight on the page, a band of flank stripes, the "All the art" heading, the filter row, and the gallery.
 
-The gallery is a justified grid: rows fill the full width, each piece keeps its own aspect ratio, and the target row height is 340px on desktop, 270px on tablets and 200px on phones, with 8px gaps (6px on phones). A row never squeezes a piece below 75% of the target height, so on phones wide and square pieces get a row of their own. Further pages load automatically near the end of the gallery (24 at a time on the real site).
+The gallery is a justified grid: rows fill the full width, each piece keeps its own aspect ratio, and the target row height is 340px on desktop, 270px on tablets and 200px on phones, with 8px gaps (6px on phones). The layout is CSS only, so the server's first HTML already has its final rows: each tile starts at 75% of the target height and grows with its shape until the row is full, so a row is never lower than 75% of the target and on phones wide and square pieces get a row of their own. Further pages load automatically near the end of the gallery (24 at a time). The visitor's place (loaded pages and scroll) is kept for the visit, so going back from a piece returns to it; a reload starts at the top.
 
 The artwork page is the photo viewer: a full-height dark stage with the piece centred, previous/next arrows on its sides, and a 380px credits panel on the right. At 1100px and below the panel moves under the stage; at 720px and below the arrows move to the bottom of the stage.
 
@@ -230,21 +259,24 @@ Only a few things are fully round, because Tigy is: the avatar (Tigy's face) and
 - **Primary:** stripe maroon with cream text (fur with maroon text in dark mode), e.g. "Download original", which carries a paw icon.
 - **Paw:** paw pink with maroon text, e.g. "Share". Pink is reserved for these.
 - **Light:** light cream with maroon text, e.g. social links and "Full view".
-- **Hover / Focus:** a small springy lift (2px up, 103%); on press the button sinks onto its ledge. Focus shows a 3px ink outline offset by 3px.
+- **Hover / Focus:** a small springy lift (2px up, 103%); on press the button sinks onto its ledge. Focus shows a 3px ink outline offset by 3px; on the dark stage and in the full view the ring is muzzle cream, since it sits outside the control.
 
 ### Chips
-- **Filter chips:** light cream, 2px soft ink outline, 8px corners, icon + label + chevron (Characters, Artists, Tags, Year). They sit in a row that sticks under the top bar. Design only for now; see the change `design-public-site`.
+- **Filter row:** sticks under the top bar. It shows a removable chip for each active filter ("Tag: comic"), the sort chip ("Newest first" / "Oldest first", which flips the order), then the four pickers.
+- **Filter pickers:** light cream, 2px soft ink outline, 8px corners, icon + label + chevron (Characters, Artists, Tags, Year). Shown but inactive for now, with the note "Filters coming later"; filters arrive through links (a credit, a tag) until the pickers are built.
 - **Tags:** light fur fill, 6px corners, "#tag" text.
-- **Badges:** "GIF" (maroon) and "NSFW" (pink) at the top-left of a tile, 6px corners.
+- **Badges:** "NSFW" (pink) at the top-left of a tile, 6px corners. There is no GIF badge.
 
 ### Gallery tile
 - **Corner Style:** 8px.
-- **Background:** muzzle cream; light cream behind transparent stickers, which are shown whole with a little padding.
+- **Background:** muzzle cream. Every piece is shown whole on it, never cropped, so stickers keep the cream behind them.
 - **Hover / Focus:** lifts 5px with a slight tilt, shows the title in a cream label at the bottom, and walks three pink paw prints up the top-right corner.
 
 ### Credits panel
-- **Style:** a flat, full-height cream side panel next to the stage (no card inside it), with the title in Grandstander and icon rows for date, artists, characters with their links, tags, set and the original file.
-- **Phones:** the same content as a full-width cream section under the stage.
+- **Style:** a flat, full-height cream side panel next to the stage (no card inside it), with the title in Grandstander and icon rows for artists, characters with their links, tags, the date ("Added {day}" for undated pieces) and the original file.
+- **Open or closed:** the info button opens and closes it on desktop. The choice is remembered in the browser (open by default) and applied before the page paints.
+- **Actions:** Download original, Share (the normal link), Full view, and for NSFW pieces "Copy safe link": the same address with `?safe`, whose link preview shows only the site card instead of the piece.
+- **Phones:** the same content as a full-width cream section under the stage; the info button scrolls to it.
 
 ### Navigation
 - **Top bar:** sticky, fur page colour with a slight blur; the forehead mark and "Tigy" on the left, the theme button and the "Show NSFW" switch on the right.
@@ -253,7 +285,7 @@ Only a few things are fully round, because Tigy is: the avatar (Tigy's face) and
 - **Viewer arrows:** 52px paw-pink buttons with 8px corners on either side of the stage.
 
 ### Icons
-- **Interface icons:** Lucide only, drawn on its 24px grid with round line ends and a slightly heavier line (2.4–2.5) to match the chunky type, shown at 18–22px in the current text colour. The Angular build uses `lucide-angular`.
+- **Interface icons:** Lucide only, drawn on its 24px grid with round line ends and a slightly heavier line (2.4–2.5) to match the chunky type, shown at 18–22px in the current text colour. The Angular build uses `@lucide/angular`.
 - **Social logos:** Simple Icons (CC0), in a single colour, the button's text colour: maroon in light mode, cream in dark mode, never the networks' own brand colours and never redrawn. Shown at 18px with the handle on desktop; on phones the links become 46px logo-only buttons. Each link's accessible name is "Network: handle".
 - **Tigy's own shapes** (the forehead mark, the paw print, the flank stripes) are custom filled drawings, not icons.
 
@@ -261,7 +293,7 @@ Only a few things are fully round, because Tigy is: the avatar (Tigy's face) and
 **The One Set Rule.** Every interface icon comes from Lucide at one line weight. Social logos and Tigy's own shapes are the only exceptions.
 
 ### Signature: the tail timeline
-A ringed tail on the right edge (desktop) that fills as you scroll, alternating fur and maroon rings with a dark tip. It marks the years, shows the month while hovering, and can be clicked or dragged to travel. On phones it becomes a thin ringed bar along the bottom edge. It sits beside the browser's own scrollbar rather than replacing it.
+A ringed tail on the right edge (desktop) that fills as you scroll, alternating fur and maroon rings with a dark tip. It spans the whole filtered gallery, not just the loaded pages, and marks the years only (no month bubble). Clicking or dragging to a year travels there, loading pages until that year arrives. On phones it becomes a thin ringed bar along the bottom edge. It sits beside the browser's own scrollbar rather than replacing it.
 
 ### Signature: the markings
 - **Forehead mark:** one long tapered stroke crossed by two shorter ones, before the "Tigy" wordmark.

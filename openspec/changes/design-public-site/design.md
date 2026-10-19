@@ -109,6 +109,13 @@ Owner feedback from the round, to carry into the build:
 10. **No month bubble.** The tail shows years only; `DESIGN.md` drops the month shown while hovering.
 11. **Credits panel state.** Open by default. Closing it is remembered in the visitor's browser and applied before first paint by the same inline script as the theme, so the stage never jumps.
 
+**Building on server-rendered data (D11).** Three choices the owner settled when the build started:
+
+1. **The justified gallery is CSS, not script.** Each tile's width starts at its piece's shape times three quarters of the target row height and grows in proportion to that shape, so every row fills the width with one height near the target, never below 75% of it, and pieces are never cropped. It works the same in the server's HTML and the browser, so nothing regroups after load.
+   - *Alternative:* the mockup's script, which measures the width in the browser; the server would have to guess it, and the rows would jump after load.
+2. **Every tile shows the whole piece on cream.** The gallery summary carries no animated or transparent flag, so tiles never crop and stickers sit on the cream backdrop; there is no GIF badge. The NSFW badge stays.
+3. **No month pill and no counter.** The mockup's month pill while scrolling and its "3 of 30" stage counter are left out: the first is a month display like the dropped month bubble, and the artwork endpoint does not know a piece's position.
+
 **Content ranges.** The number of published images is not confirmed. The design must hold up with about 10 images and with several hundred. Credits range from one artist and only Tigy up to several artists and four or more characters on one piece. Titles, descriptions and tags may all be missing.
 
 **States to show.** Gallery loading the next page; an artwork with every field filled and one with only the image; an animated image; a transparent sticker; the NSFW confirm screen; NSFW switch on and off. With four real pieces, a gallery of several hundred is shown by repeating them, marked as such.
