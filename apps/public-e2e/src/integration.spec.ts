@@ -26,7 +26,7 @@ test('Hydration: no data request while an artwork page becomes interactive', asy
   await page.waitForLoadState('networkidle');
   expect(data).toEqual([]);
 
-  await page.locator('.next').click();
+  await page.locator('.nav.next').click();
   await expect(page).toHaveURL(/\/i\/chibi-tigy$/);
 });
 
@@ -47,7 +47,10 @@ test.describe('edits', () => {
     });
     for (const id of ['hey-pookie', 'happy-tigy']) {
       await page.goto(`/i/${id}`);
-      await expect(page.locator('.artists .links a')).toHaveText(['mastodon']);
+      const link = page.locator('.artists .links a');
+      await expect(link).toHaveAttribute('aria-label', 'Mastodon: artist');
+      // Network without a logo: the generic link icon.
+      await expect(link.locator('svg.generic')).toHaveCount(1);
     }
   });
 
@@ -60,8 +63,11 @@ test.describe('edits', () => {
       ],
     });
     await page.goto('/');
-    await expect(page.locator('.social a')).toHaveText(['bluesky']);
-    await expect(page.locator('.social a')).toHaveAttribute(
+    await expect(page.locator('.socials a')).toHaveAttribute(
+      'aria-label',
+      'Bluesky: tigy',
+    );
+    await expect(page.locator('.socials a')).toHaveAttribute(
       'href',
       'https://example.com/tigy',
     );
@@ -73,8 +79,8 @@ test.describe('edits', () => {
     await db.doc('people/placeholder-character').update({ name: 'Pookie' });
     await rebuildSummaries();
     await page.goto('/?character=placeholder-character');
-    await expect(page.locator('.active-filters a')).toHaveText([
-      'Character: Pookie ×',
+    await expect(page.locator('.chip.is-active')).toHaveText([
+      'Character: Pookie',
     ]);
     await expect(page.locator('.gallery .tile a')).toHaveCount(1);
   });

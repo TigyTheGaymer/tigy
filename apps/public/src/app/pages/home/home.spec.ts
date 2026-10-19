@@ -14,6 +14,19 @@ import { RouterTestingHarness } from '@angular/router/testing';
 import { appRoutes } from '../../app.routes';
 import { galleryPage, HOME, requested, rows, settled } from '../../testing';
 
+/** Stands in for the browser's IntersectionObserver, which jsdom lacks. */
+let setNearEnd: (isNear: boolean) => void = () => undefined;
+class FakeIntersectionObserver {
+  constructor(callback: (entries: { isIntersecting: boolean }[]) => void) {
+    setNearEnd = (isNear) => callback([{ isIntersecting: isNear }]);
+  }
+  readonly observe = vi.fn();
+  readonly disconnect = vi.fn();
+}
+
+// The first test loads and compiles the lazy page with its icons, which can take a few seconds.
+vi.setConfig({ testTimeout: 20_000 });
+
 describe('HomePage', () => {
   let http: HttpTestingController;
   let harness: RouterTestingHarness;
@@ -22,6 +35,7 @@ describe('HomePage', () => {
   beforeEach(async () => {
     sessionStorage.clear();
     localStorage.clear();
+    vi.stubGlobal('IntersectionObserver', FakeIntersectionObserver);
     response = {};
     TestBed.configureTestingModule({
       providers: [
@@ -35,7 +49,10 @@ describe('HomePage', () => {
     harness = await RouterTestingHarness.create();
   });
 
-  afterEach(() => http.verify());
+  afterEach(() => {
+    http.verify();
+    vi.unstubAllGlobals();
+  });
 
   const page = () => harness.routeNativeElement as HTMLElement;
   const text = (selector: string) =>
@@ -58,14 +75,16 @@ describe('HomePage', () => {
     await settled();
 
     expect(text('h1')).toBe('Tigy');
+    expect(text('.bio')).toBe('A tiger');
     expect(page().querySelector('.avatar')?.getAttribute('src')).toBe(
       '/avatars/tigy.webp',
     );
     expect(
-      [...page().querySelectorAll('.social a')].map((a) =>
+      [...page().querySelectorAll('.socials a')].map((a) => [
         a.getAttribute('href'),
-      ),
-    ).toEqual(['https://bsky.app/profile/tigy']);
+        a.getAttribute('aria-label'),
+      ]),
+    ).toEqual([['https://bsky.app/profile/tigy', 'Bluesky: tigy']]);
     expect(text('.overview')).toBe('30 pieces · Nov 2025 – Apr 2026');
     expect(tiles()).toHaveLength(24);
     expect(tiles()[0]).toBe('/i/p01');
@@ -73,7 +92,9 @@ describe('HomePage', () => {
     expect(thumb.getAttribute('src')).toBe('/img/p01/thumb.webp');
     expect(thumb.getAttribute('width')).toBe('400');
     expect(thumb.getAttribute('height')).toBe('300');
-    expect(thumb.getAttribute('alt')).toBe('Piece 1');
+    expect(page().querySelector('.tile a')?.getAttribute('aria-label')).toBe(
+      'Piece 1',
+    );
   });
 
   it("shows just the name Tigy without Tigy's person", async () => {
@@ -84,7 +105,7 @@ describe('HomePage', () => {
 
     expect(text('h1')).toBe('Tigy');
     expect(page().querySelector('.avatar')).toBeNull();
-    expect(page().querySelector('.social')).toBeNull();
+    expect(page().querySelector('.socials')).toBeNull();
   });
 
   it('No art yet: leaves out the count and date range and says so', async () => {
@@ -98,11 +119,11 @@ describe('HomePage', () => {
     await settled();
 
     expect(page().querySelector('.overview')).toBeNull();
-    expect(text('.gallery')).toBe('No art yet.');
-    expect(page().querySelector('.load-more')).toBeNull();
+    expect(text('.empty')).toBe('No art yet.');
+    expect(text('.end')).toBeUndefined();
   });
 
-  it('Loading more: appends the next page after the last piece and says the end is reached', async () => {
+  it('Loading more: scrolling near the end appends the next page and says the end is reached', async () => {
     await open('/?tag=comic');
     (await requested(http, '/api/home')).flush(HOME);
     (await requested(http, '/api/gallery?tag=comic')).flush(
@@ -111,7 +132,7 @@ describe('HomePage', () => {
     await settled();
     expect(text('.end')).toBeUndefined();
 
-    page().querySelector<HTMLButtonElement>('.load-more')!.click();
+    setNearEnd(true);
     const last = rows(24)[23];
     (
       await requested(
@@ -123,7 +144,6 @@ describe('HomePage', () => {
 
     expect(tiles()).toHaveLength(30);
     expect(tiles()[24]).toBe('/i/p25');
-    expect(page().querySelector('.load-more')).toBeNull();
     expect(text('.end')).toBe("That's every piece.");
     // Only the filters, so the link stays shareable.
     expect(TestBed.inject(Router).url).toBe('/?tag=comic');
@@ -142,20 +162,20 @@ describe('HomePage', () => {
     await settled();
 
     const filters = [
-      ...page().querySelectorAll<HTMLAnchorElement>('.active-filters a'),
+      ...page().querySelectorAll<HTMLAnchorElement>('.chip.is-active'),
     ];
     expect(filters.map((a) => a.textContent?.trim())).toEqual([
-      'Character: Tigy ×',
-      'Tag: comic ×',
+      'Character: Tigy',
+      'Tag: comic',
     ]);
     expect(filters.map((a) => a.getAttribute('href'))).toEqual([
       '/?tag=comic&sort=oldest',
       '/?character=tigy&sort=oldest',
     ]);
-    expect(text('.sort strong')).toBe('Oldest first');
-    expect(page().querySelector('.sort a')?.getAttribute('href')).toBe(
-      '/?character=tigy&tag=comic',
-    );
+    const sort = page().querySelector('.chip.sort')!;
+    expect(sort.textContent?.trim()).toBe('Oldest first');
+    expect(sort.getAttribute('href')).toBe('/?character=tigy&tag=comic');
+    expect(page().querySelectorAll('button.chip[aria-disabled="true"]')).toHaveLength(4);
   });
 
   it('Unknown person: names the filter "Unknown person", says nothing matches and offers to clear', async () => {
@@ -170,9 +190,8 @@ describe('HomePage', () => {
     });
     await settled();
 
-    const filter =
-      page().querySelector<HTMLAnchorElement>('.active-filters a')!;
-    expect(filter.textContent?.trim()).toBe('Artist: Unknown person ×');
+    const filter = page().querySelector<HTMLAnchorElement>('.chip.is-active')!;
+    expect(filter.textContent?.trim()).toBe('Artist: Unknown person');
     expect(filter.getAttribute('href')).toBe('/');
     expect(text('.empty')).toContain('Nothing matches these filters.');
     expect(page().querySelector('.empty a')?.getAttribute('href')).toBe('/');
@@ -186,7 +205,7 @@ describe('HomePage', () => {
       statusText: 'Server Error',
     });
     await settled();
-    expect(text('.gallery')).toBe('Could not load the gallery.');
+    expect(text('.error')).toBe('Could not load the gallery.');
     expect(response.status).toBe(503);
     expect(new Headers(response.headers).get('cache-control')).toBe('no-store');
   });
@@ -201,10 +220,10 @@ describe('HomePage', () => {
 
     expect(http.match('/api/people')).toEqual([]);
     expect(
-      [...page().querySelectorAll('.active-filters a')].map((a) =>
+      [...page().querySelectorAll('.chip.is-active')].map((a) =>
         a.textContent?.trim(),
       ),
-    ).toEqual(['Tag: comic ×', 'Year: 2025 ×']);
+    ).toEqual(['Tag: comic', 'Year: 2025']);
   });
 
   it('remembers its address in this tab for the link back', async () => {

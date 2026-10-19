@@ -1,0 +1,227 @@
+import {
+  afterNextRender,
+  Component,
+  computed,
+  DestroyRef,
+  DOCUMENT,
+  ElementRef,
+  inject,
+  input,
+  output,
+  signal,
+  viewChild,
+} from '@angular/core';
+import { LucideMaximize, LucideMinus, LucidePlus, LucideX } from '@lucide/angular';
+
+const MAX_SCALE = 8;
+
+/**
+ * The full view: the piece fills the screen, at once from the image the page
+ * already has, and the original replaces it once loaded, for zooming into
+ * full detail (design D10).
+ */
+@Component({
+  selector: 'app-full-view',
+  imports: [LucideMaximize, LucideMinus, LucidePlus, LucideX],
+  styleUrl: './full-view.css',
+  host: {
+    role: 'dialog',
+    'aria-modal': 'true',
+    '[attr.aria-label]': '"Full view: " + alt()',
+    '[class.is-open]': 'isShown()',
+    '[class.is-zoomed]': 'isZoomed()',
+    '[class.is-dragging]': 'isDragging()',
+    '(document:keydown)': 'onKey($event)',
+  },
+  template: `
+    <div
+      #stage
+      class="stage"
+      (wheel)="onWheel($event)"
+      (pointerdown)="onPointerDown($event)"
+      (pointermove)="onPointerMove($event)"
+      (pointerup)="onPointerUp($event)"
+      (pointercancel)="onPointerUp($event)"
+      (dblclick)="onDoubleClick($event)"
+    >
+      <img
+        #image
+        [src]="src()"
+        [alt]="alt()"
+        draggable="false"
+        [style.transform]="transform()"
+        [style.transition]="isAnimated() ? 'transform 260ms var(--ease-out)' : 'none'"
+      />
+    </div>
+    <div class="bar">
+      <button type="button" class="btn" aria-label="Zoom out" (click)="zoomBy(1 / 1.5)">
+        <svg lucideMinus class="icon" aria-hidden="true"></svg>
+      </button>
+      <output class="zoom" aria-live="polite">{{ zoomLabel() }}</output>
+      <button type="button" class="btn" aria-label="Zoom in" (click)="zoomBy(1.5)">
+        <svg lucidePlus class="icon" aria-hidden="true"></svg>
+      </button>
+      <button type="button" class="btn" aria-label="Fit to screen" (click)="fit()">
+        <svg lucideMaximize class="icon" aria-hidden="true"></svg>
+      </button>
+      <button
+        #closeButton
+        type="button"
+        class="btn close"
+        aria-label="Close full view"
+        (click)="closed.emit()"
+      >
+        <svg lucideX class="icon" aria-hidden="true"></svg>
+      </button>
+    </div>
+    <p class="hint">Scroll or pinch to zoom · drag to move · Esc to close</p>
+  `,
+})
+export class FullView {
+  /** The image the page already shows. */
+  readonly fullSrc = input.required<string>();
+  readonly originalSrc = input.required<string>();
+  readonly alt = input('');
+  readonly closed = output<void>();
+
+  private readonly original = signal<string | undefined>(undefined);
+  protected readonly src = computed(() => this.original() ?? this.fullSrc());
+
+  protected readonly isShown = signal(false);
+  protected readonly isDragging = signal(false);
+  protected readonly isAnimated = signal(false);
+  private readonly scale = signal(1);
+  private readonly x = signal(0);
+  private readonly y = signal(0);
+  protected readonly isZoomed = computed(() => this.scale() > 1.001);
+  protected readonly zoomLabel = computed(() =>
+    this.isZoomed() ? `${Math.round(this.scale() * 100)}%` : 'Fit',
+  );
+  protected readonly transform = computed(
+    () => `translate(${this.x()}px, ${this.y()}px) scale(${this.scale()})`,
+  );
+
+  private readonly stage = viewChild.required<ElementRef<HTMLElement>>('stage');
+  private readonly image = viewChild.required<ElementRef<HTMLImageElement>>('image');
+  private readonly closeButton =
+    viewChild.required<ElementRef<HTMLButtonElement>>('closeButton');
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+
+  private readonly pointers = new Map<number, { x: number; y: number }>();
+  private last: { x: number; y: number } | undefined;
+  private pinch: { distance: number; scale: number } | undefined;
+
+  constructor() {
+    const root = inject(DOCUMENT).documentElement;
+    inject(DestroyRef).onDestroy(() => root.classList.remove('viewer-lock'));
+    afterNextRender(() => {
+      root.classList.add('viewer-lock');
+      this.isShown.set(true);
+      this.closeButton().nativeElement.focus();
+      const original = new Image();
+      original.onload = () => this.original.set(this.originalSrc());
+      original.src = this.originalSrc();
+    });
+  }
+
+  zoomBy(factor: number, clientX?: number, clientY?: number, isAnimated = true): void {
+    const rect = this.stage().nativeElement.getBoundingClientRect();
+    const px = (clientX ?? rect.left + rect.width / 2) - (rect.left + rect.width / 2);
+    const py = (clientY ?? rect.top + rect.height / 2) - (rect.top + rect.height / 2);
+    const scale = Math.min(MAX_SCALE, Math.max(1, this.scale() * factor));
+    const ratio = scale / this.scale();
+    this.x.set(px - (px - this.x()) * ratio);
+    this.y.set(py - (py - this.y()) * ratio);
+    this.scale.set(scale);
+    this.apply(isAnimated);
+  }
+
+  fit(): void {
+    this.scale.set(1);
+    this.x.set(0);
+    this.y.set(0);
+    this.apply(true);
+  }
+
+  protected onWheel(event: WheelEvent): void {
+    event.preventDefault();
+    this.zoomBy(Math.exp(-event.deltaY * 0.0018), event.clientX, event.clientY, false);
+  }
+
+  protected onPointerDown(event: PointerEvent): void {
+    this.stage().nativeElement.setPointerCapture(event.pointerId);
+    this.pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+    this.last = { x: event.clientX, y: event.clientY };
+    if (this.pointers.size === 2) {
+      const [a, b] = [...this.pointers.values()];
+      this.pinch = { distance: Math.hypot(a.x - b.x, a.y - b.y), scale: this.scale() };
+    }
+    this.isDragging.set(true);
+  }
+
+  protected onPointerMove(event: PointerEvent): void {
+    if (!this.pointers.has(event.pointerId)) return;
+    this.pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+    if (this.pointers.size === 2 && this.pinch) {
+      const [a, b] = [...this.pointers.values()];
+      const distance = Math.hypot(a.x - b.x, a.y - b.y);
+      this.zoomBy(
+        (this.pinch.scale * (distance / this.pinch.distance)) / this.scale(),
+        (a.x + b.x) / 2,
+        (a.y + b.y) / 2,
+        false,
+      );
+    } else if (this.pointers.size === 1 && this.last) {
+      this.x.update((x) => x + event.clientX - this.last!.x);
+      this.y.update((y) => y + event.clientY - this.last!.y);
+      this.last = { x: event.clientX, y: event.clientY };
+      this.apply(false);
+    }
+  }
+
+  protected onPointerUp(event: PointerEvent): void {
+    this.pointers.delete(event.pointerId);
+    if (this.pointers.size < 2) this.pinch = undefined;
+    if (this.pointers.size === 0) {
+      this.last = undefined;
+      this.isDragging.set(false);
+    }
+  }
+
+  protected onDoubleClick(event: MouseEvent): void {
+    if (this.isZoomed()) this.fit();
+    else this.zoomBy(2.5, event.clientX, event.clientY);
+  }
+
+  protected onKey(event: KeyboardEvent): void {
+    if (event.key === 'Escape') this.closed.emit();
+    else if (event.key === '+' || event.key === '=') this.zoomBy(1.5);
+    else if (event.key === '-') this.zoomBy(1 / 1.5);
+    else if (event.key === '0') this.fit();
+    else if (event.key === 'Tab') this.trapFocus(event);
+  }
+
+  private trapFocus(event: KeyboardEvent): void {
+    const buttons = this.host.nativeElement.querySelectorAll('button');
+    const first = buttons[0];
+    const last = buttons[buttons.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  }
+
+  /** Keeps the zoomed piece covering the screen it can cover. */
+  private apply(isAnimated: boolean): void {
+    const image = this.image().nativeElement;
+    const stage = this.stage().nativeElement;
+    const maxX = Math.max(0, (image.offsetWidth * this.scale() - stage.clientWidth) / 2);
+    const maxY = Math.max(0, (image.offsetHeight * this.scale() - stage.clientHeight) / 2);
+    this.x.set(Math.min(maxX, Math.max(-maxX, this.x())));
+    this.y.set(Math.min(maxY, Math.max(-maxY, this.y())));
+    this.isAnimated.set(isAnimated);
+  }
+}

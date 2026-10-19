@@ -1,14 +1,20 @@
 import { isPlatformBrowser } from '@angular/common';
 import {
+  afterNextRender,
+  afterRenderEffect,
   Component,
   computed,
+  DestroyRef,
   effect,
+  ElementRef,
   inject,
   input,
   linkedSignal,
   PLATFORM_ID,
+  signal,
+  viewChild,
 } from '@angular/core';
-import { Router, RouterLink, type Params } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import {
   galleryQueryFromParams,
   galleryQueryToParams,
@@ -21,27 +27,46 @@ import {
   CatalogService,
   type GalleryRequest,
 } from '../../catalog/catalog.service';
+import { TopBar } from '../../chrome/top-bar';
 import { monthRange, pieceCount } from '../../format';
 import { rememberGallery } from '../../gallery-address';
 import { HeadService } from '../../head/head.service';
-import { avatarUrl, thumbnailUrl } from '../../urls';
+import { Mark } from '../../markings/mark';
+import { Paw } from '../../markings/paw';
+import { Stripes } from '../../markings/stripes';
 import { NsfwSwitchService } from '../../nsfw/nsfw-switch.service';
 import { latest } from '../../resources';
 import { injectServerResponse } from '../../server-response';
-
-export interface ActiveFilter {
-  key: string;
-  kind: 'Character' | 'Artist' | 'Tag' | 'Year';
-  name: string;
-  remove: Params;
-}
+import { SocialLink } from '../../social/social-link';
+import { avatarUrl } from '../../urls';
+import { activeFilters } from './active-filters';
+import { FilterRow } from './filter-row';
+import { GalleryPlaceService } from './gallery-place.service';
+import { TailTimeline } from './tail-timeline';
+import { toTile } from './tile';
+import { Tiles } from './tiles';
 
 /** Repeated query parameters arrive as a list. */
 type QueryParam = string | string[] | undefined;
 
+interface MorePages {
+  rows: GalleryRow[];
+  hasMore?: boolean;
+}
+
 @Component({
   selector: 'app-home',
-  imports: [RouterLink],
+  imports: [
+    RouterLink,
+    TopBar,
+    Mark,
+    Paw,
+    Stripes,
+    SocialLink,
+    FilterRow,
+    Tiles,
+    TailTimeline,
+  ],
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
@@ -55,6 +80,8 @@ export class HomePage {
 
   private readonly catalog = inject(CatalogService);
   private readonly router = inject(Router);
+  private readonly place = inject(GalleryPlaceService);
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly isNsfwShown = inject(NsfwSwitchService).isOn;
 
   protected readonly query = computed(
@@ -69,11 +96,23 @@ export class HomePage {
     { equal: (a, b) => sameQuery(a, b) },
   );
 
+  /** Which gallery this is: its filters, sort and the NSFW switch. */
+  private readonly key = computed(() =>
+    JSON.stringify([galleryQueryToParams(this.query()), this.isNsfwShown()]),
+  );
+
+  /** The visitor's place when coming back to this gallery during the visit. */
+  private readonly restored = this.place.take();
+  private readonly isRestored = computed(
+    () => this.restored?.key === this.key(),
+  );
+
   private readonly homeResource = this.catalog.home(this.isNsfwShown);
-  private readonly firstPage = this.catalog.gallery(() => ({
-    query: this.query(),
-    includeNsfw: this.isNsfwShown(),
-  }));
+  private readonly firstPage = this.catalog.gallery(() =>
+    this.isRestored()
+      ? undefined
+      : { query: this.query(), includeNsfw: this.isNsfwShown() },
+  );
   // Only needed to name person filters.
   private readonly people = this.catalog.people(() => {
     const { characterIds, artistIds } = this.query();
@@ -83,25 +122,44 @@ export class HomePage {
   });
 
   protected readonly home = latest(this.homeResource);
-  protected readonly gallery = latest(this.firstPage);
 
-  /** Cleared whenever the first page changes: new filters, sort or switch start over. */
-  private readonly nextRequest = linkedSignal<
+  /** The first page; the last one stays while another loads, so a swap never empties the page. */
+  protected readonly gallery = linkedSignal<
     GalleryResponse | undefined,
+    GalleryResponse | undefined
+  >({
+    source: () =>
+      this.isRestored()
+        ? this.restored?.first
+        : this.firstPage.hasValue()
+          ? this.firstPage.value()
+          : undefined,
+    computation: (value, previous) => value ?? previous?.value,
+  });
+
+  /** Where more pieces continue; cleared when the gallery changes. */
+  private readonly nextRequest = linkedSignal<
+    string,
     GalleryRequest | undefined
-  >({ source: this.gallery, computation: () => undefined });
+  >({ source: this.key, computation: () => undefined });
   private readonly nextPage = this.catalog.gallery(this.nextRequest);
 
+  /** The pages loaded after the first, appended in order. */
   private readonly more = linkedSignal<
-    { first: GalleryResponse | undefined; page: GalleryResponse | undefined },
-    { rows: GalleryRow[]; hasMore?: boolean }
+    { key: string; page: GalleryResponse | undefined },
+    MorePages
   >({
     source: () => ({
-      first: this.gallery(),
+      key: this.key(),
       page: this.nextPage.hasValue() ? this.nextPage.value() : undefined,
     }),
-    computation: ({ first, page }, previous) => {
-      if (!previous || previous.source.first !== first) return { rows: [] };
+    computation: ({ key, page }, previous) => {
+      if (!previous) {
+        return this.isRestored() && this.restored
+          ? this.restored.more
+          : { rows: [] };
+      }
+      if (previous.source.key !== key) return { rows: [] };
       if (!page || page === previous.source.page) return previous.value;
       return {
         rows: [...previous.value.rows, ...page.rows],
@@ -114,25 +172,21 @@ export class HomePage {
     ...(this.gallery()?.rows ?? []),
     ...this.more().rows,
   ]);
-  protected readonly tiles = computed(() =>
-    this.rows().map((row) => ({
-      id: row.id,
-      src: thumbnailUrl(row.id),
-      width: row.w,
-      height: row.h,
-      alt: row.title ?? 'Untitled',
-    })),
-  );
+  protected readonly tiles = computed(() => this.rows().map(toTile));
   protected readonly hasMore = computed(
     () => this.more().hasMore ?? this.gallery()?.hasMore ?? false,
   );
   protected readonly isLoadingMore = this.nextPage.isLoading;
-  // A new first page is on its way: more pages would continue the old one.
-  protected readonly canLoadMore = computed(
-    () => !this.isLoadingMore() && !this.firstPage.isLoading(),
-  );
   protected readonly hasLoadMoreFailed = computed(
     () => this.nextPage.error() !== undefined,
+  );
+  // A new first page is on its way: more pages would continue the old one.
+  private readonly canLoadMore = computed(
+    () =>
+      this.hasMore() &&
+      !this.isLoadingMore() &&
+      !this.hasLoadMoreFailed() &&
+      !this.firstPage.isLoading(),
   );
   protected readonly hasGalleryFailed = computed(
     () => this.firstPage.error() !== undefined && !this.gallery(),
@@ -141,14 +195,14 @@ export class HomePage {
     () => this.homeResource.error() !== undefined && !this.home(),
   );
 
-  protected readonly socialLinks = computed(
-    () => this.home()?.owner?.links ?? [],
-  );
   protected readonly ownerName = computed(
     () => this.home()?.owner?.name ?? 'Tigy',
   );
   protected readonly ownerAvatar = computed(() =>
     this.home()?.owner?.avatar ? avatarUrl(TIGY_ID) : null,
+  );
+  protected readonly socialLinks = computed(
+    () => this.home()?.owner?.links ?? [],
   );
   protected readonly overview = computed(() => {
     const home = this.home();
@@ -159,15 +213,26 @@ export class HomePage {
   protected readonly filters = computed(() =>
     activeFilters(this.query(), (id) => this.personName(id)),
   );
-  protected readonly newest = computed(() =>
-    galleryQueryToParams({ ...this.query(), sort: 'newest' }),
-  );
-  protected readonly oldest = computed(() =>
-    galleryQueryToParams({ ...this.query(), sort: 'oldest' }),
+  protected readonly otherSortParams = computed(() =>
+    galleryQueryToParams({
+      ...this.query(),
+      sort: this.query().sort === 'newest' ? 'oldest' : 'newest',
+    }),
   );
   protected readonly cleared = computed(() =>
     galleryQueryToParams({ ...UNFILTERED_QUERY, sort: this.query().sort }),
   );
+
+  /** Year marks in gallery order. */
+  protected readonly years = computed(() => {
+    const years = this.gallery()?.years ?? [];
+    return this.query().sort === 'oldest' ? [...years].reverse() : years;
+  });
+
+  private readonly sentinel = viewChild<ElementRef<HTMLElement>>('sentinel');
+  private readonly isNearEnd = signal(false);
+  /** The piece the timeline asked for, until it is in view. */
+  private readonly travelTarget = signal<number | undefined>(undefined);
 
   constructor() {
     inject(HeadService).siteCard();
@@ -177,6 +242,29 @@ export class HomePage {
         response.unavailable();
       }
     });
+
+    // The next page loads by itself once the end of the gallery is near, and
+    // keeps loading while the timeline's chosen piece is not there yet.
+    effect(() => {
+      const target = this.travelTarget();
+      const isWanted =
+        this.isNearEnd() ||
+        (target !== undefined && target >= this.rows().length);
+      if (isWanted && this.canLoadMore()) this.loadMore();
+    });
+
+    afterRenderEffect(() => {
+      const target = this.travelTarget();
+      if (target === undefined) return;
+      const tile = this.host.nativeElement.querySelectorAll('.tile')[target];
+      if (tile) {
+        tile.scrollIntoView({ block: 'center' });
+        this.travelTarget.set(undefined);
+      } else if (!this.hasMore()) {
+        this.travelTarget.set(undefined);
+      }
+    });
+
     if (isPlatformBrowser(inject(PLATFORM_ID))) {
       // For the artwork page's link back.
       effect(() => {
@@ -185,7 +273,35 @@ export class HomePage {
         });
         rememberGallery(this.router.serializeUrl(tree));
       });
+
+      const destroyRef = inject(DestroyRef);
+      afterNextRender(() => {
+        const sentinel = this.sentinel()?.nativeElement;
+        if (!sentinel || typeof IntersectionObserver === 'undefined') return;
+        const observer = new IntersectionObserver(
+          ([entry]) => this.isNearEnd.set(entry.isIntersecting),
+          { rootMargin: '0px 0px 300px 0px' },
+        );
+        observer.observe(sentinel);
+        destroyRef.onDestroy(() => observer.disconnect());
+      });
+
+      destroyRef.onDestroy(() => {
+        const first = this.gallery();
+        if (!first) return;
+        const target = this.router.currentNavigation()?.finalUrl;
+        const isLeavingForArtwork =
+          !!target && this.router.serializeUrl(target).startsWith('/i/');
+        this.place.keep(
+          { key: this.key(), first, more: this.more() },
+          isLeavingForArtwork,
+        );
+      });
     }
+  }
+
+  protected travel(index: number): void {
+    this.travelTarget.set(index);
   }
 
   protected loadMore(): void {
@@ -213,48 +329,6 @@ export class HomePage {
       'Unknown person'
     );
   }
-}
-
-export function activeFilters(
-  query: GalleryQuery,
-  personName: (id: string) => string | null,
-): ActiveFilter[] {
-  const without = (change: Partial<GalleryQuery>) =>
-    galleryQueryToParams({ ...query, ...change });
-  return [
-    ...query.characterIds.map((id) => ({
-      key: `character:${id}`,
-      kind: 'Character' as const,
-      name: personName(id) ?? '…',
-      remove: without({
-        characterIds: query.characterIds.filter((other) => other !== id),
-      }),
-    })),
-    ...query.artistIds.map((id) => ({
-      key: `artist:${id}`,
-      kind: 'Artist' as const,
-      name: personName(id) ?? '…',
-      remove: without({
-        artistIds: query.artistIds.filter((other) => other !== id),
-      }),
-    })),
-    ...query.tags.map((tag) => ({
-      key: `tag:${tag}`,
-      kind: 'Tag' as const,
-      name: tag,
-      remove: without({ tags: query.tags.filter((other) => other !== tag) }),
-    })),
-    ...(query.year === undefined
-      ? []
-      : [
-          {
-            key: 'year',
-            kind: 'Year' as const,
-            name: String(query.year),
-            remove: without({ year: undefined }),
-          },
-        ]),
-  ];
 }
 
 function sameQuery(a: GalleryQuery, b: GalleryQuery): boolean {

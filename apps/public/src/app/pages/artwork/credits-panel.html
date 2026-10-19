@@ -1,0 +1,98 @@
+<article class="info" aria-labelledby="title">
+  <div class="info-head">
+    <button type="button" class="round close" aria-label="Close credits" (click)="closed.emit()">
+      <svg lucideX class="icon" aria-hidden="true"></svg>
+    </button>
+  </div>
+  <h1 id="title" [class.untitled]="!title()">{{ title() ?? 'Untitled' }}</h1>
+  @if (artwork().description; as description) {
+    <p class="desc">{{ description }}</p>
+  }
+
+  @for (section of sections(); track section.role) {
+    <div class="row credits" [class]="section.className">
+      @if (section.role === 'artist') {
+        <svg lucidePalette class="icon" aria-hidden="true"></svg>
+      } @else {
+        <svg lucideUsers class="icon" aria-hidden="true"></svg>
+      }
+      <div>
+        <span class="label">{{ section.label }}</span>
+        @for (person of section.people; track person.id) {
+          <div class="person">
+            <span class="dot" aria-hidden="true">
+              @if (person.avatar; as src) {
+                <img [src]="src" alt="" width="34" height="34" />
+              } @else {
+                {{ person.initial }}
+              }
+            </span>
+            <div>
+              <a class="name" routerLink="/" [queryParams]="person.queryParams">{{
+                person.name
+              }}</a>
+              @if (person.links.length) {
+                <span class="links">
+                  @for (link of person.links; track link.url) {
+                    <app-social-link [link]="link" look="inline" />
+                  }
+                </span>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  @if (artwork().tags.length) {
+    <div class="row">
+      <svg lucideTag class="icon" aria-hidden="true"></svg>
+      <div>
+        <span class="label">Tags</span>
+        <div class="tags">
+          @for (tag of artwork().tags; track tag) {
+            <a routerLink="/" [queryParams]="{ tag: tag }">#{{ tag }}</a>
+          }
+        </div>
+      </div>
+    </div>
+  }
+
+  <div class="row">
+    <svg lucideCalendar class="icon" aria-hidden="true"></svg>
+    <div>
+      <span class="label">Date</span>
+      <time class="date" [attr.datetime]="artwork().date ?? artwork().sortDate">{{
+        date()
+      }}</time>
+    </div>
+  </div>
+
+  <div class="row">
+    <svg lucideImage class="icon" aria-hidden="true"></svg>
+    <div>
+      <span class="label">Original file</span>
+      <span class="file">{{ file().summary }}</span>
+    </div>
+  </div>
+
+  <div class="actions">
+    @if (isPieceShown()) {
+      <a class="pad dark download" [href]="file().href" download
+        ><app-paw />Download original</a
+      >
+      <button type="button" class="pad" (click)="shared.emit()">
+        <svg lucideShare2 class="icon" aria-hidden="true"></svg>Share
+      </button>
+      <button type="button" class="pad light" (click)="fullViewOpened.emit()">
+        <svg lucideExpand class="icon" aria-hidden="true"></svg>Full view
+      </button>
+    }
+    @if (artwork().nsfw) {
+      <button type="button" class="pad light" (click)="safeLinkCopied.emit()">
+        <svg lucideLink class="icon" aria-hidden="true"></svg>Copy safe link
+      </button>
+    }
+  </div>
+</article>

@@ -1,18 +1,32 @@
 import { Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { StageBar } from '../../chrome/stage-bar';
 import { HeadService } from '../../head/head.service';
+import { Paw } from '../../markings/paw';
 import { injectServerResponse } from '../../server-response';
 
 /** Also shown for a missing or unpublished artwork. */
 @Component({
   selector: 'app-not-found',
-  imports: [RouterLink],
+  imports: [RouterLink, StageBar, Paw],
+  styles: `
+    main {
+      position: relative;
+      display: grid;
+      place-items: center;
+      min-height: 100svh;
+      background: var(--stage);
+    }
+  `,
   template: `
-    <section class="not-found">
-      <h1>Not found</h1>
-      <p>There is nothing at this address.</p>
-      <p><a routerLink="/">Go to the gallery</a></p>
-    </section>
+    <main>
+      <app-stage-bar />
+      <section class="shy" aria-labelledby="not-found">
+        <h1 id="not-found">No tiger here</h1>
+        <p>There's nothing at this address: no page, or no published piece.</p>
+        <a class="pad dark" routerLink="/"><app-paw />Back to the gallery</a>
+      </section>
+    </main>
   `,
 })
 export class NotFoundPage {

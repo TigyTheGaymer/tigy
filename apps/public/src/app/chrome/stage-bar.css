@@ -1,0 +1,43 @@
+/* The bar floats over the stage, so the host must not take a row of the stage's grid. */
+:host {
+  display: contents;
+}
+
+.stage-top {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 12px 26px;
+  color: var(--on-stage);
+  background: linear-gradient(180deg, rgb(0 0 0 / 0.5), transparent);
+}
+
+.side {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.logo {
+  margin-left: 6px;
+  font-size: 1.3rem;
+  color: var(--on-stage);
+}
+
+.logo app-mark {
+  color: #f5a742;
+}
+
+app-nsfw-switch {
+  margin-right: 6px;
+}
+
+@media (max-width: 720px) {
+  .logo {
+    display: none;
+  }
+}

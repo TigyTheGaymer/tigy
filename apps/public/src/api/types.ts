@@ -10,6 +10,8 @@ export interface GalleryResponse {
   hasMore: boolean;
   /** For every piece the visitor may see, not only this page. */
   overview: GalleryOverview;
+  /** How many matching pieces each year has, newest first: the tail timeline's marks. */
+  years: GalleryOverview['years'];
 }
 
 /** A person offered in a filter picker, with how many visible pieces credit them. */

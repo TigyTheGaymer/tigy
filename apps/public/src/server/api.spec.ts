@@ -224,6 +224,19 @@ describe('GET /api/gallery', () => {
     expect(body).toMatchObject({ rows: [], hasMore: false });
   });
 
+  it('counts the matching pieces per year, for the tail timeline', async () => {
+    const all = await get<GalleryResponse>('/api/gallery');
+    expect(all.body.years).toEqual([{ year: 2025, count: 30 }]);
+    const withNsfw = await get<GalleryResponse>('/api/gallery?nsfw=1');
+    expect(withNsfw.body.years).toEqual([{ year: 2025, count: 31 }]);
+    const filtered = await get<GalleryResponse>(
+      '/api/gallery?artist=nsfw-artist&nsfw=1',
+    );
+    expect(filtered.body.years).toEqual([{ year: 2025, count: 1 }]);
+    const none = await get<GalleryResponse>('/api/gallery?year=2024');
+    expect(none.body.years).toEqual([]);
+  });
+
   it('refuses a malformed cursor', async () => {
     const { status } = await get('/api/gallery?after=yesterday');
     expect(status).toBe(400);

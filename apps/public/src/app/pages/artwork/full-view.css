@@ -1,0 +1,96 @@
+:host {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgb(22 5 6 / 0.98);
+  opacity: 0;
+  --ring: var(--on-stage);
+  transition: opacity 220ms var(--ease-out);
+}
+
+:host(.is-open) {
+  opacity: 1;
+}
+
+.stage {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  touch-action: none;
+  cursor: zoom-in;
+}
+
+:host(.is-zoomed) .stage {
+  cursor: grab;
+}
+
+:host(.is-dragging) .stage {
+  cursor: grabbing;
+}
+
+img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  user-select: none;
+}
+
+.bar {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px;
+  border-radius: var(--r-md);
+  background: #fde3bc;
+}
+
+.btn {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: var(--r-md);
+  background: transparent;
+  color: #4b1416;
+  cursor: pointer;
+}
+
+.btn:hover {
+  background: #fff3e0;
+}
+
+.zoom {
+  min-width: 3.8em;
+  text-align: center;
+  font-weight: 800;
+  font-size: 0.86rem;
+  font-variant-numeric: tabular-nums;
+  color: #4b1416;
+}
+
+.close {
+  margin-left: 4px;
+  background: #f4a3ad;
+}
+
+.close:hover {
+  background: #e07c8b;
+}
+
+.hint {
+  position: absolute;
+  bottom: 16px;
+  left: 0;
+  right: 0;
+  margin: 0;
+  text-align: center;
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: rgb(253 227 188 / 0.65);
+}

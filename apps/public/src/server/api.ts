@@ -1,6 +1,7 @@
 import {
   galleryOverview,
   galleryQueryFromParams,
+  matchesQuery,
   neighbours,
   parseCursor,
   queryGallery,
@@ -56,13 +57,18 @@ export function apiRouter(catalog: Catalog): Router {
       }
       const nsfw = nsfwFlag(req);
       const rows = await catalog.summaries.gallery();
-      const page = queryGallery(rows, galleryQueryFromParams(req.query), {
+      const query = galleryQueryFromParams(req.query);
+      const page = queryGallery(rows, query, {
         nsfw,
         ...(after && { after }),
       });
       const body: GalleryResponse = {
         ...page,
         overview: galleryOverview(rows, nsfw),
+        years: galleryOverview(
+          rows.filter((row) => matchesQuery(row, query)),
+          nsfw,
+        ).years,
       };
       res.json(body);
     }),

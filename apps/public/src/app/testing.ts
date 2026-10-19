@@ -66,7 +66,7 @@ export function galleryPage(
   hasMore: boolean,
   total = pageRows.length,
 ): GalleryResponse {
-  return { rows: pageRows, hasMore, overview: overview(total) };
+  return { rows: pageRows, hasMore, overview: overview(total), years: [] };
 }
 
 export const HOME: HomeResponse = {

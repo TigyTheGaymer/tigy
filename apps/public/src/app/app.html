@@ -1,15 +1,1 @@
-<div class="site-bar">
-  <label class="nsfw-switch">
-    <input
-      #nsfwToggle
-      type="checkbox"
-      role="switch"
-      [checked]="nsfwSwitch.isOn()"
-      (change)="nsfwSwitch.set(nsfwToggle.checked)"
-    />
-    Show NSFW
-  </label>
-</div>
-<main>
-  <router-outlet />
-</main>
+<router-outlet />

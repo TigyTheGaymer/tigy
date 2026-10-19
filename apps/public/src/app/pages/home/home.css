@@ -1,29 +1,149 @@
-/* Only what keeps the plain page readable; design-public-site styles it. */
-.tiles {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  padding: 0;
-  list-style: none;
+/* The intro sits straight on the page, like a photo album's header: no card. */
+.hero {
+  padding-top: clamp(20px, 4vw, 48px);
 }
 
-.tile img {
-  display: block;
-  width: auto;
-  height: 200px;
-  max-width: 100%;
-  object-fit: contain;
+.head {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 8px clamp(18px, 3vw, 36px);
 }
 
 .avatar {
+  width: clamp(92px, 11vw, 148px);
+  height: auto;
+  aspect-ratio: 1;
   border-radius: 50%;
+  object-fit: cover;
+  box-shadow:
+    0 0 0 5px var(--panel-2),
+    0 0 0 8px var(--pink);
 }
 
-.social,
-.active-filters {
+h1 {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.12em;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(3.4rem, 9vw, 5.6rem);
+  line-height: 0.9;
+  letter-spacing: -0.02em;
+}
+
+h1 app-mark {
+  font-size: 0.57em;
+}
+
+.bio {
+  margin: 10px 0 4px;
+  max-width: 32rem;
+  font-size: clamp(1.02rem, 1.5vw, 1.15rem);
+  font-weight: 600;
+}
+
+.overview {
+  margin: 0 0 16px;
+  font-size: 0.86rem;
+  font-weight: 700;
+  opacity: 0.8;
+}
+
+.socials {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 8px;
+  margin: 0;
   padding: 0;
   list-style: none;
+}
+
+.album-head h2 {
+  margin: 0 0 18px;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(2.1rem, 4.6vw, 3rem);
+  line-height: 1;
+}
+
+/* Room on the right for the tail timeline */
+.gallery {
+  padding-right: calc(var(--gutter) + 44px);
+  padding-bottom: 24px;
+}
+
+.empty,
+.error {
+  font-weight: 700;
+}
+
+/* Paw prints walking while the next page loads */
+.sentinel {
+  display: grid;
+  place-items: center;
+  gap: 10px;
+  min-height: 80px;
+  margin-top: 20px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.sentinel p {
+  margin: 0;
+}
+
+.walk {
+  display: inline-flex;
+  gap: 10px;
+  font-size: 18px;
+}
+
+.walk app-paw {
+  opacity: 0.15;
+  animation: step 900ms ease-in-out infinite;
+}
+
+.walk app-paw:nth-child(odd) {
+  transform: rotate(-12deg);
+}
+
+.walk app-paw:nth-child(even) {
+  transform: translateY(8px) rotate(12deg);
+}
+
+.walk app-paw:nth-child(2) {
+  animation-delay: 150ms;
+}
+
+.walk app-paw:nth-child(3) {
+  animation-delay: 300ms;
+}
+
+.walk app-paw:nth-child(4) {
+  animation-delay: 450ms;
+}
+
+@keyframes step {
+  40% {
+    opacity: 1;
+  }
+}
+
+@media (max-width: 720px) {
+  .gallery {
+    padding-right: var(--gutter);
+  }
+}
+
+@media (max-width: 560px) {
+  .head {
+    grid-template-columns: 1fr;
+    justify-items: start;
+  }
+
+  .avatar {
+    width: 84px;
+  }
 }
