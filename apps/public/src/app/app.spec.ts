@@ -55,7 +55,7 @@ describe('routes', () => {
       const page = await harness.navigateByUrl(url, NotFoundPage);
       expect(page).toBeInstanceOf(NotFoundPage);
       expect(response.status).toBe(404);
-      const home = harness.routeNativeElement?.querySelector('.shy a');
+      const home = harness.routeNativeElement?.querySelector('.stage-panel a');
       expect(home?.getAttribute('href')).toBe('/');
     },
   );

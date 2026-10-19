@@ -21,7 +21,7 @@ import { injectServerResponse } from '../../server-response';
   template: `
     <main>
       <app-stage-bar />
-      <section class="shy" aria-labelledby="not-found">
+      <section class="stage-panel" aria-labelledby="not-found">
         <h1 id="not-found">No tiger here</h1>
         <p>There's nothing at this address: no page, or no published piece.</p>
         <a class="pad dark" routerLink="/"><app-paw />Back to the gallery</a>

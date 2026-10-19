@@ -145,7 +145,7 @@ describe('ArtworkPage', () => {
       statusText: 'Server Error',
     });
     await settled();
-    expect(text('.shy p')).toContain('Could not load this piece.');
+    expect(text('.stage-panel p')).toContain('Could not load this piece.');
     expect(response.status).toBe(503);
     expect(new Headers(response.headers).get('cache-control')).toBe('no-store');
   });

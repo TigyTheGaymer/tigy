@@ -19,7 +19,7 @@ for (const path of ['/no-such-page', '/p/tigy']) {
       'No tiger here',
     );
     await expect(
-      page.locator('.shy a'),
+      page.locator('.stage-panel a'),
     ).toHaveAttribute('href', '/');
   });
 }
