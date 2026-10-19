@@ -35,6 +35,26 @@
         "command": "firebase emulators:exec --only firestore,storage --project demo-tigy \"playwright test --config apps/public-e2e/playwright.config.mts\"",
         "cwd": "{workspaceRoot}"
       }
+    },
+    "preview": {
+      "executor": "nx:run-commands",
+      "continuous": true,
+      "dependsOn": [
+        {
+          "projects": ["public"],
+          "target": "build"
+        }
+      ],
+      "options": {
+        "command": "firebase emulators:exec --only firestore,storage --project demo-tigy \"node -r @swc-node/register firebase/seed/seed.ts && node dist/apps/public/server/server.mjs\"",
+        "cwd": "{workspaceRoot}",
+        "env": {
+          "PORT": "4300",
+          "SWC_NODE_PROJECT": "tsconfig.base.json",
+          "GCLOUD_PROJECT": "demo-tigy",
+          "FIREBASE_CONFIG": "{\"projectId\":\"demo-tigy\",\"storageBucket\":\"demo-tigy.appspot.com\"}"
+        }
+      }
     }
   }
 }

@@ -88,6 +88,12 @@ npx nx e2e public-e2e
 
 The server under test keeps the gallery summaries for one second instead of five minutes, so the tests see their own edits quickly. Set `SUMMARY_MAX_AGE_MS` to change that.
 
+To look at the same seeded site yourself, start it on http://localhost:4300 and stop it with Ctrl+C before running the suite, since both use the same ports:
+
+```bash
+npx nx run public-e2e:preview
+```
+
 ## Deploy
 
 Everything lives in one Firebase project, `tigy-165cc`. Every push to `main` runs [.github/workflows/deploy.yml](.github/workflows/deploy.yml), which deploys only what changed since the last successful run:

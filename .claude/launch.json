@@ -6,6 +6,12 @@
       "runtimeExecutable": "node",
       "runtimeArgs": ["design/mockups/serve.mjs"],
       "port": 4321
+    },
+    {
+      "name": "public",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["nx", "run", "public-e2e:preview"],
+      "port": 4300
     }
   ]
 }
