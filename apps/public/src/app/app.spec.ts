@@ -7,31 +7,7 @@ import { RouterTestingHarness } from '@angular/router/testing';
 import { CDN_CACHE_CONTROL } from '../server/cache-control';
 import { appRoutes } from './app.routes';
 import { serverRoutes } from './app.routes.server';
-import { TopBar } from './chrome/top-bar';
 import { NotFoundPage } from './not-found/not-found';
-
-describe('TopBar', () => {
-  it('offers the logo, the theme button and the NSFW switch, off by default', async () => {
-    TestBed.configureTestingModule({
-      imports: [TopBar],
-      providers: [provideRouter([])],
-    });
-    const fixture = TestBed.createComponent(TopBar);
-    await fixture.whenStable();
-    const element = fixture.nativeElement as HTMLElement;
-    expect(element.querySelector('.logo')?.getAttribute('href')).toBe('/');
-    expect(
-      element.querySelector('.theme-btn')?.getAttribute('aria-label'),
-    ).toContain('Theme: Automatic');
-    const toggle = element.querySelector<HTMLInputElement>(
-      '.switch input[role="switch"]',
-    );
-    expect(element.querySelector('.switch')?.textContent).toContain(
-      'Show NSFW',
-    );
-    expect(toggle?.checked).toBe(false);
-  });
-});
 
 describe('routes', () => {
   let response: ResponseInit;

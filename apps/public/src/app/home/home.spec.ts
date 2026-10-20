@@ -21,6 +21,7 @@ class FakeIntersectionObserver {
     setNearEnd = (isNear) => callback([{ isIntersecting: isNear }]);
   }
   readonly observe = vi.fn();
+  readonly unobserve = vi.fn();
   readonly disconnect = vi.fn();
 }
 

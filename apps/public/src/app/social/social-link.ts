@@ -13,7 +13,6 @@ import { brandFor } from './brands';
     <a
       [class]="look() === 'button' ? 'pad light social' : 'social-inline'"
       [href]="link().url"
-      rel="noopener"
       [attr.aria-label]="name() + ': ' + link().handle"
       [title]="name()"
     >

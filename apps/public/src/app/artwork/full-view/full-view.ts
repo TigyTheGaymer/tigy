@@ -27,78 +27,9 @@ const MAX_SCALE = 8;
   providers: [
     provideIcons({ lucideMaximize, lucideMinus, lucidePlus, lucideX }),
   ],
+  templateUrl: './full-view.html',
   styleUrl: './full-view.css',
   host: { '(keydown)': 'onKey($event)' },
-  template: `
-    <dialog
-      #dialog
-      class="viewer"
-      [attr.aria-label]="'Full view: ' + alt()"
-      [class.is-open]="isShown()"
-      [class.is-zoomed]="isZoomed()"
-      [class.is-dragging]="isDragging()"
-      (close)="onClosed()"
-    >
-      <div
-        #stage
-        class="stage"
-        (wheel)="onWheel($event)"
-        (pointerdown)="onPointerDown($event)"
-        (pointermove)="onPointerMove($event)"
-        (pointerup)="onPointerUp($event)"
-        (pointercancel)="onPointerUp($event)"
-        (dblclick)="onDoubleClick($event)"
-      >
-        <img
-          #image
-          [src]="src()"
-          [alt]="alt()"
-          draggable="false"
-          [style.transform]="transform()"
-          [style.transition]="
-            isAnimated() ? 'transform 260ms var(--ease-out)' : 'none'
-          "
-        />
-      </div>
-      <div class="bar">
-        <button
-          type="button"
-          class="btn"
-          aria-label="Zoom out"
-          (click)="zoomBy(1 / 1.5)"
-        >
-          <ng-icon name="lucideMinus" class="icon" />
-        </button>
-        <output class="zoom" aria-live="polite">{{ zoomLabel() }}</output>
-        <button
-          type="button"
-          class="btn"
-          aria-label="Zoom in"
-          (click)="zoomBy(1.5)"
-        >
-          <ng-icon name="lucidePlus" class="icon" />
-        </button>
-        <button
-          type="button"
-          class="btn"
-          aria-label="Fit to screen"
-          (click)="fit()"
-        >
-          <ng-icon name="lucideMaximize" class="icon" />
-        </button>
-        <button
-          type="button"
-          class="btn close"
-          aria-label="Close full view"
-          autofocus
-          (click)="dialog.close()"
-        >
-          <ng-icon name="lucideX" class="icon" />
-        </button>
-      </div>
-      <p class="hint">Scroll or pinch to zoom · drag to move · Esc to close</p>
-    </dialog>
-  `,
 })
 export class FullView {
   /** The image the page already shows. */
@@ -146,7 +77,7 @@ export class FullView {
     });
   }
 
-  zoomBy(
+  protected zoomBy(
     factor: number,
     clientX?: number,
     clientY?: number,
@@ -165,7 +96,7 @@ export class FullView {
     this.apply(isAnimated);
   }
 
-  fit(): void {
+  protected fit(): void {
     this.scale.set(1);
     this.x.set(0);
     this.y.set(0);

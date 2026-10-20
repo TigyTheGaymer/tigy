@@ -15,14 +15,15 @@ import {
 import { formatArtworkDate } from '@tigy/gallery';
 import { TIGY_ID } from '@tigy/models';
 import type { ArtworkResponse, CreditedPerson } from '../../../api/types';
-import { fileSize, formatName } from '../../format';
 import { Paw } from '../../markings/paw';
+import { fileSize, formatName } from '../../shared/format';
+import { PieceTitlePipe } from '../../shared/piece-title.pipe';
+import { avatarUrl, originalUrl } from '../../shared/urls';
 import { SocialLink } from '../../social/social-link';
-import { avatarUrl, originalUrl } from '../../urls';
 
 @Component({
   selector: 'app-credits-panel',
-  imports: [RouterLink, NgIcon, Paw, SocialLink],
+  imports: [RouterLink, NgIcon, Paw, SocialLink, PieceTitlePipe],
   providers: [
     provideIcons({
       lucideCalendar,
@@ -43,10 +44,10 @@ export class CreditsPanel {
   readonly page = input.required<ArtworkResponse>();
   /** False while an NSFW piece waits behind the confirm screen: no actions yet. */
   readonly isPieceShown = input(true);
-  readonly closed = output<void>();
-  readonly shared = output<void>();
-  readonly safeLinkCopied = output<void>();
-  readonly fullViewOpened = output<void>();
+  readonly closeRequested = output<void>();
+  readonly shareRequested = output<void>();
+  readonly safeLinkRequested = output<void>();
+  readonly fullViewRequested = output<void>();
 
   protected readonly artwork = computed(() => this.page().artwork);
   protected readonly title = computed(() => this.artwork().title);
@@ -57,9 +58,9 @@ export class CreditsPanel {
       : `Added ${formatArtworkDate(sortDate)}`;
   });
   protected readonly file = computed(() => {
-    const { id, file } = this.artwork();
+    const { file } = this.artwork();
     return {
-      href: originalUrl(id, file.original),
+      href: originalUrl(this.artwork()),
       summary: [
         formatName(file.mime) + (file.animated ? ' (animated)' : ''),
         `${file.w} × ${file.h} px`,

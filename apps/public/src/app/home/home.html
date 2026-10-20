@@ -1,13 +1,13 @@
 <app-top-bar />
 
 <main>
-  <section class="hero container" aria-labelledby="intro">
+  <section class="hero container" aria-labelledby="owner-heading">
     <div class="head">
       @if (ownerAvatar(); as src) {
         <img class="avatar" [src]="src" alt="" width="148" height="148" />
       }
       <div>
-        <h1 id="intro"><app-mark />{{ ownerName() }}</h1>
+        <h1 id="owner-heading"><app-mark />{{ ownerName() }}</h1>
         <p class="bio">A tiger</p>
         @if (overview(); as text) {
           <p class="overview">{{ text }}</p>
@@ -25,9 +25,9 @@
 
   <app-stripes />
 
-  <section class="album" aria-labelledby="album-h">
+  <section class="album" aria-labelledby="album-heading">
     <div class="container album-head">
-      <h2 id="album-h">All the art</h2>
+      <h2 id="album-heading">All the art</h2>
     </div>
     <app-filter-row
       [filters]="filters()"
@@ -38,7 +38,7 @@
     <div class="container gallery">
       @if (tiles().length) {
         <app-tiles [tiles]="tiles()" />
-      } @else if (gallery(); as page) {
+      } @else if (pages.first(); as page) {
         @if (!page.overview.count) {
           <p class="empty">No art yet.</p>
         } @else {
@@ -47,22 +47,22 @@
             <a routerLink="/" [queryParams]="cleared()">Clear the filters</a>
           </p>
         }
-      } @else if (hasGalleryFailed()) {
+      } @else if (pages.hasFailed()) {
         <p class="error">Could not load the gallery.</p>
       }
 
       <div #sentinel class="sentinel" role="status">
-        @if (isLoadingMore()) {
+        @if (pages.isLoadingMore()) {
           <span class="walk" aria-hidden="true"
             ><app-paw /><app-paw /><app-paw /><app-paw
           /></span>
           <span class="visually-hidden">Loading more art</span>
-        } @else if (hasLoadMoreFailed()) {
+        } @else if (pages.hasLoadMoreFailed()) {
           <p class="error">Could not load more pieces.</p>
-          <button type="button" class="pad light" (click)="loadMore()">
+          <button type="button" class="pad light" (click)="pages.loadMore()">
             Try again
           </button>
-        } @else if (tiles().length && !hasMore()) {
+        } @else if (tiles().length && !pages.hasMore()) {
           <p class="end">That's every piece.</p>
         }
       </div>
@@ -73,7 +73,7 @@
 @if (years().length) {
   <app-tail-timeline
     [years]="years()"
-    [loaded]="rows().length"
+    [loaded]="pages.rows().length"
     (travel)="travel($event)"
   />
 }

@@ -1,12 +1,7 @@
-import { ApplicationRef, DOCUMENT } from '@angular/core';
+import { DOCUMENT } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
+import { rendered } from '../../testing';
 import { CreditsPanelService } from './credits-panel.service';
-
-/** Runs the first-render callbacks. */
-async function rendered(): Promise<void> {
-  TestBed.inject(ApplicationRef).tick();
-  await TestBed.inject(ApplicationRef).whenStable();
-}
 
 describe('CreditsPanelService', () => {
   let root: HTMLElement;

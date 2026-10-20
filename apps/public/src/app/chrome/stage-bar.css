@@ -29,7 +29,7 @@
 }
 
 .logo app-mark {
-  color: #f5a742;
+  color: var(--fur);
 }
 
 app-nsfw-switch {

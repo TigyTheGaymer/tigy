@@ -67,7 +67,7 @@ h1.untitled {
   overflow: hidden;
   border-radius: 50%;
   background: var(--pink);
-  color: #4b1416;
+  color: var(--on-pink);
   font-family: var(--font-display);
   font-weight: 800;
 }

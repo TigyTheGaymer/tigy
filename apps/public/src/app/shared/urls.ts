@@ -12,9 +12,15 @@ export function fullImageUrl(id: string): string {
   return `/img/${encodeURIComponent(id)}/full.webp`;
 }
 
-/** `storagePath` is the original's, such as `images/k3x/original.png`. */
-export function originalUrl(id: string, storagePath: string): string {
-  const name = storagePath.slice(storagePath.lastIndexOf('/') + 1);
+/** `file.original` is the Storage path, such as `images/k3x/original.png`. */
+export function originalUrl({
+  id,
+  file,
+}: {
+  id: string;
+  file: { original: string };
+}): string {
+  const name = file.original.slice(file.original.lastIndexOf('/') + 1);
   return `/img/${encodeURIComponent(id)}/${name}`;
 }
 

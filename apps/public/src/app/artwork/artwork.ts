@@ -22,13 +22,15 @@ import {
 import { CatalogService, isNotFound } from '../catalog/catalog.service';
 import { StageBar } from '../chrome/stage-bar';
 import { HeadService } from '../head/head.service';
+import { injectServerResponse } from '../head/server-response';
 import { Paw } from '../markings/paw';
 import { NotFoundPage } from '../not-found/not-found';
 import { ConfirmedPiecesService } from '../nsfw/confirmed-pieces.service';
 import { NsfwSwitchService } from '../nsfw/nsfw-switch.service';
-import { latest } from '../resources';
-import { injectServerResponse } from '../server-response';
-import { artworkPath, fullImageUrl, originalUrl } from '../urls';
+import { pieceTitle } from '../shared/format';
+import { PieceTitlePipe } from '../shared/piece-title.pipe';
+import { latest } from '../shared/resources';
+import { artworkPath, fullImageUrl, originalUrl } from '../shared/urls';
 import { CreditsPanel } from './credits-panel/credits-panel';
 import { CreditsPanelService } from './credits-panel/credits-panel.service';
 import { FullView } from './full-view/full-view';
@@ -40,6 +42,7 @@ const SWIPE_DISTANCE = 60;
 @Component({
   selector: 'app-artwork',
   imports: [
+    PieceTitlePipe,
     RouterLink,
     NgIcon,
     StageBar,
@@ -105,13 +108,13 @@ export class ArtworkPage {
     );
   });
 
-  protected readonly title = computed(
-    () => this.data()?.artwork.title ?? 'Untitled',
+  protected readonly title = computed(() =>
+    pieceTitle(this.data()?.artwork.title),
   );
   protected readonly fullImage = computed(() => fullImageUrl(this.id()));
   protected readonly originalHref = computed(() => {
     const artwork = this.data()?.artwork;
-    return artwork ? originalUrl(artwork.id, artwork.file.original) : '';
+    return artwork ? originalUrl(artwork) : '';
   });
 
   protected readonly isFullViewOpen = signal(false);

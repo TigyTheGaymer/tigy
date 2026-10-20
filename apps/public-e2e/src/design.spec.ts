@@ -35,10 +35,11 @@ test.describe('foundations', () => {
     expect(await background(page)).toBe(FUR);
     await page.emulateMedia({ colorScheme: 'dark' });
     expect(await background(page)).toBe(NIGHT);
-    const panel = await page.evaluate(() =>
-      getComputedStyle(document.documentElement).getPropertyValue('--panel'),
+    // Tiles sit on the panel colour.
+    const panel = await page.evaluate(
+      () => getComputedStyle(document.querySelector('.tile')!).backgroundColor,
     );
-    expect(panel.trim()).toBe('#3d1718');
+    expect(panel).toBe('rgb(61, 23, 24)');
   });
 });
 

@@ -67,25 +67,39 @@
   src: url('/fonts/sour-gummy-latin-800-normal.woff2') format('woff2');
 }
 
+/* The coat's colours, the same in both themes. */
 :root {
-  --page: #f5a742;
-  --page-deep: #e48c2b;
-  --page-light: #f9c27a;
-  --panel: #fde3bc;
-  --panel-2: #fff3e0;
-  --ink: #4b1416;
-  --ink-2: #6e2422;
-  --stripe: #4b1416;
+  --fur: #f5a742;
+  --cream: #fde3bc;
+  --cream-light: #fff3e0;
+  --maroon: #4b1416;
   --pink: #f4a3ad;
   --pink-deep: #e07c8b;
-  --on-pink: #4b1416;
-  --dark-btn: #4b1416;
-  --on-dark-btn: #fde3bc;
-  --tail-a: #e48c2b;
-  --tail-b: #4b1416;
-  --stage: #2a0b0c;
-  --on-stage: #fde3bc;
-  --shadow: 0 2px 0 var(--page-deep), 0 18px 34px -20px rgb(75 20 22 / 0.55);
+  --night: #160506;
+}
+
+/* Theme colours as light-dark(light, dark). The device picks unless the visitor chose Light or
+   Dark (data-theme, set before first paint by the script in index.html). */
+:root {
+  color-scheme: light dark;
+  --page: light-dark(var(--fur), #2a0d0e);
+  --page-deep: light-dark(#e48c2b, #1c0708);
+  --page-light: light-dark(#f9c27a, #4a1b1b);
+  --panel: light-dark(var(--cream), #3d1718);
+  --panel-2: light-dark(var(--cream-light), #4d2020);
+  --ink: light-dark(var(--maroon), var(--cream));
+  --ink-2: light-dark(#6e2422, #f0c99a);
+  --stripe: light-dark(var(--maroon), var(--fur));
+  --on-pink: var(--maroon);
+  --dark-btn: light-dark(var(--maroon), var(--fur));
+  --on-dark-btn: light-dark(var(--cream), #2a0b0c);
+  --tail-a: light-dark(#e48c2b, var(--fur));
+  --tail-b: light-dark(var(--maroon), #6e2422);
+  --stage: light-dark(#2a0b0c, var(--night));
+  --on-stage: var(--cream);
+  --ledge: light-dark(#e48c2b, #12040a);
+  --drop: light-dark(rgb(75 20 22 / 0.55), rgb(0 0 0 / 0.7));
+  --shadow: 0 2px 0 var(--ledge), 0 18px 34px -20px var(--drop);
 
   --font-display: 'Grandstander', 'Nunito', system-ui, sans-serif;
   --font-ui: 'Nunito', system-ui, sans-serif;
@@ -103,47 +117,12 @@
   --row-h: 340px;
 }
 
-/* Dark follows the device unless the visitor picked Light or Dark (data-theme, set before first
-   paint by the script in index.html). */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']) {
-    --page: #2a0d0e;
-    --page-deep: #1c0708;
-    --page-light: #4a1b1b;
-    --panel: #3d1718;
-    --panel-2: #4d2020;
-    --ink: #fde3bc;
-    --ink-2: #f0c99a;
-    --stripe: #f5a742;
-    --dark-btn: #f5a742;
-    --on-dark-btn: #2a0b0c;
-    --tail-a: #f5a742;
-    --tail-b: #6e2422;
-    --stage: #160506;
-    --shadow: 0 2px 0 #12040a, 0 18px 34px -20px rgb(0 0 0 / 0.7);
-  }
+:root[data-theme='light'] {
+  color-scheme: light;
 }
 
 :root[data-theme='dark'] {
   color-scheme: dark;
-  --page: #2a0d0e;
-  --page-deep: #1c0708;
-  --page-light: #4a1b1b;
-  --panel: #3d1718;
-  --panel-2: #4d2020;
-  --ink: #fde3bc;
-  --ink-2: #f0c99a;
-  --stripe: #f5a742;
-  --dark-btn: #f5a742;
-  --on-dark-btn: #2a0b0c;
-  --tail-a: #f5a742;
-  --tail-b: #6e2422;
-  --stage: #160506;
-  --shadow: 0 2px 0 #12040a, 0 18px 34px -20px rgb(0 0 0 / 0.7);
-}
-
-:root[data-theme='light'] {
-  color-scheme: light;
 }
 
 *,
@@ -153,7 +132,6 @@
 }
 
 html {
-  color-scheme: light dark;
   overflow-x: clip;
   scrollbar-color: var(--ink) var(--page-deep);
 }
@@ -276,7 +254,7 @@ h2 {
 
 .round.is-on {
   background: var(--pink);
-  color: #4b1416;
+  color: var(--on-pink);
 }
 
 /* Page frame */
@@ -331,7 +309,7 @@ h2 {
   padding: 12px 18px;
   border-radius: var(--r-md);
   background: var(--pink);
-  color: #4b1416;
+  color: var(--on-pink);
   font-weight: 800;
   font-size: 0.86rem;
   box-shadow: 0 3px 0 var(--pink-deep);
@@ -494,19 +472,19 @@ h2 {
 
 .stage-top .theme-btn,
 .stage-top .switch {
-  background: rgb(253 227 188 / 0.12);
+  background: color-mix(in srgb, var(--cream) 12%, transparent);
   color: var(--on-stage);
   box-shadow: none;
 }
 
 .stage-top .switch .track {
-  background: rgb(253 227 188 / 0.1);
+  background: color-mix(in srgb, var(--cream) 10%, transparent);
   box-shadow: inset 0 0 0 2px var(--on-stage);
 }
 
 .stage-top .switch .thumb {
   background: var(--on-stage);
-  color: #4b1416;
+  color: var(--maroon);
 }
 
 .stage-top .switch input:checked + .track {

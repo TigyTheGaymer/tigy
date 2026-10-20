@@ -1,12 +1,6 @@
-import { ApplicationRef } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
+import { rendered } from '../testing';
 import { ConfirmedPiecesService } from './confirmed-pieces.service';
-
-/** Runs the first-render callbacks. */
-async function rendered(): Promise<void> {
-  TestBed.inject(ApplicationRef).tick();
-  await TestBed.inject(ApplicationRef).whenStable();
-}
 
 describe('ConfirmedPiecesService', () => {
   beforeEach(() => {

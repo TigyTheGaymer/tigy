@@ -1,7 +1,7 @@
 import { Service } from '@angular/core';
 import type { GalleryRow } from '@tigy/models';
 import type { GalleryResponse } from '../../api/types';
-import { session } from '../browser/storage';
+import { session } from '../shared/storage';
 
 export interface GalleryPlace {
   /** The address's filters and sort, and the NSFW switch. */
@@ -10,7 +10,7 @@ export interface GalleryPlace {
   more: { rows: GalleryRow[]; hasMore?: boolean };
 }
 
-const ADDRESS_KEY = 'tigy.gallery';
+const STORAGE_KEY = 'tigy.gallery';
 
 /**
  * Where to go back to: the place (loaded pages) lives in memory, so a reload starts fresh, and the
@@ -39,12 +39,12 @@ export class GalleryPlaceService {
   }
 
   rememberAddress(address: string): void {
-    session.set(ADDRESS_KEY, address);
+    session.set(STORAGE_KEY, address);
   }
 
   /** Only addresses on this site count. */
   rememberedAddress(): string | null {
-    const address = session.get(ADDRESS_KEY);
+    const address = session.get(STORAGE_KEY);
     return address?.startsWith('/') && !address.startsWith('//')
       ? address
       : null;

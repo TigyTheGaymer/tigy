@@ -6,11 +6,11 @@ import {
   signal,
   type Signal,
 } from '@angular/core';
-import { local } from '../browser/storage';
+import { local } from '../shared/storage';
 
 export type Theme = 'auto' | 'light' | 'dark';
 
-const KEY = 'tigy.theme';
+const STORAGE_KEY = 'tigy.theme';
 const ORDER: readonly Theme[] = ['auto', 'light', 'dark'];
 
 /** index.html applies the stored theme before first paint; the button shows it once hydrated. */
@@ -21,7 +21,7 @@ export class ThemeService {
   readonly theme: Signal<Theme> = this.state.asReadonly();
 
   constructor() {
-    afterNextRender(() => this.state.set(stored(local.get(KEY))));
+    afterNextRender(() => this.state.set(stored(local.get(STORAGE_KEY))));
   }
 
   cycle(): void {
@@ -32,10 +32,10 @@ export class ThemeService {
     this.state.set(theme);
     if (theme === 'auto') {
       delete this.root.dataset['theme'];
-      local.remove(KEY);
+      local.remove(STORAGE_KEY);
     } else {
       this.root.dataset['theme'] = theme;
-      local.set(KEY, theme);
+      local.set(STORAGE_KEY, theme);
     }
   }
 }

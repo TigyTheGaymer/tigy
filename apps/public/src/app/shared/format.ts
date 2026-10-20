@@ -1,5 +1,9 @@
 import { formatArtworkDate } from '@tigy/gallery';
 
+export function pieceTitle(title: string | undefined): string {
+  return title ?? 'Untitled';
+}
+
 export function pieceCount(count: number): string {
   return count === 1 ? '1 piece' : `${count} pieces`;
 }

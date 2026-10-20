@@ -56,7 +56,7 @@
               class="nav prev"
               [routerLink]="['/i', previous.id]"
               [replaceUrl]="true"
-              [attr.aria-label]="'Previous: ' + (previous.title ?? 'Untitled')"
+              [attr.aria-label]="'Previous: ' + (previous.title | pieceTitle)"
               ><ng-icon name="lucideArrowLeft" class="icon"
             /></a>
           }
@@ -78,7 +78,7 @@
               class="nav next"
               [routerLink]="['/i', next.id]"
               [replaceUrl]="true"
-              [attr.aria-label]="'Next: ' + (next.title ?? 'Untitled')"
+              [attr.aria-label]="'Next: ' + (next.title | pieceTitle)"
               ><ng-icon name="lucideArrowRight" class="icon"
             /></a>
           }
@@ -100,8 +100,8 @@
           </section>
         }
       } @else if (hasFailed()) {
-        <section class="stage-panel">
-          <h2>Something went wrong</h2>
+        <section class="stage-panel" aria-labelledby="error-heading">
+          <h2 id="error-heading">Something went wrong</h2>
           <p>Could not load this piece. Try again in a moment.</p>
         </section>
       }
@@ -112,10 +112,10 @@
         <app-credits-panel
           [page]="page"
           [isPieceShown]="isImageShown()"
-          (closed)="creditsPanel.set(false)"
-          (shared)="share()"
-          (safeLinkCopied)="copySafeLink()"
-          (fullViewOpened)="isFullViewOpen.set(true)"
+          (closeRequested)="creditsPanel.set(false)"
+          (shareRequested)="share()"
+          (safeLinkRequested)="copySafeLink()"
+          (fullViewRequested)="isFullViewOpen.set(true)"
         />
       </div>
     }

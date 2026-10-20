@@ -1,5 +1,6 @@
 import type { GalleryRow } from '@tigy/models';
-import { thumbnailUrl } from '../../urls';
+import { pieceTitle } from '../../shared/format';
+import { thumbnailUrl } from '../../shared/urls';
 
 export interface Tile {
   id: string;
@@ -24,7 +25,7 @@ export function toTile(row: GalleryRow): Tile {
     width: row.w,
     height: row.h,
     shape: Math.min(WIDEST, Math.max(NARROWEST, shape)),
-    alt: row.title ?? 'Untitled',
+    alt: pieceTitle(row.title),
     isNsfw: row.nsfw,
   };
 }

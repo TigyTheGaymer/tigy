@@ -1,5 +1,5 @@
 import { Router, type Request, type Response } from 'express';
-import { artworkPath } from '../app/urls';
+import { artworkPath } from '../app/shared/urls';
 import { CDN_CACHE_CONTROL } from './cache-control';
 import type { SummaryCache } from './summary-cache';
 

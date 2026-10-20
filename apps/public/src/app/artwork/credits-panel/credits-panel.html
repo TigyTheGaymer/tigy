@@ -1,15 +1,17 @@
-<article class="info" aria-labelledby="title">
+<article class="info" aria-labelledby="piece-heading">
   <div class="info-head">
     <button
       type="button"
       class="round close"
       aria-label="Close credits"
-      (click)="closed.emit()"
+      (click)="closeRequested.emit()"
     >
       <ng-icon name="lucideX" class="icon" />
     </button>
   </div>
-  <h1 id="title" [class.untitled]="!title()">{{ title() ?? 'Untitled' }}</h1>
+  <h1 id="piece-heading" [class.untitled]="!title()">
+    {{ title() | pieceTitle }}
+  </h1>
   @if (artwork().description; as description) {
     <p class="desc">{{ description }}</p>
   }
@@ -92,15 +94,23 @@
       <a class="pad dark download" [href]="file().href" download
         ><app-paw />Download original</a
       >
-      <button type="button" class="pad" (click)="shared.emit()">
+      <button type="button" class="pad" (click)="shareRequested.emit()">
         <ng-icon name="lucideShare2" class="icon" />Share
       </button>
-      <button type="button" class="pad light" (click)="fullViewOpened.emit()">
+      <button
+        type="button"
+        class="pad light"
+        (click)="fullViewRequested.emit()"
+      >
         <ng-icon name="lucideExpand" class="icon" />Full view
       </button>
     }
     @if (artwork().nsfw) {
-      <button type="button" class="pad light" (click)="safeLinkCopied.emit()">
+      <button
+        type="button"
+        class="pad light"
+        (click)="safeLinkRequested.emit()"
+      >
         <ng-icon name="lucideLink" class="icon" />Copy safe link
       </button>
     }

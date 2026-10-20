@@ -62,7 +62,7 @@
   margin-top: -26px;
   border-radius: var(--r-md);
   background: var(--pink);
-  color: #4b1416;
+  color: var(--on-pink);
   text-decoration: none;
   box-shadow: 0 3px 0 var(--pink-deep);
   transition: transform 260ms var(--ease-squish);

@@ -2,6 +2,8 @@ import type {
   TestRequest,
   HttpTestingController,
 } from '@angular/common/http/testing';
+import { ApplicationRef } from '@angular/core';
+import { TestBed } from '@angular/core/testing';
 import type { GalleryOverview } from '@tigy/gallery';
 import type { GalleryRow } from '@tigy/models';
 import type {
@@ -24,6 +26,12 @@ export async function requested(
   }
   const open = http.match(() => true).map((req) => req.request.urlWithParams);
   throw new Error(`No request for ${path}; open requests: ${open.join(', ')}`);
+}
+
+/** Runs the first-render callbacks, such as reading browser storage. */
+export async function rendered(): Promise<void> {
+  TestBed.inject(ApplicationRef).tick();
+  await TestBed.inject(ApplicationRef).whenStable();
 }
 
 export async function settled(): Promise<void> {

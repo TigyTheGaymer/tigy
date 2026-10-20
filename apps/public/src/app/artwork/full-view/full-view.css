@@ -8,7 +8,7 @@
   margin: 0;
   padding: 0;
   border: 0;
-  background: rgb(22 5 6 / 0.98);
+  background: color-mix(in srgb, var(--night) 98%, transparent);
   color: var(--on-stage);
   opacity: 0;
   --ring: var(--on-stage);
@@ -57,7 +57,7 @@ img {
   gap: 4px;
   padding: 5px;
   border-radius: var(--r-md);
-  background: #fde3bc;
+  background: var(--cream);
 }
 
 .btn {
@@ -68,12 +68,12 @@ img {
   border: 0;
   border-radius: var(--r-md);
   background: transparent;
-  color: #4b1416;
+  color: var(--maroon);
   cursor: pointer;
 }
 
 .btn:hover {
-  background: #fff3e0;
+  background: var(--cream-light);
 }
 
 .zoom {
@@ -82,16 +82,16 @@ img {
   font-weight: 800;
   font-size: 0.86rem;
   font-variant-numeric: tabular-nums;
-  color: #4b1416;
+  color: var(--maroon);
 }
 
 .close {
   margin-left: 4px;
-  background: #f4a3ad;
+  background: var(--pink);
 }
 
 .close:hover {
-  background: #e07c8b;
+  background: var(--pink-deep);
 }
 
 .hint {
@@ -103,5 +103,5 @@ img {
   text-align: center;
   font-size: 0.86rem;
   font-weight: 600;
-  color: rgb(253 227 188 / 0.65);
+  color: color-mix(in srgb, var(--cream) 65%, transparent);
 }

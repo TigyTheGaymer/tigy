@@ -39,55 +39,8 @@ const PICKERS = [
       lucideX,
     }),
   ],
+  templateUrl: './filter-row.html',
   styleUrl: './filter-row.css',
-  template: `
-    <div class="bar">
-      <nav class="filters container" aria-label="Filters and sort">
-        @for (filter of filters(); track filter.key) {
-          <a
-            class="chip is-active"
-            routerLink="/"
-            [queryParams]="filter.remove"
-            [attr.aria-label]="
-              'Remove filter ' + filter.kind + ': ' + filter.name
-            "
-            >{{ filter.kind }}: {{ filter.name
-            }}<ng-icon name="lucideX" class="icon"
-          /></a>
-        }
-        <a
-          class="chip sort"
-          routerLink="/"
-          [queryParams]="otherSortParams()"
-          [attr.aria-label]="
-            'Sort: ' +
-            sortName() +
-            '. Switch to ' +
-            otherSortName().toLowerCase()
-          "
-          ><ng-icon name="lucideArrowDownUp" class="icon" />{{ sortName() }}</a
-        >
-        <span
-          class="pickers"
-          role="group"
-          aria-label="Filter pickers (coming later)"
-        >
-          @for (picker of pickers; track picker.name) {
-            <button
-              type="button"
-              class="chip"
-              aria-disabled="true"
-              title="Filters are coming later"
-            >
-              <ng-icon [name]="picker.icon" class="icon" />{{ picker.name
-              }}<ng-icon name="lucideChevronDown" class="icon chev" />
-            </button>
-          }
-        </span>
-        <span class="note">Filters coming later</span>
-      </nav>
-    </div>
-  `,
 })
 export class FilterRow {
   readonly filters = input.required<readonly ActiveFilter[]>();
