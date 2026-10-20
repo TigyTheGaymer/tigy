@@ -206,6 +206,8 @@ Every colour is lifted from Tigy's coat; nothing is borrowed from a generic pale
 **Alternates kept for a later swap:** Fredoka (700) and Sour Gummy (800). Both share Grandstander's soft, rounded, friendly feel and have a standard lowercase "g". They are self-hosted and declared in `src/styles.css` but unused; swapping means changing only `--font-display`, since every display style uses it. Compare them in `design/mockups/fonts.html`.
 
 ### Hierarchy
+Each step is a `--text-*` variable in `src/styles.css`, named after it (`--text-display` to `--text-caption`; the stage logo is `--text-logo-stage`).
+
 - **Display** (800, clamp(3.4rem, 9vw, 5.6rem), 0.9): the "Tigy" name in the home header, with the forehead mark before it.
 - **Headline** (800, clamp(2.1rem, 4.6vw, 3rem), 1): section titles such as "All the art".
 - **Panel heading** (800, clamp(2rem, 5vw, 2.8rem), 1.05): the NSFW, error and not-found panels.
@@ -214,7 +216,7 @@ Every colour is lifted from Tigy's coat; nothing is borrowed from a generic pale
 - **Lead** (600, clamp(1.02rem, 1.5vw, 1.15rem), 1.55): the bio under the name.
 - **Body** (400, 1.02rem, 1.55): descriptions and credits.
 - **Button** (800, 0.95rem): all buttons, chips and social links.
-- **Label** (800, 0.78rem): field labels in the credits panel ("Art by", "Characters").
+- **Label** (800, 0.78rem): field labels in the credits panel ("Art by", "Characters"), the "Filters coming later" note, and the switch's label on small phones.
 - **Small** (700, 0.86rem): the piece count, handles, tags, the file summary, toasts, tile hover labels and the full view's zoom readout.
 - **Caption** (800, 0.74rem): tile badges and the tail's years.
 
@@ -255,7 +257,7 @@ Only a few things are fully round, because Tigy is: the avatar (Tigy's face) and
 ## Components
 
 ### Buttons
-- **Shape:** gently rounded (8px), 46px tall.
+- **Shape:** gently rounded (8px), 46px tall (`--control`); the full view's buttons and the NSFW switch are 44px (`--control-small`), filter chips 42px (`--control-chip`).
 - **Primary:** stripe maroon with cream text (fur with maroon text in dark mode), e.g. "Download original", which carries a paw icon.
 - **Paw:** paw pink with maroon text, e.g. "Share". Pink is reserved for these.
 - **Light:** light cream with maroon text, e.g. social links and "Full view".
@@ -282,7 +284,7 @@ Only a few things are fully round, because Tigy is: the avatar (Tigy's face) and
 - **Top bar:** sticky, fur page colour with a slight blur; the forehead mark and "Tigy" on the left, the theme button and the "Show NSFW" switch on the right.
 - **Theme button:** a 46px icon button (8px corners) cycling Automatic → Light → Dark.
 - **NSFW switch:** a light cream control with 8px corners and a round paw thumb; the track turns pink when on.
-- **Viewer arrows:** 52px paw-pink buttons with 8px corners on either side of the stage.
+- **Viewer arrows:** 52px (`--control-arrow`) paw-pink buttons with 8px corners on either side of the stage.
 
 ### Icons
 - **Interface icons:** Lucide only, drawn on its 24px grid with round line ends and a slightly heavier line (2.4–2.5) to match the chunky type, shown at 18–22px in the current text colour. The Angular build uses ng-icons: a component imports the icon from `@ng-icons/lucide`, registers it with `provideIcons` and shows it with `<ng-icon name="lucideShare2" />`; the line weight is set once with `provideNgIconsConfig`.

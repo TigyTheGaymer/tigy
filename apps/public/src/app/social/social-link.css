@@ -28,7 +28,7 @@
   align-items: center;
   gap: 6px;
   color: var(--ink-2);
-  font-size: 0.86rem;
+  font-size: var(--text-small);
   font-weight: 700;
   text-decoration: none;
 }
@@ -44,7 +44,7 @@
 
 @media (max-width: 560px) {
   .social {
-    width: 46px;
+    width: var(--control);
     padding: 0;
   }
 

@@ -27,7 +27,7 @@ h1 {
   gap: 0.12em;
   font-family: var(--font-display);
   font-weight: 800;
-  font-size: clamp(3.4rem, 9vw, 5.6rem);
+  font-size: var(--text-display);
   line-height: 0.9;
   letter-spacing: -0.02em;
 }
@@ -39,13 +39,13 @@ h1 app-mark {
 .bio {
   margin: 10px 0 4px;
   max-width: 32rem;
-  font-size: clamp(1.02rem, 1.5vw, 1.15rem);
+  font-size: var(--text-lead);
   font-weight: 600;
 }
 
 .overview {
   margin: 0 0 16px;
-  font-size: 0.86rem;
+  font-size: var(--text-small);
   font-weight: 700;
   opacity: 0.8;
 }
@@ -63,13 +63,13 @@ h1 app-mark {
   margin: 0 0 18px;
   font-family: var(--font-display);
   font-weight: 800;
-  font-size: clamp(2.1rem, 4.6vw, 3rem);
+  font-size: var(--text-headline);
   line-height: 1;
 }
 
 /* Room on the right for the tail timeline */
 .gallery {
-  padding-right: calc(var(--gutter) + 44px);
+  padding-right: calc(var(--gutter) + var(--tail-room));
   padding-bottom: 24px;
 }
 

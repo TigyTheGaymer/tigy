@@ -63,8 +63,8 @@ img {
 .btn {
   display: grid;
   place-items: center;
-  width: 44px;
-  height: 44px;
+  width: var(--control-small);
+  height: var(--control-small);
   border: 0;
   border-radius: var(--r-md);
   background: transparent;
@@ -80,7 +80,7 @@ img {
   min-width: 3.8em;
   text-align: center;
   font-weight: 800;
-  font-size: 0.86rem;
+  font-size: var(--text-small);
   font-variant-numeric: tabular-nums;
   color: var(--maroon);
 }
@@ -101,7 +101,7 @@ img {
   right: 0;
   margin: 0;
   text-align: center;
-  font-size: 0.86rem;
+  font-size: var(--text-small);
   font-weight: 600;
   color: color-mix(in srgb, var(--cream) 65%, transparent);
 }

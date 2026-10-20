@@ -6,7 +6,7 @@
 .stage-top {
   position: absolute;
   inset: 0 0 auto;
-  z-index: 3;
+  z-index: var(--z-stage);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -24,7 +24,7 @@
 
 .logo {
   margin-left: 6px;
-  font-size: 1.3rem;
+  font-size: var(--text-logo-stage);
   color: var(--on-stage);
 }
 

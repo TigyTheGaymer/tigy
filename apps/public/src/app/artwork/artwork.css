@@ -54,12 +54,12 @@
 .nav {
   position: absolute;
   top: 50%;
-  z-index: 3;
+  z-index: var(--z-stage);
   display: grid;
   place-items: center;
-  width: 52px;
-  height: 52px;
-  margin-top: -26px;
+  width: var(--control-arrow);
+  height: var(--control-arrow);
+  margin-top: calc(var(--control-arrow) / -2);
   border-radius: var(--r-md);
   background: var(--pink);
   color: var(--on-pink);

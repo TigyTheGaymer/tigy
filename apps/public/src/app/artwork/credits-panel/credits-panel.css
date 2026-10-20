@@ -13,7 +13,7 @@ h1 {
   margin: 0 0 6px;
   font-family: var(--font-display);
   font-weight: 800;
-  font-size: clamp(1.8rem, 2.6vw, 2.4rem);
+  font-size: var(--text-title);
   line-height: 1.05;
 }
 
@@ -43,7 +43,7 @@ h1.untitled {
 .label {
   display: block;
   margin-bottom: 2px;
-  font-size: 0.78rem;
+  font-size: var(--text-label);
   font-weight: 800;
   color: var(--ink-2);
 }
@@ -104,7 +104,7 @@ h1.untitled {
   border-radius: var(--r-sm);
   background: var(--page-light);
   color: var(--ink);
-  font-size: 0.86rem;
+  font-size: var(--text-small);
   font-weight: 800;
   text-decoration: none;
   transition: transform 220ms var(--ease-squish);

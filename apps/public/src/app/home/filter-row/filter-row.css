@@ -1,7 +1,7 @@
 .bar {
   position: sticky;
   top: var(--bar-h);
-  z-index: 25;
+  z-index: var(--z-filter-row);
   margin-bottom: 14px;
   padding: 8px 0 10px;
   background: color-mix(in srgb, var(--page) 94%, transparent);
@@ -19,7 +19,7 @@
 /* Room on the right for the tail timeline, as in the gallery */
 @media (min-width: 721px) {
   .filters {
-    padding-right: calc(var(--gutter) + 44px);
+    padding-right: calc(var(--gutter) + var(--tail-room));
   }
 }
 
@@ -36,7 +36,7 @@
   flex: none;
   align-items: center;
   gap: 6px;
-  min-height: 42px;
+  min-height: var(--control-chip);
   padding: 6px 10px 6px 14px;
   border: 2px solid color-mix(in srgb, var(--ink) 22%, transparent);
   border-radius: var(--r-md);
@@ -44,7 +44,7 @@
   color: var(--ink);
   font: inherit;
   font-weight: 800;
-  font-size: 0.92rem;
+  font-size: var(--text-button);
   white-space: nowrap;
   text-decoration: none;
 }
@@ -81,7 +81,7 @@ a.chip:hover {
   flex: none;
   margin-left: auto;
   padding-left: 8px;
-  font-size: 0.8rem;
+  font-size: var(--text-label);
   font-weight: 700;
   opacity: 0.85;
   white-space: nowrap;
