@@ -14,15 +14,20 @@ import type {
 
 // For the app's unit tests only.
 
-/** The request is consumed: later `match` or `expectOne` calls won't find it. */
+/**
+ * Waits up to 3s, by the clock: a page's first test also loads its lazy code, which a slow CI runner
+ * can take many turns of the event loop to do. The request is consumed: later `match` or
+ * `expectOne` calls won't find it.
+ */
 export async function requested(
   http: HttpTestingController,
   path: string,
 ): Promise<TestRequest> {
-  for (let attempt = 0; attempt < 100; attempt++) {
+  const deadline = Date.now() + 3000;
+  while (Date.now() < deadline) {
     const [request] = http.match((req) => req.urlWithParams === path);
     if (request) return request;
-    await new Promise((resolve) => setTimeout(resolve));
+    await new Promise((resolve) => setTimeout(resolve, 5));
   }
   const open = http.match(() => true).map((req) => req.request.urlWithParams);
   throw new Error(`No request for ${path}; open requests: ${open.join(', ')}`);
