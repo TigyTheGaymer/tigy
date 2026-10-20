@@ -1,7 +1,12 @@
 <article class="info" aria-labelledby="title">
   <div class="info-head">
-    <button type="button" class="round close" aria-label="Close credits" (click)="closed.emit()">
-      <svg lucideX class="icon" aria-hidden="true"></svg>
+    <button
+      type="button"
+      class="round close"
+      aria-label="Close credits"
+      (click)="closed.emit()"
+    >
+      <ng-icon name="lucideX" class="icon" />
     </button>
   </div>
   <h1 id="title" [class.untitled]="!title()">{{ title() ?? 'Untitled' }}</h1>
@@ -12,9 +17,9 @@
   @for (section of sections(); track section.role) {
     <div class="row credits" [class]="section.className">
       @if (section.role === 'artist') {
-        <svg lucidePalette class="icon" aria-hidden="true"></svg>
+        <ng-icon name="lucidePalette" class="icon" />
       } @else {
-        <svg lucideUsers class="icon" aria-hidden="true"></svg>
+        <ng-icon name="lucideUsers" class="icon" />
       }
       <div>
         <span class="label">{{ section.label }}</span>
@@ -28,9 +33,12 @@
               }
             </span>
             <div>
-              <a class="name" routerLink="/" [queryParams]="person.queryParams">{{
-                person.name
-              }}</a>
+              <a
+                class="name"
+                routerLink="/"
+                [queryParams]="person.queryParams"
+                >{{ person.name }}</a
+              >
               @if (person.links.length) {
                 <span class="links">
                   @for (link of person.links; track link.url) {
@@ -47,7 +55,7 @@
 
   @if (artwork().tags.length) {
     <div class="row">
-      <svg lucideTag class="icon" aria-hidden="true"></svg>
+      <ng-icon name="lucideTag" class="icon" />
       <div>
         <span class="label">Tags</span>
         <div class="tags">
@@ -60,17 +68,19 @@
   }
 
   <div class="row">
-    <svg lucideCalendar class="icon" aria-hidden="true"></svg>
+    <ng-icon name="lucideCalendar" class="icon" />
     <div>
       <span class="label">Date</span>
-      <time class="date" [attr.datetime]="artwork().date ?? artwork().sortDate">{{
-        date()
-      }}</time>
+      <time
+        class="date"
+        [attr.datetime]="artwork().date ?? artwork().sortDate"
+        >{{ date() }}</time
+      >
     </div>
   </div>
 
   <div class="row">
-    <svg lucideImage class="icon" aria-hidden="true"></svg>
+    <ng-icon name="lucideImage" class="icon" />
     <div>
       <span class="label">Original file</span>
       <span class="file">{{ file().summary }}</span>
@@ -83,15 +93,15 @@
         ><app-paw />Download original</a
       >
       <button type="button" class="pad" (click)="shared.emit()">
-        <svg lucideShare2 class="icon" aria-hidden="true"></svg>Share
+        <ng-icon name="lucideShare2" class="icon" />Share
       </button>
       <button type="button" class="pad light" (click)="fullViewOpened.emit()">
-        <svg lucideExpand class="icon" aria-hidden="true"></svg>Full view
+        <ng-icon name="lucideExpand" class="icon" />Full view
       </button>
     }
     @if (artwork().nsfw) {
       <button type="button" class="pad light" (click)="safeLinkCopied.emit()">
-        <svg lucideLink class="icon" aria-hidden="true"></svg>Copy safe link
+        <ng-icon name="lucideLink" class="icon" />Copy safe link
       </button>
     }
   </div>

@@ -1,6 +1,7 @@
 import {
   Component,
   computed,
+  DestroyRef,
   DOCUMENT,
   effect,
   inject,
@@ -9,29 +10,30 @@ import {
   viewChild,
 } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
+import { NgIcon, provideIcons } from '@ng-icons/core';
 import {
-  LucideArrowLeft,
-  LucideArrowRight,
-  LucideDownload,
-  LucideExpand,
-  LucideInfo,
-  LucideShare2,
-} from '@lucide/angular';
-import { CatalogService, isNotFound } from '../../catalog/catalog.service';
-import { StageBar } from '../../chrome/stage-bar';
-import { HeadService } from '../../head/head.service';
-import { Paw } from '../../markings/paw';
-import { ConfirmedPiecesService } from '../../nsfw/confirmed-pieces.service';
-import { NsfwSwitchService } from '../../nsfw/nsfw-switch.service';
-import { latest } from '../../resources';
-import { injectServerResponse } from '../../server-response';
-import { artworkPath, fullImageUrl, originalUrl } from '../../urls';
+  lucideArrowLeft,
+  lucideArrowRight,
+  lucideDownload,
+  lucideExpand,
+  lucideInfo,
+  lucideShare2,
+} from '@ng-icons/lucide';
+import { CatalogService, isNotFound } from '../catalog/catalog.service';
+import { StageBar } from '../chrome/stage-bar';
+import { HeadService } from '../head/head.service';
+import { Paw } from '../markings/paw';
 import { NotFoundPage } from '../not-found/not-found';
-import { CreditsPanel } from './credits-panel';
-import { CreditsPanelService } from './credits-panel.service';
-import { FullView } from './full-view';
+import { ConfirmedPiecesService } from '../nsfw/confirmed-pieces.service';
+import { NsfwSwitchService } from '../nsfw/nsfw-switch.service';
+import { latest } from '../resources';
+import { injectServerResponse } from '../server-response';
+import { artworkPath, fullImageUrl, originalUrl } from '../urls';
+import { CreditsPanel } from './credits-panel/credits-panel';
+import { CreditsPanelService } from './credits-panel/credits-panel.service';
+import { FullView } from './full-view/full-view';
 
-/** At this width and below, the credits sit under the stage instead of beside it. */
+/** artwork.css's breakpoint: at this width and below, the credits sit under the stage. */
 const STACKED_WIDTH = 1100;
 const SWIPE_DISTANCE = 60;
 
@@ -39,17 +41,22 @@ const SWIPE_DISTANCE = 60;
   selector: 'app-artwork',
   imports: [
     RouterLink,
-    LucideArrowLeft,
-    LucideArrowRight,
-    LucideDownload,
-    LucideExpand,
-    LucideInfo,
-    LucideShare2,
+    NgIcon,
     StageBar,
     Paw,
     NotFoundPage,
     CreditsPanel,
     FullView,
+  ],
+  providers: [
+    provideIcons({
+      lucideArrowLeft,
+      lucideArrowRight,
+      lucideDownload,
+      lucideExpand,
+      lucideInfo,
+      lucideShare2,
+    }),
   ],
   templateUrl: './artwork.html',
   styleUrl: './artwork.css',
@@ -110,12 +117,12 @@ export class ArtworkPage {
   protected readonly isFullViewOpen = signal(false);
   protected readonly toast = signal('');
   private toastTimer: ReturnType<typeof setTimeout> | undefined;
-  private fullViewOpener: HTMLElement | null = null;
   private swipeStart: { x: number; y: number } | undefined;
 
   private readonly stageBar = viewChild(StageBar);
 
   constructor() {
+    inject(DestroyRef).onDestroy(() => clearTimeout(this.toastTimer));
     const response = injectServerResponse();
     effect(() => {
       if (this.hasFailed()) response.unavailable();
@@ -142,8 +149,11 @@ export class ArtworkPage {
   }
 
   protected toggleCredits(): void {
-    if (window.innerWidth <= STACKED_WIDTH) {
-      const isMotionReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const view = this.document.defaultView;
+    if (view && view.innerWidth <= STACKED_WIDTH) {
+      const isMotionReduced = view.matchMedia(
+        '(prefers-reduced-motion: reduce)',
+      ).matches;
       this.document
         .getElementById('credits')
         ?.scrollIntoView({ behavior: isMotionReduced ? 'auto' : 'smooth' });
@@ -152,19 +162,10 @@ export class ArtworkPage {
     this.creditsPanel.set(!this.creditsPanel.isOpen());
   }
 
-  protected openFullView(): void {
-    this.fullViewOpener = this.document.activeElement as HTMLElement | null;
-    this.isFullViewOpen.set(true);
-  }
-
-  protected closeFullView(): void {
-    this.isFullViewOpen.set(false);
-    this.fullViewOpener?.focus();
-  }
-
   protected async share(): Promise<void> {
     const url = this.head.url(artworkPath(this.id()));
-    if (navigator.share) {
+    const navigator = this.document.defaultView?.navigator;
+    if (navigator?.share) {
       try {
         await navigator.share({ title: this.title(), url });
       } catch {
@@ -173,14 +174,14 @@ export class ArtworkPage {
       return;
     }
     this.showToast(
-      (await copy(url)) ? 'Link copied!' : 'Couldn’t copy the link',
+      (await this.copy(url)) ? 'Link copied!' : 'Couldn’t copy the link',
     );
   }
 
   protected async copySafeLink(): Promise<void> {
     const url = this.head.url(`${artworkPath(this.id())}?safe`);
     this.showToast(
-      (await copy(url)) ? 'Safe link copied!' : 'Couldn’t copy the link',
+      (await this.copy(url)) ? 'Safe link copied!' : 'Couldn’t copy the link',
     );
   }
 
@@ -196,7 +197,10 @@ export class ArtworkPage {
 
   protected onTouchStart(event: TouchEvent): void {
     if (event.touches.length !== 1) return;
-    this.swipeStart = { x: event.touches[0].clientX, y: event.touches[0].clientY };
+    this.swipeStart = {
+      x: event.touches[0].clientX,
+      y: event.touches[0].clientY,
+    };
   }
 
   protected onTouchEnd(event: TouchEvent): void {
@@ -221,13 +225,15 @@ export class ArtworkPage {
     clearTimeout(this.toastTimer);
     this.toastTimer = setTimeout(() => this.toast.set(''), 2200);
   }
-}
 
-async function copy(text: string): Promise<boolean> {
-  try {
-    await navigator.clipboard.writeText(text);
-    return true;
-  } catch {
-    return false;
+  private async copy(text: string): Promise<boolean> {
+    const clipboard = this.document.defaultView?.navigator.clipboard;
+    if (!clipboard) return false;
+    try {
+      await clipboard.writeText(text);
+      return true;
+    } catch {
+      return false;
+    }
   }
 }

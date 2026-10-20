@@ -1,9 +1,9 @@
 import { Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { StageBar } from '../../chrome/stage-bar';
-import { HeadService } from '../../head/head.service';
-import { Paw } from '../../markings/paw';
-import { injectServerResponse } from '../../server-response';
+import { StageBar } from '../chrome/stage-bar';
+import { HeadService } from '../head/head.service';
+import { Paw } from '../markings/paw';
+import { injectServerResponse } from '../server-response';
 
 /** Also shown for a missing or unpublished artwork. */
 @Component({

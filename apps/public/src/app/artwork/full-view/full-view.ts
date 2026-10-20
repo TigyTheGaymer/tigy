@@ -1,9 +1,8 @@
 import {
   afterNextRender,
   Component,
-  computed,
   DestroyRef,
-  DOCUMENT,
+  computed,
   ElementRef,
   inject,
   input,
@@ -11,70 +10,94 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { LucideMaximize, LucideMinus, LucidePlus, LucideX } from '@lucide/angular';
+import { NgIcon, provideIcons } from '@ng-icons/core';
+import {
+  lucideMaximize,
+  lucideMinus,
+  lucidePlus,
+  lucideX,
+} from '@ng-icons/lucide';
 
 const MAX_SCALE = 8;
 
-/**
- * The full view: the piece fills the screen, at once from the image the page
- * already has, and the original replaces it once loaded, for zooming into
- * full detail (design D10).
- */
+/** Opens at once on the image the page already has, then swaps in the original for zooming. */
 @Component({
   selector: 'app-full-view',
-  imports: [LucideMaximize, LucideMinus, LucidePlus, LucideX],
+  imports: [NgIcon],
+  providers: [
+    provideIcons({ lucideMaximize, lucideMinus, lucidePlus, lucideX }),
+  ],
   styleUrl: './full-view.css',
-  host: {
-    role: 'dialog',
-    'aria-modal': 'true',
-    '[attr.aria-label]': '"Full view: " + alt()',
-    '[class.is-open]': 'isShown()',
-    '[class.is-zoomed]': 'isZoomed()',
-    '[class.is-dragging]': 'isDragging()',
-    '(document:keydown)': 'onKey($event)',
-  },
+  host: { '(keydown)': 'onKey($event)' },
   template: `
-    <div
-      #stage
-      class="stage"
-      (wheel)="onWheel($event)"
-      (pointerdown)="onPointerDown($event)"
-      (pointermove)="onPointerMove($event)"
-      (pointerup)="onPointerUp($event)"
-      (pointercancel)="onPointerUp($event)"
-      (dblclick)="onDoubleClick($event)"
+    <dialog
+      #dialog
+      class="viewer"
+      [attr.aria-label]="'Full view: ' + alt()"
+      [class.is-open]="isShown()"
+      [class.is-zoomed]="isZoomed()"
+      [class.is-dragging]="isDragging()"
+      (close)="onClosed()"
     >
-      <img
-        #image
-        [src]="src()"
-        [alt]="alt()"
-        draggable="false"
-        [style.transform]="transform()"
-        [style.transition]="isAnimated() ? 'transform 260ms var(--ease-out)' : 'none'"
-      />
-    </div>
-    <div class="bar">
-      <button type="button" class="btn" aria-label="Zoom out" (click)="zoomBy(1 / 1.5)">
-        <svg lucideMinus class="icon" aria-hidden="true"></svg>
-      </button>
-      <output class="zoom" aria-live="polite">{{ zoomLabel() }}</output>
-      <button type="button" class="btn" aria-label="Zoom in" (click)="zoomBy(1.5)">
-        <svg lucidePlus class="icon" aria-hidden="true"></svg>
-      </button>
-      <button type="button" class="btn" aria-label="Fit to screen" (click)="fit()">
-        <svg lucideMaximize class="icon" aria-hidden="true"></svg>
-      </button>
-      <button
-        #closeButton
-        type="button"
-        class="btn close"
-        aria-label="Close full view"
-        (click)="closed.emit()"
+      <div
+        #stage
+        class="stage"
+        (wheel)="onWheel($event)"
+        (pointerdown)="onPointerDown($event)"
+        (pointermove)="onPointerMove($event)"
+        (pointerup)="onPointerUp($event)"
+        (pointercancel)="onPointerUp($event)"
+        (dblclick)="onDoubleClick($event)"
       >
-        <svg lucideX class="icon" aria-hidden="true"></svg>
-      </button>
-    </div>
-    <p class="hint">Scroll or pinch to zoom · drag to move · Esc to close</p>
+        <img
+          #image
+          [src]="src()"
+          [alt]="alt()"
+          draggable="false"
+          [style.transform]="transform()"
+          [style.transition]="
+            isAnimated() ? 'transform 260ms var(--ease-out)' : 'none'
+          "
+        />
+      </div>
+      <div class="bar">
+        <button
+          type="button"
+          class="btn"
+          aria-label="Zoom out"
+          (click)="zoomBy(1 / 1.5)"
+        >
+          <ng-icon name="lucideMinus" class="icon" />
+        </button>
+        <output class="zoom" aria-live="polite">{{ zoomLabel() }}</output>
+        <button
+          type="button"
+          class="btn"
+          aria-label="Zoom in"
+          (click)="zoomBy(1.5)"
+        >
+          <ng-icon name="lucidePlus" class="icon" />
+        </button>
+        <button
+          type="button"
+          class="btn"
+          aria-label="Fit to screen"
+          (click)="fit()"
+        >
+          <ng-icon name="lucideMaximize" class="icon" />
+        </button>
+        <button
+          type="button"
+          class="btn close"
+          aria-label="Close full view"
+          autofocus
+          (click)="dialog.close()"
+        >
+          <ng-icon name="lucideX" class="icon" />
+        </button>
+      </div>
+      <p class="hint">Scroll or pinch to zoom · drag to move · Esc to close</p>
+    </dialog>
   `,
 })
 export class FullView {
@@ -101,33 +124,39 @@ export class FullView {
     () => `translate(${this.x()}px, ${this.y()}px) scale(${this.scale()})`,
   );
 
+  private readonly dialog =
+    viewChild.required<ElementRef<HTMLDialogElement>>('dialog');
   private readonly stage = viewChild.required<ElementRef<HTMLElement>>('stage');
-  private readonly image = viewChild.required<ElementRef<HTMLImageElement>>('image');
-  private readonly closeButton =
-    viewChild.required<ElementRef<HTMLButtonElement>>('closeButton');
-  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+  private readonly image =
+    viewChild.required<ElementRef<HTMLImageElement>>('image');
 
   private readonly pointers = new Map<number, { x: number; y: number }>();
   private last: { x: number; y: number } | undefined;
   private pinch: { distance: number; scale: number } | undefined;
+  private isDestroyed = false;
 
   constructor() {
-    const root = inject(DOCUMENT).documentElement;
-    inject(DestroyRef).onDestroy(() => root.classList.remove('viewer-lock'));
+    inject(DestroyRef).onDestroy(() => (this.isDestroyed = true));
     afterNextRender(() => {
-      root.classList.add('viewer-lock');
+      this.dialog().nativeElement.showModal();
       this.isShown.set(true);
-      this.closeButton().nativeElement.focus();
       const original = new Image();
       original.onload = () => this.original.set(this.originalSrc());
       original.src = this.originalSrc();
     });
   }
 
-  zoomBy(factor: number, clientX?: number, clientY?: number, isAnimated = true): void {
+  zoomBy(
+    factor: number,
+    clientX?: number,
+    clientY?: number,
+    isAnimated = true,
+  ): void {
     const rect = this.stage().nativeElement.getBoundingClientRect();
-    const px = (clientX ?? rect.left + rect.width / 2) - (rect.left + rect.width / 2);
-    const py = (clientY ?? rect.top + rect.height / 2) - (rect.top + rect.height / 2);
+    const px =
+      (clientX ?? rect.left + rect.width / 2) - (rect.left + rect.width / 2);
+    const py =
+      (clientY ?? rect.top + rect.height / 2) - (rect.top + rect.height / 2);
     const scale = Math.min(MAX_SCALE, Math.max(1, this.scale() * factor));
     const ratio = scale / this.scale();
     this.x.set(px - (px - this.x()) * ratio);
@@ -143,9 +172,22 @@ export class FullView {
     this.apply(true);
   }
 
+  /**
+   * The browser closes the dialog first (Escape or the close button), which returns focus to
+   * whatever opened it; only then does the page remove it.
+   */
+  protected onClosed(): void {
+    if (!this.isDestroyed) this.closed.emit();
+  }
+
   protected onWheel(event: WheelEvent): void {
     event.preventDefault();
-    this.zoomBy(Math.exp(-event.deltaY * 0.0018), event.clientX, event.clientY, false);
+    this.zoomBy(
+      Math.exp(-event.deltaY * 0.0018),
+      event.clientX,
+      event.clientY,
+      false,
+    );
   }
 
   protected onPointerDown(event: PointerEvent): void {
@@ -154,7 +196,10 @@ export class FullView {
     this.last = { x: event.clientX, y: event.clientY };
     if (this.pointers.size === 2) {
       const [a, b] = [...this.pointers.values()];
-      this.pinch = { distance: Math.hypot(a.x - b.x, a.y - b.y), scale: this.scale() };
+      this.pinch = {
+        distance: Math.hypot(a.x - b.x, a.y - b.y),
+        scale: this.scale(),
+      };
     }
     this.isDragging.set(true);
   }
@@ -162,6 +207,7 @@ export class FullView {
   protected onPointerMove(event: PointerEvent): void {
     if (!this.pointers.has(event.pointerId)) return;
     this.pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+    const last = this.last;
     if (this.pointers.size === 2 && this.pinch) {
       const [a, b] = [...this.pointers.values()];
       const distance = Math.hypot(a.x - b.x, a.y - b.y);
@@ -171,9 +217,9 @@ export class FullView {
         (a.y + b.y) / 2,
         false,
       );
-    } else if (this.pointers.size === 1 && this.last) {
-      this.x.update((x) => x + event.clientX - this.last!.x);
-      this.y.update((y) => y + event.clientY - this.last!.y);
+    } else if (this.pointers.size === 1 && last) {
+      this.x.update((x) => x + event.clientX - last.x);
+      this.y.update((y) => y + event.clientY - last.y);
       this.last = { x: event.clientX, y: event.clientY };
       this.apply(false);
     }
@@ -194,32 +240,23 @@ export class FullView {
   }
 
   protected onKey(event: KeyboardEvent): void {
-    if (event.key === 'Escape') this.closed.emit();
-    else if (event.key === '+' || event.key === '=') this.zoomBy(1.5);
+    if (event.key === '+' || event.key === '=') this.zoomBy(1.5);
     else if (event.key === '-') this.zoomBy(1 / 1.5);
     else if (event.key === '0') this.fit();
-    else if (event.key === 'Tab') this.trapFocus(event);
-  }
-
-  private trapFocus(event: KeyboardEvent): void {
-    const buttons = this.host.nativeElement.querySelectorAll('button');
-    const first = buttons[0];
-    const last = buttons[buttons.length - 1];
-    if (event.shiftKey && document.activeElement === first) {
-      event.preventDefault();
-      last.focus();
-    } else if (!event.shiftKey && document.activeElement === last) {
-      event.preventDefault();
-      first.focus();
-    }
   }
 
   /** Keeps the zoomed piece covering the screen it can cover. */
   private apply(isAnimated: boolean): void {
     const image = this.image().nativeElement;
     const stage = this.stage().nativeElement;
-    const maxX = Math.max(0, (image.offsetWidth * this.scale() - stage.clientWidth) / 2);
-    const maxY = Math.max(0, (image.offsetHeight * this.scale() - stage.clientHeight) / 2);
+    const maxX = Math.max(
+      0,
+      (image.offsetWidth * this.scale() - stage.clientWidth) / 2,
+    );
+    const maxY = Math.max(
+      0,
+      (image.offsetHeight * this.scale() - stage.clientHeight) / 2,
+    );
     this.x.set(Math.min(maxX, Math.max(-maxX, this.x())));
     this.y.set(Math.min(maxY, Math.max(-maxY, this.y())));
     this.isAnimated.set(isAnimated);

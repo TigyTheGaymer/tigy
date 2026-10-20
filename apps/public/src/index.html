@@ -13,7 +13,8 @@
         var root = document.documentElement;
         var theme = localStorage.getItem('tigy.theme');
         if (theme === 'light' || theme === 'dark') root.dataset.theme = theme;
-        if (localStorage.getItem('tigy.credits') === 'closed') root.dataset.credits = 'closed';
+        if (localStorage.getItem('tigy.credits') === 'closed')
+          root.dataset.credits = 'closed';
       } catch (e) {}
     </script>
   </head>

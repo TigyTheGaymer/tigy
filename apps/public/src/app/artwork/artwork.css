@@ -3,7 +3,6 @@
   background: var(--stage);
 }
 
-/* The photo viewer: a dark stage beside a flat 380px credits panel */
 .photo {
   isolation: isolate;
   display: grid;

@@ -27,7 +27,10 @@ test('Piece with every field: shows the image, details, credits, tags, file, nei
     'href',
     '/i/ref-sheet',
   );
-  await expect(page.locator('.nav.next')).toHaveAttribute('href', '/i/chibi-tigy');
+  await expect(page.locator('.nav.next')).toHaveAttribute(
+    'href',
+    '/i/chibi-tigy',
+  );
   await expect(
     page.getByRole('link', { name: 'Back to the gallery' }),
   ).toBeVisible();

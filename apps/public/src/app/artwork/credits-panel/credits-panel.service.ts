@@ -10,11 +10,7 @@ import { local } from '../../browser/storage';
 
 const KEY = 'tigy.credits';
 
-/**
- * Whether the credits panel is open on wide screens: open by default, and a
- * closed panel is remembered. Index.html applies the stored state before
- * first paint, so the stage never jumps.
- */
+/** index.html applies the stored state before first paint, so the stage never jumps. */
 @Service()
 export class CreditsPanelService {
   private readonly root = inject(DOCUMENT).documentElement;

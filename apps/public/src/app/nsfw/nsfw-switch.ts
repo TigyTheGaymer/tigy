@@ -15,7 +15,9 @@ import { NsfwSwitchService } from './nsfw-switch.service';
         [checked]="nsfwSwitch.isOn()"
         (change)="nsfwSwitch.set(toggle.checked)"
       />
-      <span class="track" aria-hidden="true"><span class="thumb"><app-paw /></span></span>
+      <span class="track" aria-hidden="true"
+        ><span class="thumb"><app-paw /></span
+      ></span>
     </label>
   `,
 })

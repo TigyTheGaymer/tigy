@@ -1,16 +1,13 @@
 import { Component, computed, input } from '@angular/core';
-import { LucideLink } from '@lucide/angular';
+import { NgIcon, provideIcons } from '@ng-icons/core';
+import { lucideLink } from '@ng-icons/lucide';
 import type { SocialLink as Link } from '@tigy/models';
 import { brandFor } from './brands';
 
-/**
- * A social link: the network's logo (or a generic link icon) and the handle,
- * named "Network: handle" for screen readers. As a button, phones show the
- * icon only.
- */
 @Component({
   selector: 'app-social-link',
-  imports: [LucideLink],
+  imports: [NgIcon],
+  providers: [provideIcons({ lucideLink })],
   styleUrl: './social-link.css',
   template: `
     <a
@@ -21,11 +18,16 @@ import { brandFor } from './brands';
       [title]="name()"
     >
       @if (brand(); as brand) {
-        <svg class="logo" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <svg
+          class="logo"
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+          focusable="false"
+        >
           <path [attr.d]="brand.path" />
         </svg>
       } @else {
-        <svg lucideLink class="logo generic" aria-hidden="true"></svg>
+        <ng-icon name="lucideLink" class="generic" />
       }
       <span class="handle">{{ link().handle }}</span>
     </a>

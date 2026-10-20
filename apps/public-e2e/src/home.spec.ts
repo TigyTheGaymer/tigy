@@ -21,9 +21,9 @@ test.describe('with 30 more pieces', () => {
     expect(html).toContain('<h1');
     expect(html).toContain('Tigy');
     expect(html).toContain('35 pieces · Jan 2025 – May 2026');
-    const links = [...html.matchAll(/class="tile[^"]*"[^>]*>\s*<a[^>]*href="([^"]+)"/g)].map(
-      (m) => m[1],
-    );
+    const links = [
+      ...html.matchAll(/class="tile[^"]*"[^>]*>\s*<a[^>]*href="([^"]+)"/g),
+    ].map((m) => m[1]);
     expect(links).toHaveLength(24);
     expect(links[0]).toBe('/i/bulk-30');
     expect(links[23]).toBe('/i/bulk-07');

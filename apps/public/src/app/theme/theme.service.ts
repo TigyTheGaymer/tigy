@@ -13,10 +13,7 @@ export type Theme = 'auto' | 'light' | 'dark';
 const KEY = 'tigy.theme';
 const ORDER: readonly Theme[] = ['auto', 'light', 'dark'];
 
-/**
- * Index.html applies the stored theme before first paint; the server renders
- * "auto", so the button only shows the stored choice once hydrated.
- */
+/** index.html applies the stored theme before first paint; the button shows it once hydrated. */
 @Service()
 export class ThemeService {
   private readonly root = inject(DOCUMENT).documentElement;
@@ -27,7 +24,6 @@ export class ThemeService {
     afterNextRender(() => this.state.set(stored(local.get(KEY))));
   }
 
-  /** Automatic → Light → Dark → Automatic. */
   cycle(): void {
     this.set(nextTheme(this.state()));
   }

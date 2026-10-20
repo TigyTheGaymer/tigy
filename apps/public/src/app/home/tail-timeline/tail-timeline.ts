@@ -2,12 +2,13 @@ import {
   afterNextRender,
   Component,
   computed,
-  DestroyRef,
+  DOCUMENT,
   ElementRef,
   inject,
   input,
   output,
   signal,
+  viewChild,
 } from '@angular/core';
 import type { YearMark } from '@tigy/gallery';
 
@@ -36,17 +37,18 @@ export function yearPositions(years: readonly YearMark[]): YearPosition[] {
   });
 }
 
-/**
- * The ringed tail: stands for the whole gallery as filtered, loaded or not
- * (design D10). Choosing a point asks the page to bring that piece into view,
- * loading pages until it is there.
- */
+/** Spans the whole filtered gallery, loaded or not; the page loads pages until a chosen piece arrives. */
 @Component({
   selector: 'app-tail-timeline',
   styleUrl: './tail-timeline.css',
-  host: { 'aria-hidden': 'true' },
+  host: {
+    'aria-hidden': 'true',
+    '(window:scroll)': 'measure()',
+    '(window:resize)': 'measure()',
+  },
   template: `
     <div
+      #timeline
       class="timeline"
       [class.is-dragging]="isDragging()"
       [style.--p]="progress()"
@@ -84,23 +86,19 @@ export class TailTimeline {
     return total ? this.scrolled() * Math.min(1, this.loaded() / total) : 0;
   });
 
-  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+  private readonly timeline =
+    viewChild.required<ElementRef<HTMLElement>>('timeline');
+  private readonly document = inject(DOCUMENT);
 
   constructor() {
-    const destroyRef = inject(DestroyRef);
-    afterNextRender(() => {
-      const onScroll = () => {
-        const max = document.documentElement.scrollHeight - window.innerHeight;
-        this.scrolled.set(max > 0 ? Math.min(1, window.scrollY / max) : 1);
-      };
-      onScroll();
-      window.addEventListener('scroll', onScroll, { passive: true });
-      window.addEventListener('resize', onScroll);
-      destroyRef.onDestroy(() => {
-        window.removeEventListener('scroll', onScroll);
-        window.removeEventListener('resize', onScroll);
-      });
-    });
+    afterNextRender(() => this.measure());
+  }
+
+  protected measure(): void {
+    const view = this.document.defaultView;
+    if (!view) return;
+    const max = this.document.documentElement.scrollHeight - view.innerHeight;
+    this.scrolled.set(max > 0 ? Math.min(1, view.scrollY / max) : 1);
   }
 
   protected start(event: PointerEvent): void {
@@ -114,10 +112,11 @@ export class TailTimeline {
   }
 
   private goTo(event: PointerEvent): void {
-    const rect = this.host.nativeElement
-      .querySelector('.timeline')!
-      .getBoundingClientRect();
-    const ratio = Math.min(1, Math.max(0, (event.clientY - rect.top) / rect.height));
+    const rect = this.timeline().nativeElement.getBoundingClientRect();
+    const ratio = Math.min(
+      1,
+      Math.max(0, (event.clientY - rect.top) / rect.height),
+    );
     const index = Math.min(this.total() - 1, Math.floor(ratio * this.total()));
     if (index >= 0) this.travel.emit(index);
   }

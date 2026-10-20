@@ -1,4 +1,3 @@
-/* The intro sits straight on the page, like a photo album's header: no card. */
 .hero {
   padding-top: clamp(20px, 4vw, 48px);
 }
@@ -79,7 +78,6 @@ h1 app-mark {
   font-weight: 700;
 }
 
-/* Paw prints walking while the next page loads */
 .sentinel {
   display: grid;
   place-items: center;

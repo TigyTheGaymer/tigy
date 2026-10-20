@@ -5,10 +5,10 @@ import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { CDN_CACHE_CONTROL } from '../server/cache-control';
-import { TopBar } from './chrome/top-bar';
 import { appRoutes } from './app.routes';
 import { serverRoutes } from './app.routes.server';
-import { NotFoundPage } from './pages/not-found/not-found';
+import { TopBar } from './chrome/top-bar';
+import { NotFoundPage } from './not-found/not-found';
 
 describe('TopBar', () => {
   it('offers the logo, the theme button and the NSFW switch, off by default', async () => {

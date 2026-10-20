@@ -11,8 +11,8 @@ import {
   withComponentInputBinding,
 } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
-import { appRoutes } from '../../app.routes';
-import { galleryPage, HOME, requested, rows, settled } from '../../testing';
+import { appRoutes } from '../app.routes';
+import { galleryPage, HOME, requested, rows, settled } from '../testing';
 
 /** Stands in for the browser's IntersectionObserver, which jsdom lacks. */
 let setNearEnd: (isNear: boolean) => void = () => undefined;
@@ -23,9 +23,6 @@ class FakeIntersectionObserver {
   readonly observe = vi.fn();
   readonly disconnect = vi.fn();
 }
-
-// The first test loads and compiles the lazy page with its icons, which can take a few seconds.
-vi.setConfig({ testTimeout: 20_000 });
 
 describe('HomePage', () => {
   let http: HttpTestingController;
@@ -175,7 +172,9 @@ describe('HomePage', () => {
     const sort = page().querySelector('.chip.sort')!;
     expect(sort.textContent?.trim()).toBe('Oldest first');
     expect(sort.getAttribute('href')).toBe('/?character=tigy&tag=comic');
-    expect(page().querySelectorAll('button.chip[aria-disabled="true"]')).toHaveLength(4);
+    expect(
+      page().querySelectorAll('button.chip[aria-disabled="true"]'),
+    ).toHaveLength(4);
   });
 
   it('Unknown person: names the filter "Unknown person", says nothing matches and offers to clear', async () => {

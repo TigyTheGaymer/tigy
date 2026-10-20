@@ -22,29 +22,28 @@ import {
   type GalleryQuery,
 } from '@tigy/gallery';
 import { TIGY_ID, type GalleryRow } from '@tigy/models';
-import type { GalleryResponse } from '../../../api/types';
+import type { GalleryResponse } from '../../api/types';
 import {
   CatalogService,
   type GalleryRequest,
-} from '../../catalog/catalog.service';
-import { TopBar } from '../../chrome/top-bar';
-import { monthRange, pieceCount } from '../../format';
-import { rememberGallery } from '../../gallery-address';
-import { HeadService } from '../../head/head.service';
-import { Mark } from '../../markings/mark';
-import { Paw } from '../../markings/paw';
-import { Stripes } from '../../markings/stripes';
-import { NsfwSwitchService } from '../../nsfw/nsfw-switch.service';
-import { latest } from '../../resources';
-import { injectServerResponse } from '../../server-response';
-import { SocialLink } from '../../social/social-link';
-import { avatarUrl } from '../../urls';
-import { activeFilters } from './active-filters';
-import { FilterRow } from './filter-row';
-import { GalleryPlaceService } from './gallery-place.service';
-import { TailTimeline } from './tail-timeline';
-import { toTile } from './tile';
-import { Tiles } from './tiles';
+} from '../catalog/catalog.service';
+import { TopBar } from '../chrome/top-bar';
+import { monthRange, pieceCount } from '../format';
+import { GalleryPlaceService } from '../gallery/gallery-place.service';
+import { HeadService } from '../head/head.service';
+import { Mark } from '../markings/mark';
+import { Paw } from '../markings/paw';
+import { Stripes } from '../markings/stripes';
+import { NsfwSwitchService } from '../nsfw/nsfw-switch.service';
+import { latest } from '../resources';
+import { injectServerResponse } from '../server-response';
+import { SocialLink } from '../social/social-link';
+import { avatarUrl } from '../urls';
+import { activeFilters } from './filter-row/active-filters';
+import { FilterRow } from './filter-row/filter-row';
+import { TailTimeline } from './tail-timeline/tail-timeline';
+import { toTile } from './tiles/tile';
+import { Tiles } from './tiles/tiles';
 
 /** Repeated query parameters arrive as a list. */
 type QueryParam = string | string[] | undefined;
@@ -81,7 +80,6 @@ export class HomePage {
   private readonly catalog = inject(CatalogService);
   private readonly router = inject(Router);
   private readonly place = inject(GalleryPlaceService);
-  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly isNsfwShown = inject(NsfwSwitchService).isOn;
 
   protected readonly query = computed(
@@ -101,7 +99,6 @@ export class HomePage {
     JSON.stringify([galleryQueryToParams(this.query()), this.isNsfwShown()]),
   );
 
-  /** The visitor's place when coming back to this gallery during the visit. */
   private readonly restored = this.place.take();
   private readonly isRestored = computed(
     () => this.restored?.key === this.key(),
@@ -137,14 +134,13 @@ export class HomePage {
     computation: (value, previous) => value ?? previous?.value,
   });
 
-  /** Where more pieces continue; cleared when the gallery changes. */
+  /** Cleared when the gallery changes. */
   private readonly nextRequest = linkedSignal<
     string,
     GalleryRequest | undefined
   >({ source: this.key, computation: () => undefined });
   private readonly nextPage = this.catalog.gallery(this.nextRequest);
 
-  /** The pages loaded after the first, appended in order. */
   private readonly more = linkedSignal<
     { key: string; page: GalleryResponse | undefined },
     MorePages
@@ -230,6 +226,7 @@ export class HomePage {
   });
 
   private readonly sentinel = viewChild<ElementRef<HTMLElement>>('sentinel');
+  private readonly tilesList = viewChild(Tiles);
   private readonly isNearEnd = signal(false);
   /** The piece the timeline asked for, until it is in view. */
   private readonly travelTarget = signal<number | undefined>(undefined);
@@ -256,11 +253,7 @@ export class HomePage {
     afterRenderEffect(() => {
       const target = this.travelTarget();
       if (target === undefined) return;
-      const tile = this.host.nativeElement.querySelectorAll('.tile')[target];
-      if (tile) {
-        tile.scrollIntoView({ block: 'center' });
-        this.travelTarget.set(undefined);
-      } else if (!this.hasMore()) {
+      if (this.tilesList()?.scrollToTile(target) || !this.hasMore()) {
         this.travelTarget.set(undefined);
       }
     });
@@ -271,7 +264,7 @@ export class HomePage {
         const tree = this.router.createUrlTree(['/'], {
           queryParams: galleryQueryToParams(this.query()),
         });
-        rememberGallery(this.router.serializeUrl(tree));
+        this.place.rememberAddress(this.router.serializeUrl(tree));
       });
 
       const destroyRef = inject(DestroyRef);

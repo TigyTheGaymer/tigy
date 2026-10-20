@@ -1,5 +1,6 @@
 import { Component, computed, inject } from '@angular/core';
-import { LucideMonitor, LucideMoon, LucideSun } from '@lucide/angular';
+import { NgIcon, provideIcons } from '@ng-icons/core';
+import { lucideMonitor, lucideMoon, lucideSun } from '@ng-icons/lucide';
 import { nextTheme, ThemeService, type Theme } from './theme.service';
 
 const NAMES: Record<Theme, string> = {
@@ -10,7 +11,8 @@ const NAMES: Record<Theme, string> = {
 
 @Component({
   selector: 'app-theme-button',
-  imports: [LucideMonitor, LucideMoon, LucideSun],
+  imports: [NgIcon],
+  providers: [provideIcons({ lucideMonitor, lucideMoon, lucideSun })],
   template: `
     <button
       type="button"
@@ -21,13 +23,13 @@ const NAMES: Record<Theme, string> = {
     >
       @switch (themes.theme()) {
         @case ('light') {
-          <svg lucideSun class="icon" aria-hidden="true"></svg>
+          <ng-icon name="lucideSun" class="icon" />
         }
         @case ('dark') {
-          <svg lucideMoon class="icon" aria-hidden="true"></svg>
+          <ng-icon name="lucideMoon" class="icon" />
         }
         @default {
-          <svg lucideMonitor class="icon" aria-hidden="true"></svg>
+          <ng-icon name="lucideMonitor" class="icon" />
         }
       }
     </button>

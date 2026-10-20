@@ -14,8 +14,9 @@
   fill: currentColor;
 }
 
-.logo.generic {
-  fill: none;
+.generic {
+  --ng-icon__size: 18px;
+  flex: none;
 }
 
 .handle {

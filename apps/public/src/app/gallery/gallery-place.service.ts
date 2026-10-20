@@ -1,8 +1,8 @@
 import { Service } from '@angular/core';
 import type { GalleryRow } from '@tigy/models';
-import type { GalleryResponse } from '../../../api/types';
+import type { GalleryResponse } from '../../api/types';
+import { session } from '../browser/storage';
 
-/** The gallery as the visitor left it: which gallery, and every piece loaded. */
 export interface GalleryPlace {
   /** The address's filters and sort, and the NSFW switch. */
   key: string;
@@ -10,10 +10,11 @@ export interface GalleryPlace {
   more: { rows: GalleryRow[]; hasMore?: boolean };
 }
 
+const ADDRESS_KEY = 'tigy.gallery';
+
 /**
- * Keeps the visitor's place in memory for the visit, so going back to the
- * gallery shows the same pieces without loading them again. A reload starts
- * fresh. The router restores the scroll position itself.
+ * Where to go back to: the place (loaded pages) lives in memory, so a reload starts fresh, and the
+ * router restores the scroll position itself. The address lives in session storage, per tab.
  */
 @Service()
 export class GalleryPlaceService {
@@ -25,7 +26,7 @@ export class GalleryPlaceService {
     this.hasLeftForArtwork = isLeavingForArtwork;
   }
 
-  /** The kept place, given up once: the home page takes it back when it opens. */
+  /** Given up once: the home page takes it when it opens. */
   take(): GalleryPlace | undefined {
     const place = this.place;
     this.place = undefined;
@@ -33,8 +34,19 @@ export class GalleryPlaceService {
     return place;
   }
 
-  /** Whether the visitor opened artwork pages from the gallery, so going back in history returns there. */
   isFromGallery(): boolean {
     return this.hasLeftForArtwork && this.place !== undefined;
+  }
+
+  rememberAddress(address: string): void {
+    session.set(ADDRESS_KEY, address);
+  }
+
+  /** Only addresses on this site count. */
+  rememberedAddress(): string | null {
+    const address = session.get(ADDRESS_KEY);
+    return address?.startsWith('/') && !address.startsWith('//')
+      ? address
+      : null;
   }
 }

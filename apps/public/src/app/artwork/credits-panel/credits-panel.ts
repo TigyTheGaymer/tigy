@@ -1,16 +1,17 @@
 import { Component, computed, input, output } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { NgIcon, provideIcons } from '@ng-icons/core';
 import {
-  LucideCalendar,
-  LucideExpand,
-  LucideImage,
-  LucideLink,
-  LucidePalette,
-  LucideShare2,
-  LucideTag,
-  LucideUsers,
-  LucideX,
-} from '@lucide/angular';
+  lucideCalendar,
+  lucideExpand,
+  lucideImage,
+  lucideLink,
+  lucidePalette,
+  lucideShare2,
+  lucideTag,
+  lucideUsers,
+  lucideX,
+} from '@ng-icons/lucide';
 import { formatArtworkDate } from '@tigy/gallery';
 import { TIGY_ID } from '@tigy/models';
 import type { ArtworkResponse, CreditedPerson } from '../../../api/types';
@@ -21,19 +22,19 @@ import { avatarUrl, originalUrl } from '../../urls';
 
 @Component({
   selector: 'app-credits-panel',
-  imports: [
-    RouterLink,
-    Paw,
-    SocialLink,
-    LucideCalendar,
-    LucideExpand,
-    LucideImage,
-    LucideLink,
-    LucidePalette,
-    LucideShare2,
-    LucideTag,
-    LucideUsers,
-    LucideX,
+  imports: [RouterLink, NgIcon, Paw, SocialLink],
+  providers: [
+    provideIcons({
+      lucideCalendar,
+      lucideExpand,
+      lucideImage,
+      lucideLink,
+      lucidePalette,
+      lucideShare2,
+      lucideTag,
+      lucideUsers,
+      lucideX,
+    }),
   ],
   templateUrl: './credits-panel.html',
   styleUrl: './credits-panel.css',
@@ -49,7 +50,6 @@ export class CreditsPanel {
 
   protected readonly artwork = computed(() => this.page().artwork);
   protected readonly title = computed(() => this.artwork().title);
-  /** The date at the precision given, or the day the piece was added (design D10). */
   protected readonly date = computed(() => {
     const { date, sortDate } = this.artwork();
     return date

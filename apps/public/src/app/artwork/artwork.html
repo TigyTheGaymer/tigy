@@ -2,20 +2,30 @@
   <app-not-found />
 } @else {
   <main class="photo">
-    <div class="stage" (touchstart)="onTouchStart($event)" (touchend)="onTouchEnd($event)">
+    <div
+      class="stage"
+      (touchstart)="onTouchStart($event)"
+      (touchend)="onTouchEnd($event)"
+    >
       <app-stage-bar>
         @if (data() && isImageShown()) {
-          <button type="button" class="round" aria-label="Share" title="Share" (click)="share()">
-            <svg lucideShare2 class="icon" aria-hidden="true"></svg>
+          <button
+            type="button"
+            class="round"
+            aria-label="Share"
+            title="Share"
+            (click)="share()"
+          >
+            <ng-icon name="lucideShare2" class="icon" />
           </button>
           <button
             type="button"
             class="round"
             aria-label="Full view"
             title="Full view"
-            (click)="openFullView()"
+            (click)="isFullViewOpen.set(true)"
           >
-            <svg lucideExpand class="icon" aria-hidden="true"></svg>
+            <ng-icon name="lucideExpand" class="icon" />
           </button>
           <button
             type="button"
@@ -26,7 +36,7 @@
             title="Credits and info"
             (click)="toggleCredits()"
           >
-            <svg lucideInfo class="icon" aria-hidden="true"></svg>
+            <ng-icon name="lucideInfo" class="icon" />
           </button>
           <a
             class="round"
@@ -34,8 +44,8 @@
             download
             aria-label="Download original"
             title="Download original"
-            ><svg lucideDownload class="icon" aria-hidden="true"></svg
-          ></a>
+            ><ng-icon name="lucideDownload" class="icon"
+          /></a>
         }
       </app-stage-bar>
 
@@ -47,14 +57,14 @@
               [routerLink]="['/i', previous.id]"
               [replaceUrl]="true"
               [attr.aria-label]="'Previous: ' + (previous.title ?? 'Untitled')"
-              ><svg lucideArrowLeft class="icon" aria-hidden="true"></svg
-            ></a>
+              ><ng-icon name="lucideArrowLeft" class="icon"
+            /></a>
           }
           <button
             type="button"
             class="piece"
             [attr.aria-label]="'Full view of ' + title()"
-            (click)="openFullView()"
+            (click)="isFullViewOpen.set(true)"
           >
             <img
               [src]="fullImage()"
@@ -69,8 +79,8 @@
               [routerLink]="['/i', next.id]"
               [replaceUrl]="true"
               [attr.aria-label]="'Next: ' + (next.title ?? 'Untitled')"
-              ><svg lucideArrowRight class="icon" aria-hidden="true"></svg
-            ></a>
+              ><ng-icon name="lucideArrowRight" class="icon"
+            /></a>
           }
         } @else {
           <section class="stage-panel confirm" aria-labelledby="nsfw-heading">
@@ -105,7 +115,7 @@
           (closed)="creditsPanel.set(false)"
           (shared)="share()"
           (safeLinkCopied)="copySafeLink()"
-          (fullViewOpened)="openFullView()"
+          (fullViewOpened)="isFullViewOpen.set(true)"
         />
       </div>
     }
@@ -122,7 +132,7 @@
       [fullSrc]="fullImage()"
       [originalSrc]="originalHref()"
       [alt]="title()"
-      (closed)="closeFullView()"
+      (closed)="isFullViewOpen.set(false)"
     />
   }
 }

@@ -50,7 +50,7 @@
   src: url('/fonts/grandstander-latin-800-normal.woff2') format('woff2');
 }
 
-/* The display font's alternates (DESIGN.md). Declared but unused, so browsers never download
+/* Alternate display fonts, declared but unused so browsers never download
    them; switching means pointing --font-display at one of them. */
 @font-face {
   font-family: 'Fredoka';
@@ -158,7 +158,7 @@ html {
   scrollbar-color: var(--ink) var(--page-deep);
 }
 
-html.viewer-lock {
+html:has(dialog[open]) {
   overflow: hidden;
 }
 
@@ -198,14 +198,13 @@ h2 {
   text-wrap: balance;
 }
 
+/* ng-icon sizes itself from this property, not from width and height. */
 .icon {
-  width: 1.15em;
-  height: 1.15em;
+  --ng-icon__size: 1.15em;
   flex: none;
-  stroke-width: 2.4;
 }
 
-/* Buttons: pads with a ledge underneath (the Press Rule) */
+/* Buttons */
 .pad {
   display: inline-flex;
   align-items: center;

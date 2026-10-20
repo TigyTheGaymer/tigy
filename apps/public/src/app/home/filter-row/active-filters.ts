@@ -1,11 +1,11 @@
 import type { Params } from '@angular/router';
 import { galleryQueryToParams, type GalleryQuery } from '@tigy/gallery';
 
-/** An active filter, named, with the gallery address that drops it. */
 export interface ActiveFilter {
   key: string;
   kind: 'Character' | 'Artist' | 'Tag' | 'Year';
   name: string;
+  /** The gallery address without this filter. */
   remove: Params;
 }
 

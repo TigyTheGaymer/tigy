@@ -38,6 +38,6 @@ describe('SocialLink', () => {
   it('Network without a logo: shows a generic link icon, named after the network', () => {
     const link = render('mastodon');
     expect(link.getAttribute('aria-label')).toBe('Mastodon: tigy');
-    expect(link.querySelector('svg.generic')).not.toBeNull();
+    expect(link.querySelector('ng-icon.generic svg')).not.toBeNull();
   });
 });

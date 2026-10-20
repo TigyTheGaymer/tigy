@@ -50,7 +50,7 @@ test.describe('edits', () => {
       const link = page.locator('.artists .links a');
       await expect(link).toHaveAttribute('aria-label', 'Mastodon: artist');
       // Network without a logo: the generic link icon.
-      await expect(link.locator('svg.generic')).toHaveCount(1);
+      await expect(link.locator('ng-icon.generic svg')).toHaveCount(1);
     }
   });
 

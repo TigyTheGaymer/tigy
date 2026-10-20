@@ -7,12 +7,9 @@ import { RESPONSE_INIT } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter, withComponentInputBinding } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
-import { appRoutes } from '../../app.routes';
-import { NsfwSwitchService } from '../../nsfw/nsfw-switch.service';
-import { artwork, requested, settled } from '../../testing';
-
-// The first test loads and compiles the lazy page with its icons, which can take a few seconds.
-vi.setConfig({ testTimeout: 20_000 });
+import { appRoutes } from '../app.routes';
+import { NsfwSwitchService } from '../nsfw/nsfw-switch.service';
+import { artwork, requested, settled } from '../testing';
 
 describe('ArtworkPage', () => {
   let http: HttpTestingController;

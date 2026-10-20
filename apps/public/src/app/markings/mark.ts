@@ -1,7 +1,5 @@
 import { Component } from '@angular/core';
 
-// Tigy's own shapes are filled drawings in the current text colour, not icons.
-
 /** One long tapered stroke crossed by two shorter ones. */
 @Component({
   selector: 'app-mark',

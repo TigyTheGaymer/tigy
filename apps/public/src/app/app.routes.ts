@@ -5,16 +5,15 @@ export const appRoutes: Route[] = [
   {
     path: '',
     pathMatch: 'full',
-    loadComponent: () => import('./pages/home/home').then((m) => m.HomePage),
+    loadComponent: () => import('./home/home').then((m) => m.HomePage),
   },
   {
     path: 'i/:id',
-    loadComponent: () =>
-      import('./pages/artwork/artwork').then((m) => m.ArtworkPage),
+    loadComponent: () => import('./artwork/artwork').then((m) => m.ArtworkPage),
   },
   {
     path: '**',
     loadComponent: () =>
-      import('./pages/not-found/not-found').then((m) => m.NotFoundPage),
+      import('./not-found/not-found').then((m) => m.NotFoundPage),
   },
 ];

@@ -1,14 +1,25 @@
-:host {
+.viewer {
   position: fixed;
   inset: 0;
-  z-index: 100;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
   background: rgb(22 5 6 / 0.98);
+  color: var(--on-stage);
   opacity: 0;
   --ring: var(--on-stage);
   transition: opacity 220ms var(--ease-out);
 }
 
-:host(.is-open) {
+.viewer::backdrop {
+  background: transparent;
+}
+
+.viewer.is-open {
   opacity: 1;
 }
 
@@ -22,11 +33,11 @@
   cursor: zoom-in;
 }
 
-:host(.is-zoomed) .stage {
+.viewer.is-zoomed .stage {
   cursor: grab;
 }
 
-:host(.is-dragging) .stage {
+.viewer.is-dragging .stage {
   cursor: grabbing;
 }
 

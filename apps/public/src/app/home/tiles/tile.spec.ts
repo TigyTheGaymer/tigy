@@ -1,7 +1,11 @@
 import type { GalleryRow } from '@tigy/models';
 import { toTile } from './tile';
 
-function row(w: number, h: number, fields: Partial<GalleryRow> = {}): GalleryRow {
+function row(
+  w: number,
+  h: number,
+  fields: Partial<GalleryRow> = {},
+): GalleryRow {
   return {
     id: 'k3x',
     sortDate: '2026-01-01',
@@ -30,17 +34,17 @@ describe('toTile', () => {
   });
 
   it("carries the piece's size, title and NSFW flag", () => {
-    expect(toTile(row(1620, 2117, { title: 'Hey Pookie!', nsfw: true }))).toEqual(
-      {
-        id: 'k3x',
-        src: '/img/k3x/thumb.webp',
-        width: 1620,
-        height: 2117,
-        shape: 1620 / 2117,
-        alt: 'Hey Pookie!',
-        isNsfw: true,
-      },
-    );
+    expect(
+      toTile(row(1620, 2117, { title: 'Hey Pookie!', nsfw: true })),
+    ).toEqual({
+      id: 'k3x',
+      src: '/img/k3x/thumb.webp',
+      width: 1620,
+      height: 2117,
+      shape: 1620 / 2117,
+      alt: 'Hey Pookie!',
+      isNsfw: true,
+    });
     expect(toTile(row(10, 10)).alt).toBe('Untitled');
   });
 });

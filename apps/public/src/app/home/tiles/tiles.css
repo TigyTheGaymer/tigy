@@ -1,6 +1,6 @@
-/* Justified rows without script (design D11): each tile starts at its shape times three quarters
-   of the row height, the lowest a row may be, and grows in proportion to its shape, so a row fills
-   the width at one height near the target. The spacer keeps the last row from stretching. */
+/* Justified rows in CSS alone, so the server HTML is already laid out: each tile starts at three
+   quarters of the row height and grows with its shape until the row is full. The spacer keeps the
+   last row from stretching. */
 .tiles {
   display: flex;
   flex-wrap: wrap;

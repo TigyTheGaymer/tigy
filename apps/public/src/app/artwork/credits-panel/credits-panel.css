@@ -1,4 +1,3 @@
-/* A flat cream side panel: no card inside it */
 :host {
   display: block;
   color: var(--ink);
@@ -36,8 +35,7 @@ h1.untitled {
 }
 
 .row > .icon {
-  width: 22px;
-  height: 22px;
+  --ng-icon__size: 22px;
   margin-top: 2px;
   color: var(--ink-2);
 }
