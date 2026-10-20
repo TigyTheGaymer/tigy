@@ -95,7 +95,7 @@ An artwork page SHALL offer the previous and next pieces in the whole gallery's 
 - **THEN** next leads to the nearest following piece that is not NSFW
 
 ### Requirement: Artwork links preview by default
-A shared artwork link SHALL show the artwork's title and image in link previews, NSFW pieces included. A safe variant of the link SHALL show a generic site preview with no title, image or other detail of the piece. For an NSFW piece, the share menu SHALL offer both links. NSFW artwork pages SHALL NOT be indexed by search engines and SHALL NOT be listed in any sitemap, whichever link is used.
+A shared artwork link SHALL show the artwork's title and image in link previews, NSFW pieces included. A safe variant of the link SHALL show a generic site preview with no title, image or other detail of the piece. For an NSFW piece, the artwork page SHALL offer both links. NSFW artwork pages SHALL NOT be indexed by search engines and SHALL NOT be listed in any sitemap, whichever link is used.
 
 #### Scenario: Default link to an NSFW piece
 - **WHEN** someone posts the default link to an NSFW piece in a chat app

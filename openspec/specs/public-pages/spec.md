@@ -29,10 +29,10 @@ The home page SHALL show the home header (Tigy's name, avatar and social links, 
 - **THEN** the page shows the header without a count or date range, and the gallery says "No art yet."
 
 ### Requirement: Loading more pieces
-When more pieces follow, the home page SHALL offer to load more, which appends the next page after the last piece shown, in the same filtered and sorted order, without changing the page's address. When no more pieces follow, the page SHALL say that the end is reached.
+When more pieces follow, the home page SHALL load the next page as the visitor scrolls near the end of the loaded pieces, without the visitor pressing a button and without changing the page's address, appending it after the last piece shown in the same filtered and sorted order. When no more pieces follow, the page SHALL say that the end is reached.
 
 #### Scenario: Loading more
-- **WHEN** a gallery of 30 pieces is open and the visitor chooses to load more
+- **WHEN** a gallery of 30 pieces is open and the visitor scrolls near the end of the first 24
 - **THEN** the remaining 6 pieces appear below the first 24, and the page says the end is reached
 
 #### Scenario: The address stays shareable
@@ -62,11 +62,15 @@ On an artwork page, every credited person except Tigy and every tag SHALL link t
 - **THEN** the home gallery opens filtered by that artist
 
 ### Requirement: Artwork page shows the piece and its details
-The artwork page SHALL show the piece, its title (or "Untitled"), description, date at the precision given, credits in order with their links, tags, the original file's format, size and dimensions, and a link to download the original, each only when set. It SHALL link to the previous and next pieces and back to the gallery.
+The artwork page SHALL show the piece, its title (or "Untitled"), description, date at the precision given or, for a piece without a date, the day it was added marked as such, credits in order with their links, tags, the original file's format, size and dimensions, and a link to download the original, each only when set. It SHALL link to the previous and next pieces and back to the gallery.
 
 #### Scenario: Piece with every field
 - **WHEN** a visitor opens a published SFW piece with title, description, date, credits and tags
 - **THEN** the page shows all of them, the image, the download link, previous, next and the link back
+
+#### Scenario: Piece without a date
+- **WHEN** a visitor opens a piece without a date that was added on 20 Nov 2025
+- **THEN** the page shows "Added 20 Nov 2025"
 
 ### Requirement: Downloading the original
 The download link SHALL save the original under the piece's title in lowercase, with words joined by hyphens, or `tigy-{id}` when it has no title, followed by the original's extension.
