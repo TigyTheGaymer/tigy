@@ -1,49 +1,32 @@
-import {
-  afterNextRender,
-  DOCUMENT,
-  inject,
-  Service,
-  signal,
-  type Signal,
-} from '@angular/core';
-import { local } from '../shared/storage';
+import { DOCUMENT, inject, Service } from '@angular/core';
+import { LOCAL_STORAGE, storedSignal } from '../shared/storage';
 
 export type Theme = 'auto' | 'light' | 'dark';
 
-const STORAGE_KEY = 'tigy.theme';
 const ORDER: readonly Theme[] = ['auto', 'light', 'dark'];
 
 /** index.html applies the stored theme before first paint; the button shows it once hydrated. */
 @Service()
 export class ThemeService {
   private readonly root = inject(DOCUMENT).documentElement;
-  private readonly state = signal<Theme>('auto');
-  readonly theme: Signal<Theme> = this.state.asReadonly();
-
-  constructor() {
-    afterNextRender(() => this.state.set(stored(local.get(STORAGE_KEY))));
-  }
+  private readonly stored = storedSignal<Theme>(LOCAL_STORAGE, 'tigy.theme', {
+    initial: 'auto',
+    parse: (value) => (value === 'light' || value === 'dark' ? value : 'auto'),
+    serialize: (theme) => (theme === 'auto' ? null : theme),
+  });
+  readonly theme = this.stored.value;
 
   cycle(): void {
-    this.set(nextTheme(this.state()));
+    this.set(nextTheme(this.theme()));
   }
 
   set(theme: Theme): void {
-    this.state.set(theme);
-    if (theme === 'auto') {
-      delete this.root.dataset['theme'];
-      local.remove(STORAGE_KEY);
-    } else {
-      this.root.dataset['theme'] = theme;
-      local.set(STORAGE_KEY, theme);
-    }
+    this.stored.set(theme);
+    if (theme === 'auto') delete this.root.dataset['theme'];
+    else this.root.dataset['theme'] = theme;
   }
 }
 
 export function nextTheme(theme: Theme): Theme {
   return ORDER[(ORDER.indexOf(theme) + 1) % ORDER.length];
-}
-
-function stored(value: string | null): Theme {
-  return value === 'light' || value === 'dark' ? value : 'auto';
 }

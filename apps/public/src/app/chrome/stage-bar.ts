@@ -1,5 +1,5 @@
 import { Location } from '@angular/common';
-import { afterNextRender, Component, inject, signal } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideArrowLeft } from '@ng-icons/lucide';
@@ -39,14 +39,9 @@ export class StageBar {
   private readonly location = inject(Location);
   private readonly place = inject(GalleryPlaceService);
 
-  /** `/` on the server and in the first browser render, so hydration matches. */
-  protected readonly remembered = signal('/');
-
-  constructor() {
-    afterNextRender(() =>
-      this.remembered.set(this.place.rememberedAddress() ?? '/'),
-    );
-  }
+  protected readonly remembered = computed(
+    () => this.place.rememberedAddress() ?? '/',
+  );
 
   /** History back, when possible, returns to the gallery at its scroll position. */
   goBack(event?: Event): void {

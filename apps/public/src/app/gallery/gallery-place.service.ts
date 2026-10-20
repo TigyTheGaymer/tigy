@@ -1,7 +1,7 @@
 import { Service } from '@angular/core';
 import type { GalleryRow } from '@tigy/models';
 import type { GalleryResponse } from '../../api/types';
-import { session } from '../shared/storage';
+import { SESSION_STORAGE, storedSignal } from '../shared/storage';
 
 export interface GalleryPlace {
   /** The address's filters and sort, and the NSFW switch. */
@@ -9,8 +9,6 @@ export interface GalleryPlace {
   first: GalleryResponse;
   more: { rows: GalleryRow[]; hasMore?: boolean };
 }
-
-const STORAGE_KEY = 'tigy.gallery';
 
 /**
  * Where to go back to: the place (loaded pages) lives in memory, so a reload starts fresh, and the
@@ -38,15 +36,19 @@ export class GalleryPlaceService {
     return this.hasLeftForArtwork && this.place !== undefined;
   }
 
-  rememberAddress(address: string): void {
-    session.set(STORAGE_KEY, address);
-  }
+  private readonly address = storedSignal<string | null>(
+    SESSION_STORAGE,
+    'tigy.gallery',
+    { initial: null, parse: onThisSite, serialize: (address) => address },
+  );
+  /** The gallery address this tab came from; `null` before the first render reads it. */
+  readonly rememberedAddress = this.address.value;
 
-  /** Only addresses on this site count. */
-  rememberedAddress(): string | null {
-    const address = session.get(STORAGE_KEY);
-    return address?.startsWith('/') && !address.startsWith('//')
-      ? address
-      : null;
+  rememberAddress(address: string): void {
+    this.address.set(address);
   }
+}
+
+function onThisSite(address: string | null): string | null {
+  return address?.startsWith('/') && !address.startsWith('//') ? address : null;
 }

@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { galleryPage, rows } from '../testing';
+import { galleryPage, rendered, rows } from '../testing';
 import {
   GalleryPlaceService,
   type GalleryPlace,
@@ -46,10 +46,19 @@ describe('GalleryPlaceService', () => {
     expect(sessionStorage.getItem('tigy.gallery')).toBe('/?tag=comic');
   });
 
-  it('ignores a stored address that leaves the site', () => {
-    sessionStorage.setItem('tigy.gallery', '//evil.example/');
+  it('reads the address stored earlier in this tab once rendered', async () => {
+    sessionStorage.setItem('tigy.gallery', '/?sort=oldest');
     expect(place.rememberedAddress()).toBeNull();
-    sessionStorage.setItem('tigy.gallery', 'https://evil.example/');
-    expect(place.rememberedAddress()).toBeNull();
+    await rendered();
+    expect(place.rememberedAddress()).toBe('/?sort=oldest');
   });
+
+  it.each(['//evil.example/', 'https://evil.example/'])(
+    'ignores a stored address that leaves the site: %s',
+    async (address) => {
+      sessionStorage.setItem('tigy.gallery', address);
+      await rendered();
+      expect(place.rememberedAddress()).toBeNull();
+    },
+  );
 });

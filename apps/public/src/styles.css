@@ -67,8 +67,8 @@
   src: url('/fonts/sour-gummy-latin-800-normal.woff2') format('woff2');
 }
 
-/* The coat's colours, the same in both themes. */
 :root {
+  /* The coat's colours, the same in both themes. */
   --fur: #f5a742;
   --cream: #fde3bc;
   --cream-light: #fff3e0;
@@ -76,11 +76,9 @@
   --pink: #f4a3ad;
   --pink-deep: #e07c8b;
   --night: #160506;
-}
 
-/* Theme colours as light-dark(light, dark). The device picks unless the visitor chose Light or
-   Dark (data-theme, set before first paint by the script in index.html). */
-:root {
+  /* Theme colours as light-dark(light, dark). The device picks unless the visitor chose Light or
+     Dark (data-theme, set before first paint by the script in index.html). */
   color-scheme: light dark;
   --page: light-dark(var(--fur), #2a0d0e);
   --page-deep: light-dark(#e48c2b, #1c0708);

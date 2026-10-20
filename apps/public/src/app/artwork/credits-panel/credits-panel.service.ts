@@ -1,34 +1,20 @@
-import {
-  afterNextRender,
-  DOCUMENT,
-  inject,
-  Service,
-  signal,
-  type Signal,
-} from '@angular/core';
-import { local } from '../../shared/storage';
-
-const STORAGE_KEY = 'tigy.credits';
+import { DOCUMENT, inject, Service } from '@angular/core';
+import { LOCAL_STORAGE, storedSignal } from '../../shared/storage';
 
 /** index.html applies the stored state before first paint, so the stage never jumps. */
 @Service()
 export class CreditsPanelService {
   private readonly root = inject(DOCUMENT).documentElement;
-  private readonly state = signal(true);
-  readonly isOpen: Signal<boolean> = this.state.asReadonly();
-
-  constructor() {
-    afterNextRender(() => this.state.set(local.get(STORAGE_KEY) !== 'closed'));
-  }
+  private readonly stored = storedSignal(LOCAL_STORAGE, 'tigy.credits', {
+    initial: true,
+    parse: (value) => value !== 'closed',
+    serialize: (isOpen) => (isOpen ? null : 'closed'),
+  });
+  readonly isOpen = this.stored.value;
 
   set(isOpen: boolean): void {
-    this.state.set(isOpen);
-    if (isOpen) {
-      delete this.root.dataset['credits'];
-      local.remove(STORAGE_KEY);
-    } else {
-      this.root.dataset['credits'] = 'closed';
-      local.set(STORAGE_KEY, 'closed');
-    }
+    this.stored.set(isOpen);
+    if (isOpen) delete this.root.dataset['credits'];
+    else this.root.dataset['credits'] = 'closed';
   }
 }
