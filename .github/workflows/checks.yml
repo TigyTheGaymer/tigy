@@ -1,0 +1,47 @@
+# Every pull request into main runs the deploy's checks on what it changes, without deploying.
+name: Checks
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  actions: read # nx-set-shas
+  contents: read
+
+# A newer push to the same pull request replaces the run in progress.
+concurrency:
+  group: checks-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+
+      # The Firestore and Storage emulators behind the rules tests need Java 21.
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: 21
+
+      # base = where the pull request branched off main.
+      - uses: nrwl/nx-set-shas@v5
+
+      # Only when the end-to-end tests are affected.
+      - name: Install Chromium for the end-to-end tests
+        run: |
+          if [ -n "$(npx nx show projects --affected --withTarget e2e)" ]; then
+            npx playwright install --with-deps chromium
+          fi
+
+      - name: Lint, test, build and end-to-end tests
+        run: npx nx affected -t lint test build e2e
