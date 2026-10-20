@@ -86,7 +86,8 @@
       "executor": "@angular/build:unit-test",
       "options": {
         "watch": false,
-        "exclude": ["apps/public/src/server/**"]
+        "exclude": ["apps/public/src/server/**"],
+        "setupFiles": ["apps/public/src/test-setup.ts"]
       },
       "dependsOn": ["test-server"]
     },

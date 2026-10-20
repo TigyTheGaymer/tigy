@@ -58,7 +58,7 @@ test.describe('the confirm screen', () => {
     await expect(
       page.getByRole('button', { name: 'Show this piece' }),
     ).toBeVisible();
-    await expect(page.locator('img')).toHaveCount(0);
+    await expect(page.locator('.piece img')).toHaveCount(0);
     await expect(page.locator('.credits')).toHaveCount(2);
     // eslint-disable-next-line playwright/no-networkidle -- checks that no request is made
     await page.waitForLoadState('networkidle');
@@ -79,7 +79,7 @@ test.describe('the confirm screen', () => {
     });
 
     await page.getByRole('button', { name: 'Show this piece' }).click();
-    await expect(page.locator('img.piece')).toBeVisible();
+    await expect(page.locator('.piece img')).toBeVisible();
     await expect(page.locator('.confirm')).toHaveCount(0);
     await expect(page.locator('.artists')).toBeVisible();
     await expect(toggle(page)).not.toBeChecked();
@@ -88,7 +88,7 @@ test.describe('the confirm screen', () => {
     // Later in the same session: no question.
     await page.goto('/');
     await page.goto(`/i/${NSFW}`);
-    await expect(page.locator('img.piece')).toBeVisible();
+    await expect(page.locator('.piece img')).toBeVisible();
     await expect(page.locator('.confirm')).toHaveCount(0);
   });
 
@@ -96,6 +96,6 @@ test.describe('the confirm screen', () => {
     await page.goto(`/i/${NSFW}`);
     await page.getByRole('button', { name: 'Show NSFW everywhere' }).click();
     await expect(toggle(page)).toBeChecked();
-    await expect(page.locator('img.piece')).toBeVisible();
+    await expect(page.locator('.piece img')).toBeVisible();
   });
 });

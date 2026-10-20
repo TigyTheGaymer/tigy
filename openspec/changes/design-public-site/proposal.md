@@ -32,6 +32,6 @@ Out of scope: the filter pickers (they follow this design later; people and tags
 ## Impact
 
 - **Code:** `apps/public` (global styles and tokens, top bar, home header, gallery, timeline, artwork page, theme switch, icons), and the gallery endpoint's per-year counts in its server.
-- **Dependencies:** `lucide-angular` for interface icons; the four Simple Icons social logos as copied SVGs; Grandstander and Nunito as self-hosted fonts, with the alternates Fredoka and Sour Gummy self-hosted but unused.
+- **Dependencies:** `@ng-icons/core` and `@ng-icons/lucide` for interface icons; the four Simple Icons social logos as copied SVGs; Grandstander and Nunito as self-hosted fonts, with the alternates Fredoka and Sour Gummy self-hosted but unused.
 - **Design references:** `apps/public/DESIGN.md` and `apps/public/.impeccable/design.json` (normative visual system; updated where this change departs from them, such as the tail's month bubble), `design/mockups/` (the mockup, design sheet and font alternates, with the provided art in `design/mockups/assets/`).
 - **Other changes:** builds on the archived `define-data-model` and `add-public-pages`; this change styles and extends their pages.

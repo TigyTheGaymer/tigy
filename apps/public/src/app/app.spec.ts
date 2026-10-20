@@ -5,29 +5,9 @@ import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { CDN_CACHE_CONTROL } from '../server/cache-control';
-import { App } from './app';
 import { appRoutes } from './app.routes';
 import { serverRoutes } from './app.routes.server';
-import { NotFoundPage } from './pages/not-found/not-found';
-
-describe('App', () => {
-  it('offers the NSFW switch, off by default, on every page', async () => {
-    TestBed.configureTestingModule({
-      imports: [App],
-      providers: [provideRouter([])],
-    });
-    const fixture = TestBed.createComponent(App);
-    await fixture.whenStable();
-    const element = fixture.nativeElement as HTMLElement;
-    const toggle = element.querySelector<HTMLInputElement>(
-      '.nsfw-switch input[role="switch"]',
-    );
-    expect(element.querySelector('.nsfw-switch')?.textContent).toContain(
-      'Show NSFW',
-    );
-    expect(toggle?.checked).toBe(false);
-  });
-});
+import { NotFoundPage } from './not-found/not-found';
 
 describe('routes', () => {
   let response: ResponseInit;
@@ -51,7 +31,7 @@ describe('routes', () => {
       const page = await harness.navigateByUrl(url, NotFoundPage);
       expect(page).toBeInstanceOf(NotFoundPage);
       expect(response.status).toBe(404);
-      const home = harness.routeNativeElement?.querySelector('a');
+      const home = harness.routeNativeElement?.querySelector('.stage-panel a');
       expect(home?.getAttribute('href')).toBe('/');
     },
   );

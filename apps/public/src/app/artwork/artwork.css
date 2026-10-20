@@ -1,0 +1,134 @@
+:host {
+  display: block;
+  background: var(--stage);
+}
+
+.photo {
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 380px;
+  min-height: 100svh;
+}
+
+:host-context([data-credits='closed']) .photo {
+  grid-template-columns: minmax(0, 1fr) 0;
+}
+
+:host-context([data-credits='closed']) .info-wrap {
+  display: none;
+}
+
+.stage {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  color: var(--on-stage);
+  background: var(--stage);
+}
+
+.piece {
+  border: 0;
+  padding: 0;
+  background: none;
+  cursor: zoom-in;
+}
+
+.piece img {
+  width: auto;
+  height: auto;
+  max-width: calc(100% - 140px);
+  max-height: calc(100svh - 150px);
+  margin: 0 auto;
+  border-radius: var(--r-md);
+  object-fit: contain;
+  transition: transform 400ms var(--ease-squish);
+}
+
+.piece:hover img {
+  transform: scale(1.01);
+}
+
+.nav {
+  position: absolute;
+  top: 50%;
+  z-index: var(--z-stage);
+  display: grid;
+  place-items: center;
+  width: var(--control-arrow);
+  height: var(--control-arrow);
+  margin-top: calc(var(--control-arrow) / -2);
+  border-radius: var(--r-md);
+  background: var(--pink);
+  color: var(--on-pink);
+  text-decoration: none;
+  box-shadow: 0 3px 0 var(--pink-deep);
+  transition: transform 260ms var(--ease-squish);
+}
+
+.nav:hover {
+  transform: scale(1.08);
+}
+
+.nav.prev {
+  left: 18px;
+}
+
+.nav.next {
+  right: 18px;
+}
+
+.info-wrap {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 18px 26px 28px;
+  background: var(--panel);
+}
+
+@media (max-width: 1100px) {
+  .photo,
+  :host-context([data-credits='closed']) .photo {
+    grid-template-columns: 1fr;
+  }
+
+  .stage {
+    position: relative;
+    height: 76svh;
+  }
+
+  .piece img {
+    max-height: calc(76svh - 120px);
+  }
+
+  .info-wrap,
+  :host-context([data-credits='closed']) .info-wrap {
+    display: block;
+    position: static;
+    height: auto;
+    overflow: visible;
+    padding: 24px var(--gutter) 64px;
+  }
+
+  app-credits-panel {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+}
+
+@media (max-width: 720px) {
+  .piece img {
+    max-width: 100%;
+    border-radius: 0;
+  }
+
+  .nav {
+    top: auto;
+    bottom: 10px;
+    margin-top: 0;
+  }
+}

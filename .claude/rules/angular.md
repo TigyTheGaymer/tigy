@@ -31,3 +31,13 @@ Use signals wherever Angular offers them, and RxJS only where an Angular API req
 
 - A service's class ends in `Service` and lives in its own `<name>.service.ts`, with its tests in `<name>.service.spec.ts`: `NsfwSwitchService` in `nsfw-switch.service.ts`. One service per file.
 - Components take no suffix: `HomePage` in `home.ts`, with `home.html`, `home.css` and `home.spec.ts` beside it.
+- A template or stylesheet longer than about 25 lines goes in its own `<name>.html` or `<name>.css`; shorter ones stay inline.
+- A pipe's class ends in `Pipe` and lives in `<name>.pipe.ts`: `PieceTitlePipe` in `piece-title.pipe.ts`.
+
+## Folders
+
+Group files by feature, as the Angular style guide asks, never by kind (no `components/` or `services/`):
+
+- each page in its own folder under `app/` (`home/`, `artwork/`, `not-found/`), with a subfolder for each larger part (`home/tiles/`, `artwork/full-view/`);
+- shared pieces in a folder named for what they are about (`chrome/`, `theme/`, `nsfw/`, `social/`, `gallery/`, `catalog/`, `head/`);
+- small helpers used across features in `shared/`.

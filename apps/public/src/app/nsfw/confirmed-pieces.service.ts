@@ -1,35 +1,33 @@
-import { afterNextRender, Service, signal } from '@angular/core';
-import { session } from '../browser/storage';
-
-const CONFIRMED_KEY = 'tigy.nsfw.confirmed';
+import { Service } from '@angular/core';
+import { SESSION_STORAGE, storedSignal } from '../shared/storage';
 
 /** NSFW pieces shown with the switch off, remembered for the browser session. */
 @Service()
 export class ConfirmedPiecesService {
-  private readonly ids = signal<ReadonlySet<string>>(new Set());
-
-  constructor() {
-    afterNextRender(() => this.ids.set(new Set(read())));
-  }
+  private readonly stored = storedSignal<ReadonlySet<string>>(
+    SESSION_STORAGE,
+    'tigy.nsfw.confirmed',
+    { initial: new Set(), parse, serialize: (ids) => JSON.stringify([...ids]) },
+  );
 
   has(id: string): boolean {
-    return this.ids().has(id);
+    return this.stored.value().has(id);
   }
 
   add(id: string): void {
-    const ids = new Set([...read(), ...this.ids(), id]);
-    this.ids.set(ids);
-    session.set(CONFIRMED_KEY, JSON.stringify([...ids]));
+    this.stored.update((ids) => new Set([...ids, id]));
   }
 }
 
-function read(): string[] {
+function parse(value: string | null): ReadonlySet<string> {
   try {
-    const value: unknown = JSON.parse(session.get(CONFIRMED_KEY) ?? '[]');
-    return Array.isArray(value)
-      ? value.filter((id): id is string => typeof id === 'string')
-      : [];
+    const ids: unknown = JSON.parse(value ?? '[]');
+    return new Set(
+      Array.isArray(ids)
+        ? ids.filter((id): id is string => typeof id === 'string')
+        : [],
+    );
   } catch {
-    return [];
+    return new Set();
   }
 }

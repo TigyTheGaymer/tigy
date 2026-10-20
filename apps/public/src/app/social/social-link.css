@@ -1,0 +1,54 @@
+:host {
+  display: contents;
+}
+
+.social {
+  gap: 8px;
+  padding-inline: 14px 18px;
+}
+
+.logo {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  fill: currentColor;
+}
+
+.generic {
+  --ng-icon__size: 18px;
+  flex: none;
+}
+
+.handle {
+  font-weight: 700;
+}
+
+.social-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ink-2);
+  font-size: var(--text-small);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.social-inline:hover .handle {
+  text-decoration: underline;
+}
+
+.social-inline .logo {
+  width: 15px;
+  height: 15px;
+}
+
+@media (max-width: 560px) {
+  .social {
+    width: var(--control);
+    padding: 0;
+  }
+
+  .social .handle {
+    display: none;
+  }
+}

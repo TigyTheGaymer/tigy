@@ -1,0 +1,118 @@
+<article class="info" aria-labelledby="piece-heading">
+  <div class="info-head">
+    <button
+      type="button"
+      class="round close"
+      aria-label="Close credits"
+      (click)="closeRequested.emit()"
+    >
+      <ng-icon name="lucideX" class="icon" />
+    </button>
+  </div>
+  <h1 id="piece-heading" [class.untitled]="!title()">
+    {{ title() | pieceTitle }}
+  </h1>
+  @if (artwork().description; as description) {
+    <p class="desc">{{ description }}</p>
+  }
+
+  @for (section of sections(); track section.role) {
+    <div class="row credits" [class]="section.className">
+      @if (section.role === 'artist') {
+        <ng-icon name="lucidePalette" class="icon" />
+      } @else {
+        <ng-icon name="lucideUsers" class="icon" />
+      }
+      <div>
+        <span class="label">{{ section.label }}</span>
+        @for (person of section.people; track person.id) {
+          <div class="person">
+            <span class="dot" aria-hidden="true">
+              @if (person.avatar; as src) {
+                <img [src]="src" alt="" width="34" height="34" />
+              } @else {
+                {{ person.initial }}
+              }
+            </span>
+            <div>
+              <a
+                class="name"
+                routerLink="/"
+                [queryParams]="person.queryParams"
+                >{{ person.name }}</a
+              >
+              @if (person.links.length) {
+                <span class="links">
+                  @for (link of person.links; track link.url) {
+                    <app-social-link [link]="link" look="inline" />
+                  }
+                </span>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  @if (artwork().tags.length) {
+    <div class="row">
+      <ng-icon name="lucideTag" class="icon" />
+      <div>
+        <span class="label">Tags</span>
+        <div class="tags">
+          @for (tag of artwork().tags; track tag) {
+            <a routerLink="/" [queryParams]="{ tag: tag }">#{{ tag }}</a>
+          }
+        </div>
+      </div>
+    </div>
+  }
+
+  <div class="row">
+    <ng-icon name="lucideCalendar" class="icon" />
+    <div>
+      <span class="label">Date</span>
+      <time
+        class="date"
+        [attr.datetime]="artwork().date ?? artwork().sortDate"
+        >{{ date() }}</time
+      >
+    </div>
+  </div>
+
+  <div class="row">
+    <ng-icon name="lucideImage" class="icon" />
+    <div>
+      <span class="label">Original file</span>
+      <span class="file">{{ file().summary }}</span>
+    </div>
+  </div>
+
+  <div class="actions">
+    @if (isPieceShown()) {
+      <a class="pad dark download" [href]="file().href" download
+        ><app-paw />Download original</a
+      >
+      <button type="button" class="pad" (click)="shareRequested.emit()">
+        <ng-icon name="lucideShare2" class="icon" />Share
+      </button>
+      <button
+        type="button"
+        class="pad light"
+        (click)="fullViewRequested.emit()"
+      >
+        <ng-icon name="lucideExpand" class="icon" />Full view
+      </button>
+    }
+    @if (artwork().nsfw) {
+      <button
+        type="button"
+        class="pad light"
+        (click)="safeLinkRequested.emit()"
+      >
+        <ng-icon name="lucideLink" class="icon" />Copy safe link
+      </button>
+    }
+  </div>
+</article>

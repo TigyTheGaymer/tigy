@@ -1,0 +1,138 @@
+@if (isMissing()) {
+  <app-not-found />
+} @else {
+  <main class="photo">
+    <div
+      class="stage"
+      (touchstart)="onTouchStart($event)"
+      (touchend)="onTouchEnd($event)"
+    >
+      <app-stage-bar>
+        @if (data() && isImageShown()) {
+          <button
+            type="button"
+            class="round"
+            aria-label="Share"
+            title="Share"
+            (click)="share()"
+          >
+            <ng-icon name="lucideShare2" class="icon" />
+          </button>
+          <button
+            type="button"
+            class="round"
+            aria-label="Full view"
+            title="Full view"
+            (click)="isFullViewOpen.set(true)"
+          >
+            <ng-icon name="lucideExpand" class="icon" />
+          </button>
+          <button
+            type="button"
+            class="round info-toggle"
+            [class.is-on]="creditsPanel.isOpen()"
+            [attr.aria-pressed]="creditsPanel.isOpen()"
+            aria-label="Credits and info"
+            title="Credits and info"
+            (click)="toggleCredits()"
+          >
+            <ng-icon name="lucideInfo" class="icon" />
+          </button>
+          <a
+            class="round"
+            [href]="originalHref()"
+            download
+            aria-label="Download original"
+            title="Download original"
+            ><ng-icon name="lucideDownload" class="icon"
+          /></a>
+        }
+      </app-stage-bar>
+
+      @if (data(); as page) {
+        @if (isImageShown()) {
+          @if (page.previous; as previous) {
+            <a
+              class="nav prev"
+              [routerLink]="['/i', previous.id]"
+              [replaceUrl]="true"
+              [attr.aria-label]="'Previous: ' + (previous.title | pieceTitle)"
+              ><ng-icon name="lucideArrowLeft" class="icon"
+            /></a>
+          }
+          <button
+            type="button"
+            class="piece"
+            [attr.aria-label]="'Full view of ' + title()"
+            (click)="isFullViewOpen.set(true)"
+          >
+            <img
+              [src]="fullImage()"
+              [width]="page.artwork.file.w"
+              [height]="page.artwork.file.h"
+              [alt]="title()"
+            />
+          </button>
+          @if (page.next; as next) {
+            <a
+              class="nav next"
+              [routerLink]="['/i', next.id]"
+              [replaceUrl]="true"
+              [attr.aria-label]="'Next: ' + (next.title | pieceTitle)"
+              ><ng-icon name="lucideArrowRight" class="icon"
+            /></a>
+          }
+        } @else {
+          <section class="stage-panel confirm" aria-labelledby="nsfw-heading">
+            <h2 id="nsfw-heading">This one’s marked NSFW</h2>
+            <p>
+              Tigy’s keeping it covered until you say so. Your choice is only
+              remembered in this browser.
+            </p>
+            <div class="choices">
+              <button type="button" class="pad dark" (click)="showPiece()">
+                <app-paw />Show this piece
+              </button>
+              <button type="button" class="pad" (click)="showAll()">
+                Show NSFW everywhere
+              </button>
+            </div>
+          </section>
+        }
+      } @else if (hasFailed()) {
+        <section class="stage-panel" aria-labelledby="error-heading">
+          <h2 id="error-heading">Something went wrong</h2>
+          <p>Could not load this piece. Try again in a moment.</p>
+        </section>
+      }
+    </div>
+
+    @if (data(); as page) {
+      <div class="info-wrap" id="credits">
+        <app-credits-panel
+          [page]="page"
+          [isPieceShown]="isImageShown()"
+          (closeRequested)="creditsPanel.set(false)"
+          (shareRequested)="share()"
+          (safeLinkRequested)="copySafeLink()"
+          (fullViewRequested)="isFullViewOpen.set(true)"
+        />
+      </div>
+    }
+  </main>
+
+  <div class="toast" [class.is-on]="toast()" role="status">
+    @if (toast()) {
+      <app-paw />{{ toast() }}
+    }
+  </div>
+
+  @if (isFullViewOpen() && data()) {
+    <app-full-view
+      [fullSrc]="fullImage()"
+      [originalSrc]="originalHref()"
+      [alt]="title()"
+      (closed)="isFullViewOpen.set(false)"
+    />
+  }
+}

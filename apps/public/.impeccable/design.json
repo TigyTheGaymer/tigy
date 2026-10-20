@@ -271,7 +271,7 @@
       },
       "title": {
         "displayName": "Title",
-        "purpose": "Piece titles; NSFW and not-found headings."
+        "purpose": "Piece titles in the credits panel."
       },
       "logo": {
         "displayName": "Logo",
@@ -279,7 +279,7 @@
       },
       "body": {
         "displayName": "Body",
-        "purpose": "Bio, descriptions and credits."
+        "purpose": "Descriptions and credits."
       },
       "button": {
         "displayName": "Button",
@@ -287,7 +287,27 @@
       },
       "label": {
         "displayName": "Label",
-        "purpose": "Credits field labels, tags and badges."
+        "purpose": "Credits field labels."
+      },
+      "panel-heading": {
+        "displayName": "Panel heading",
+        "purpose": "Headings of the NSFW, error and not-found panels."
+      },
+      "logo-stage": {
+        "displayName": "Stage logo",
+        "purpose": "The wordmark in the artwork page's stage bar."
+      },
+      "lead": {
+        "displayName": "Lead",
+        "purpose": "The bio under the Tigy name."
+      },
+      "small": {
+        "displayName": "Small",
+        "purpose": "Piece count, handles, tags, file summary, toasts, tile hover labels and zoom readouts."
+      },
+      "caption": {
+        "displayName": "Caption",
+        "purpose": "Tile badges and the tail's years."
       }
     },
     "shadows": [
@@ -368,9 +388,9 @@
       "name": "Filter chip",
       "kind": "chip",
       "refersTo": "filter-chip",
-      "description": "A dropdown in the filter row above the gallery (design only for now).",
+      "description": "A picker in the filter row above the gallery; shown but inactive until filtering by picker is built. Active filters and the sort show as live chips beside it.",
       "html": "<button class=\"ds-filter\"><svg viewBox=\"0 0 24 24\" width=\"18\" height=\"18\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z\"/></svg>Tags<svg viewBox=\"0 0 24 24\" width=\"16\" height=\"16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\" aria-hidden=\"true\"><path d=\"m6 9 6 6 6-6\"/></svg></button>",
-      "css": ".ds-filter{display:inline-flex;align-items:center;gap:6px;min-height:42px;padding:6px 10px 6px 14px;border:2px solid rgb(75 20 22 / 0.22);border-radius:8px;background:#fff3e0;color:#4b1416;font:800 0.92rem Nunito,system-ui,sans-serif;cursor:pointer}.ds-filter:hover{border-color:#4b1416}.ds-filter:focus-visible{outline:3px solid #4b1416;outline-offset:3px}"
+      "css": ".ds-filter{display:inline-flex;align-items:center;gap:6px;min-height:42px;padding:6px 10px 6px 14px;border:2px solid rgb(75 20 22 / 0.22);border-radius:8px;background:#fff3e0;color:#4b1416;font:800 0.95rem Nunito,system-ui,sans-serif;cursor:pointer}.ds-filter:hover{border-color:#4b1416}.ds-filter:focus-visible{outline:3px solid #4b1416;outline-offset:3px}"
     },
     {
       "name": "Tag",
@@ -385,8 +405,8 @@
       "kind": "card",
       "refersTo": "gallery-tile",
       "description": "One piece in the justified gallery at its real shape; lifts, shows its title and walks paw prints on hover.",
-      "html": "<a class=\"ds-tile\" href=\"#\"><span class=\"ds-badge\">GIF</span><span class=\"ds-tile-label\">Tigy portrait</span></a>",
-      "css": ".ds-tile{position:relative;display:block;width:220px;height:180px;border-radius:8px;background:#fde3bc;box-shadow:0 2px 0 #e48c2b;transition:transform 380ms cubic-bezier(0.34,1.3,0.64,1),box-shadow 300ms}.ds-tile:hover,.ds-tile:focus-visible{transform:translateY(-5px) rotate(-1.2deg) scale(1.02);box-shadow:0 2px 0 #e48c2b,0 16px 26px -14px rgb(0 0 0 / 0.5);outline:none}.ds-badge{position:absolute;top:8px;left:8px;padding:2px 10px;border-radius:6px;background:#4b1416;color:#fde3bc;font:800 0.72rem Nunito,system-ui,sans-serif}.ds-tile-label{position:absolute;left:8px;bottom:8px;padding:4px 12px;border-radius:6px;background:#fff3e0;color:#4b1416;font:700 0.9rem Grandstander,Nunito,sans-serif;opacity:0;transition:opacity 200ms}.ds-tile:hover .ds-tile-label,.ds-tile:focus-visible .ds-tile-label{opacity:1}"
+      "html": "<a class=\"ds-tile\" href=\"#\"><span class=\"ds-badge\">NSFW</span><span class=\"ds-tile-label\">Tigy portrait</span></a>",
+      "css": ".ds-tile{position:relative;display:block;width:220px;height:180px;border-radius:8px;background:#fde3bc;box-shadow:0 2px 0 #e48c2b;transition:transform 380ms cubic-bezier(0.34,1.3,0.64,1),box-shadow 300ms}.ds-tile:hover,.ds-tile:focus-visible{transform:translateY(-5px) rotate(-1.2deg) scale(1.02);box-shadow:0 2px 0 #e48c2b,0 16px 26px -14px rgb(0 0 0 / 0.5);outline:none}.ds-badge{position:absolute;top:8px;left:8px;padding:2px 10px;border-radius:6px;background:#f4a3ad;color:#4b1416;font:800 0.74rem Nunito,system-ui,sans-serif}.ds-tile-label{position:absolute;left:8px;bottom:8px;padding:4px 12px;border-radius:6px;background:#fff3e0;color:#4b1416;font:700 0.86rem Grandstander,Nunito,sans-serif;opacity:0;transition:opacity 200ms}.ds-tile:hover .ds-tile-label,.ds-tile:focus-visible .ds-tile-label{opacity:1}"
     },
     {
       "name": "Social link",

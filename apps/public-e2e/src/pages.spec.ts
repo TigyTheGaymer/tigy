@@ -16,10 +16,10 @@ for (const path of ['/no-such-page', '/p/tigy']) {
     const response = await page.goto(path);
     expect(response?.status()).toBe(404);
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(
-      'Not found',
+      'No tiger here',
     );
     await expect(
-      page.getByRole('link', { name: 'Go to the gallery' }),
+      page.locator('.stage-panel a'),
     ).toHaveAttribute('href', '/');
   });
 }
@@ -29,7 +29,9 @@ test('Unpublished artwork link: shows the not-found page with 404', async ({
 }) => {
   const response = await page.goto('/i/draft');
   expect(response?.status()).toBe(404);
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Not found');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText(
+    'No tiger here',
+  );
   await expect(page.getByText('Draft')).toHaveCount(0);
 });
 

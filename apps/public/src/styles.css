@@ -1,1 +1,531 @@
-/* You can add global styles to this file, and also import other style files */
+/* Tigy's Album: the tokens and shared pieces from apps/public/DESIGN.md. */
+
+@font-face {
+  font-family: 'Nunito';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/nunito-latin-400-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Nunito';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/nunito-latin-600-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Nunito';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/nunito-latin-700-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Nunito';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url('/fonts/nunito-latin-800-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Grandstander';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/grandstander-latin-600-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Grandstander';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/grandstander-latin-700-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Grandstander';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url('/fonts/grandstander-latin-800-normal.woff2') format('woff2');
+}
+
+/* Alternate display fonts, declared but unused so browsers never download
+   them; switching means pointing --font-display at one of them. */
+@font-face {
+  font-family: 'Fredoka';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/fredoka-latin-700-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Sour Gummy';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url('/fonts/sour-gummy-latin-800-normal.woff2') format('woff2');
+}
+
+:root {
+  /* The coat's colours, the same in both themes. */
+  --fur: #f5a742;
+  --cream: #fde3bc;
+  --cream-light: #fff3e0;
+  --maroon: #4b1416;
+  --pink: #f4a3ad;
+  --pink-deep: #e07c8b;
+  --night: #160506;
+
+  /* Theme colours as light-dark(light, dark). The device picks unless the visitor chose Light or
+     Dark (data-theme, set before first paint by the script in index.html). */
+  color-scheme: light dark;
+  --page: light-dark(var(--fur), #2a0d0e);
+  --page-deep: light-dark(#e48c2b, #1c0708);
+  --page-light: light-dark(#f9c27a, #4a1b1b);
+  --panel: light-dark(var(--cream), #3d1718);
+  --panel-2: light-dark(var(--cream-light), #4d2020);
+  --ink: light-dark(var(--maroon), var(--cream));
+  --ink-2: light-dark(#6e2422, #f0c99a);
+  --stripe: light-dark(var(--maroon), var(--fur));
+  --on-pink: var(--maroon);
+  --dark-btn: light-dark(var(--maroon), var(--fur));
+  --on-dark-btn: light-dark(var(--cream), #2a0b0c);
+  --tail-a: light-dark(#e48c2b, var(--fur));
+  --tail-b: light-dark(var(--maroon), #6e2422);
+  --stage: light-dark(#2a0b0c, var(--night));
+  --on-stage: var(--cream);
+  --ledge: light-dark(#e48c2b, #12040a);
+  --drop: light-dark(rgb(75 20 22 / 0.55), rgb(0 0 0 / 0.7));
+  --shadow: 0 2px 0 var(--ledge), 0 18px 34px -20px var(--drop);
+
+  --font-display: 'Grandstander', 'Nunito', system-ui, sans-serif;
+  --font-ui: 'Nunito', system-ui, sans-serif;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-squish: cubic-bezier(0.34, 1.3, 0.64, 1);
+  --gutter: clamp(16px, 4vw, 48px);
+  --container: 1320px;
+
+  /* The type ramp from DESIGN.md. */
+  --text-display: clamp(3.4rem, 9vw, 5.6rem);
+  --text-headline: clamp(2.1rem, 4.6vw, 3rem);
+  --text-panel-heading: clamp(2rem, 5vw, 2.8rem);
+  --text-title: clamp(1.8rem, 2.6vw, 2.4rem);
+  --text-logo: 1.7rem;
+  --text-logo-stage: 1.3rem;
+  --text-lead: clamp(1.02rem, 1.5vw, 1.15rem);
+  --text-body: 1.02rem;
+  --text-button: 0.95rem;
+  --text-small: 0.86rem;
+  --text-label: 0.78rem;
+  --text-caption: 0.74rem;
+
+  --control: 46px;
+  --control-small: 44px;
+  --control-arrow: 52px;
+  --control-chip: 42px;
+  /* The filter row and the tail stick under the bar: its tallest control plus its padding. */
+  --bar-h: calc(var(--control) + 20px);
+  /* Kept free on the right for the tail timeline. */
+  --tail-room: 44px;
+
+  /* Layers, lowest first. */
+  --z-tile: 2;
+  --z-stage: 3;
+  --z-filter-row: 25;
+  --z-tail: 26;
+  --z-topbar: 30;
+  --z-phone-tail: 40;
+  --z-toast: 50;
+
+  --r-sm: 6px;
+  --r-md: 8px;
+  --r-lg: 16px;
+  --row-gap: 8px;
+  --row-h: 340px;
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  overflow-x: clip;
+  scrollbar-color: var(--ink) var(--page-deep);
+}
+
+html:has(dialog[open]) {
+  overflow: hidden;
+}
+
+body {
+  margin: 0;
+  background: var(--page);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: var(--text-body);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--ink);
+  color: var(--page);
+}
+
+a {
+  color: inherit;
+  text-underline-offset: 0.2em;
+  text-decoration-thickness: 2px;
+}
+
+:focus-visible {
+  outline: 3px solid var(--ring, var(--ink));
+  outline-offset: 3px;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+h1,
+h2 {
+  text-wrap: balance;
+}
+
+/* ng-icon sizes itself from this property, not from width and height. */
+.icon {
+  --ng-icon__size: 1.15em;
+  flex: none;
+}
+
+/* Buttons */
+.pad {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: var(--control);
+  padding: 10px 20px;
+  border: 0;
+  border-radius: var(--r-md);
+  background: var(--pink);
+  color: var(--on-pink);
+  font: inherit;
+  font-weight: 800;
+  font-size: var(--text-button);
+  line-height: 1.2;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 0 3px 0 var(--pink-deep);
+  transition:
+    transform 260ms var(--ease-squish),
+    box-shadow 200ms;
+}
+
+.pad:hover {
+  transform: translateY(-2px) scale(1.03);
+}
+
+.pad:active {
+  transform: translateY(2px) scale(0.97);
+  box-shadow: 0 1px 0 var(--pink-deep);
+}
+
+.pad.dark {
+  background: var(--dark-btn);
+  color: var(--on-dark-btn);
+  box-shadow: 0 3px 0 rgb(0 0 0 / 0.35);
+}
+
+.pad.light {
+  background: var(--panel-2);
+  color: var(--ink);
+  box-shadow: 0 3px 0 var(--page-deep);
+}
+
+.pad[disabled] {
+  cursor: progress;
+  transform: none;
+}
+
+.round {
+  display: inline-grid;
+  place-items: center;
+  width: var(--control);
+  height: var(--control);
+  border: 0;
+  border-radius: var(--r-md);
+  background: transparent;
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background 150ms,
+    transform 260ms var(--ease-squish);
+}
+
+.round:hover {
+  background: color-mix(in srgb, currentColor 14%, transparent);
+}
+
+.round.is-on {
+  background: var(--pink);
+  color: var(--on-pink);
+}
+
+.container {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding-inline: var(--gutter);
+}
+
+/* The NSFW confirm, error and not-found panels */
+.stage-panel {
+  max-width: 560px;
+  margin: 0 24px;
+  padding: clamp(26px, 5vw, 46px);
+  border-radius: var(--r-lg);
+  background: var(--panel);
+  color: var(--ink);
+  box-shadow: var(--shadow);
+  text-align: center;
+}
+
+.stage-panel h1,
+.stage-panel h2 {
+  margin: 0 0 12px;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: var(--text-panel-heading);
+  line-height: 1.05;
+}
+
+.stage-panel p {
+  margin: 0 auto 22px;
+  max-width: 26rem;
+  font-weight: 600;
+}
+
+.stage-panel .choices {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.toast {
+  position: fixed;
+  left: 24px;
+  bottom: 24px;
+  z-index: var(--z-toast);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 18px;
+  border-radius: var(--r-md);
+  background: var(--pink);
+  color: var(--on-pink);
+  font-weight: 800;
+  font-size: var(--text-small);
+  box-shadow: 0 3px 0 var(--pink-deep);
+  transform: translateY(16px);
+  opacity: 0;
+  transition: all 260ms var(--ease-squish);
+  pointer-events: none;
+}
+
+.toast.is-on {
+  transform: none;
+  opacity: 1;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (max-width: 720px) {
+  :root {
+    --row-gap: 6px;
+    --row-h: 200px;
+  }
+}
+
+@media (min-width: 721px) and (max-width: 1100px) {
+  :root {
+    --row-h: 270px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+/* Top bar and its controls; the artwork page's stage bar restyles them in place. */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-topbar);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: var(--bar-h);
+  padding: 10px var(--gutter);
+  background: color-mix(in srgb, var(--page) 92%, transparent);
+  backdrop-filter: blur(8px);
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: var(--text-logo);
+  line-height: 1;
+  text-decoration: none;
+}
+
+.theme-btn {
+  background: var(--panel-2);
+  color: var(--ink);
+  box-shadow: 0 2px 0 var(--page-deep);
+}
+
+.theme-btn:hover {
+  background: var(--panel);
+}
+
+.switch {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: var(--control-small);
+  padding: 6px 8px 6px 16px;
+  border-radius: var(--r-md);
+  background: var(--panel-2);
+  color: var(--ink);
+  box-shadow: 0 2px 0 var(--page-deep);
+  font-weight: 800;
+  font-size: var(--text-small);
+  cursor: pointer;
+  user-select: none;
+}
+
+.switch input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+
+.switch .track {
+  position: relative;
+  width: 50px;
+  height: 30px;
+  border-radius: var(--r-md);
+  background: var(--panel);
+  box-shadow: inset 0 0 0 2px var(--ink);
+  transition: background 200ms;
+}
+
+.switch .thumb {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--pink);
+  font-size: 12px;
+  transition: transform 320ms var(--ease-squish);
+}
+
+.switch input:checked + .track {
+  background: var(--pink);
+}
+
+.switch input:checked + .track .thumb {
+  transform: translateX(20px) rotate(20deg);
+}
+
+.switch input:focus-visible + .track {
+  outline: 3px solid var(--ring, var(--ink));
+  outline-offset: 3px;
+}
+
+/* A ring sits outside its control, so on the dark stage it takes the stage's light ink. */
+.stage,
+.stage-top {
+  --ring: var(--on-stage);
+}
+
+.stage-panel {
+  --ring: var(--ink);
+}
+
+.stage-top .theme-btn,
+.stage-top .switch {
+  background: color-mix(in srgb, var(--cream) 12%, transparent);
+  color: var(--on-stage);
+  box-shadow: none;
+}
+
+.stage-top .switch .track {
+  background: color-mix(in srgb, var(--cream) 10%, transparent);
+  box-shadow: inset 0 0 0 2px var(--on-stage);
+}
+
+.stage-top .switch .thumb {
+  background: var(--on-stage);
+  color: var(--maroon);
+}
+
+.stage-top .switch input:checked + .track {
+  background: var(--pink);
+}
+
+@media (max-width: 720px) {
+  .stage-top .switch .label {
+    display: none;
+  }
+}
+
+@media (max-width: 560px) {
+  .switch .label {
+    font-size: var(--text-label);
+  }
+}

@@ -2,6 +2,8 @@ import type {
   TestRequest,
   HttpTestingController,
 } from '@angular/common/http/testing';
+import { ApplicationRef } from '@angular/core';
+import { TestBed } from '@angular/core/testing';
 import type { GalleryOverview } from '@tigy/gallery';
 import type { GalleryRow } from '@tigy/models';
 import type {
@@ -12,18 +14,29 @@ import type {
 
 // For the app's unit tests only.
 
-/** The request is consumed: later `match` or `expectOne` calls won't find it. */
+/**
+ * Waits up to 3s, by the clock: a page's first test also loads its lazy code, which a slow CI runner
+ * can take many turns of the event loop to do. The request is consumed: later `match` or
+ * `expectOne` calls won't find it.
+ */
 export async function requested(
   http: HttpTestingController,
   path: string,
 ): Promise<TestRequest> {
-  for (let attempt = 0; attempt < 100; attempt++) {
+  const deadline = Date.now() + 3000;
+  while (Date.now() < deadline) {
     const [request] = http.match((req) => req.urlWithParams === path);
     if (request) return request;
-    await new Promise((resolve) => setTimeout(resolve));
+    await new Promise((resolve) => setTimeout(resolve, 5));
   }
   const open = http.match(() => true).map((req) => req.request.urlWithParams);
   throw new Error(`No request for ${path}; open requests: ${open.join(', ')}`);
+}
+
+/** Runs the first-render callbacks, such as reading browser storage. */
+export async function rendered(): Promise<void> {
+  TestBed.inject(ApplicationRef).tick();
+  await TestBed.inject(ApplicationRef).whenStable();
 }
 
 export async function settled(): Promise<void> {
@@ -66,7 +79,7 @@ export function galleryPage(
   hasMore: boolean,
   total = pageRows.length,
 ): GalleryResponse {
-  return { rows: pageRows, hasMore, overview: overview(total) };
+  return { rows: pageRows, hasMore, overview: overview(total), years: [] };
 }
 
 export const HOME: HomeResponse = {

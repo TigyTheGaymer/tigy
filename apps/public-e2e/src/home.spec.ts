@@ -21,41 +21,38 @@ test.describe('with 30 more pieces', () => {
     expect(html).toContain('<h1');
     expect(html).toContain('Tigy');
     expect(html).toContain('35 pieces · Jan 2025 – May 2026');
-    const links = [...html.matchAll(/class="tile"><a[^>]*href="([^"]+)"/g)].map(
-      (m) => m[1],
-    );
+    const links = [
+      ...html.matchAll(/class="tile[^"]*"[^>]*>\s*<a[^>]*href="([^"]+)"/g),
+    ].map((m) => m[1]);
     expect(links).toHaveLength(24);
     expect(links[0]).toBe('/i/bulk-30');
     expect(links[23]).toBe('/i/bulk-07');
     expect(html).not.toContain('nsfw-test');
 
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Tigy');
-    await expect(page.locator('.social a')).toHaveCount(4);
+    await expect(page.locator('.socials a')).toHaveCount(4);
     await expect(tiles(page)).toHaveCount(24);
   });
 
-  test('Loading more: the remaining 6 pieces appear below the first 24, and the end is reached', async ({
+  test('Loading more: scrolling near the end shows the remaining 6 pieces below the first 24, and the end is reached', async ({
     page,
   }) => {
     await page.goto('/?tag=bulk');
     await expect(tiles(page)).toHaveCount(24);
     await expect(page.locator('.end')).toHaveCount(0);
 
-    await page.getByRole('button', { name: 'Load more' }).click();
+    await page.locator('.sentinel').scrollIntoViewIfNeeded();
     await expect(tiles(page)).toHaveCount(30);
     await expect(tiles(page).nth(24)).toHaveAttribute('href', '/i/bulk-06');
     await expect(tiles(page).last()).toHaveAttribute('href', '/i/bulk-01');
     await expect(page.getByText("That's every piece.")).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Load more' })).toHaveCount(
-      0,
-    );
   });
 
   test('The address stays shareable: it carries only the filters and sort, and opens from the first piece', async ({
     page,
   }) => {
     await page.goto('/?tag=bulk&sort=oldest');
-    await page.getByRole('button', { name: 'Load more' }).click();
+    await page.locator('.sentinel').scrollIntoViewIfNeeded();
     await expect(tiles(page)).toHaveCount(30);
     expect(page.url()).toMatch(/\/\?tag=bulk&sort=oldest$/);
 
@@ -77,7 +74,7 @@ test.describe('without art', () => {
     page,
   }) => {
     await page.goto('/');
-    await expect(page.locator('.gallery')).toHaveText('No art yet.');
+    await expect(page.locator('.empty')).toHaveText('No art yet.');
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Tigy');
     await expect(page.locator('.overview')).toHaveCount(0);
   });
@@ -89,9 +86,9 @@ test.describe('filters', () => {
   }) => {
     const response = await page.goto('/?character=tigy&tag=comic&sort=oldest');
     const html = (await response?.text()) ?? '';
-    expect(html).toContain('Character: Tigy ×');
-    expect(html).toContain('Tag: comic ×');
-    expect(html).toMatch(/<strong[^>]*aria-current="true"[^>]*>Oldest first</);
+    expect(html).toContain('Character: Tigy');
+    expect(html).toContain('Tag: comic');
+    expect(html).toContain('Sort: Oldest first.');
     expect(html).toContain('href="/i/hey-pookie"');
     expect(html).not.toContain('nsfw-test');
 
@@ -107,8 +104,8 @@ test.describe('filters', () => {
     // chibi-tigy credits nobody.
     await expect(tiles(page)).toHaveCount(4);
     await expect(tiles(page).first()).toHaveAttribute('href', '/i/happy-tigy');
-    await expect(page.locator('.active-filters a')).toHaveText([
-      'Character: Tigy ×',
+    await expect(page.locator('.chip.is-active')).toHaveText([
+      'Character: Tigy',
     ]);
   });
 
@@ -116,8 +113,8 @@ test.describe('filters', () => {
     page,
   }) => {
     await page.goto('/?artist=nobody&sort=oldest');
-    await expect(page.locator('.active-filters a')).toHaveText([
-      'Artist: Unknown person ×',
+    await expect(page.locator('.chip.is-active')).toHaveText([
+      'Artist: Unknown person',
     ]);
     await expect(
       page.getByText('Nothing matches these filters.'),
@@ -141,8 +138,8 @@ test.describe('filters', () => {
 
   test('offers newest and oldest first', async ({ page }) => {
     await page.goto('/');
-    await expect(page.locator('.sort strong')).toHaveText('Newest first');
-    await page.getByRole('link', { name: 'Oldest first' }).click();
+    await expect(page.locator('.chip.sort')).toHaveText('Newest first');
+    await page.locator('.chip.sort').click();
     await expect(page).toHaveURL(/\/\?sort=oldest$/);
     await expect(tiles(page).first()).toHaveAttribute('href', '/i/happy-tigy');
   });

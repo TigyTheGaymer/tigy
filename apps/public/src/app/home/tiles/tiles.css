@@ -1,0 +1,164 @@
+/* Justified rows in CSS alone, so the server HTML is already laid out: each tile starts at three
+   quarters of the row height and grows with its shape until the row is full. The spacer keeps the
+   last row from stretching. */
+.tiles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--row-gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tiles::after {
+  content: '';
+  flex-grow: 1000000;
+}
+
+.tile {
+  position: relative;
+  flex: var(--shape) 1 calc(var(--shape) * var(--row-h) * 0.75);
+  aspect-ratio: var(--shape);
+  max-width: 100%;
+  border-radius: var(--r-md);
+  background: var(--panel);
+  box-shadow: 0 2px 0 var(--page-deep);
+  --tilt: -1.2deg;
+  transition:
+    transform 380ms var(--ease-squish),
+    box-shadow 300ms;
+}
+
+.tile.tilt {
+  --tilt: 1.2deg;
+}
+
+.tile a {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: inherit;
+}
+
+/* Whole pieces on cream: never cropped, and stickers keep their backdrop. */
+.tile img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.tile:hover,
+.tile:has(a:focus-visible) {
+  z-index: var(--z-tile);
+  transform: translateY(-5px) rotate(var(--tilt)) scale(1.02);
+  box-shadow:
+    0 2px 0 var(--page-deep),
+    0 16px 26px -14px rgb(0 0 0 / 0.5);
+}
+
+.badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  padding: 2px 10px;
+  border-radius: var(--r-sm);
+  background: var(--pink);
+  color: var(--on-pink);
+  font-size: var(--text-caption);
+  font-weight: 800;
+}
+
+.label {
+  position: absolute;
+  left: 8px;
+  bottom: 8px;
+  max-width: calc(100% - 16px);
+  padding: 4px 12px;
+  border-radius: var(--r-sm);
+  background: var(--panel-2);
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-small);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0;
+  transform: translateY(6px);
+  transition:
+    opacity 200ms,
+    transform 300ms var(--ease-squish);
+}
+
+.tile:hover .label,
+.tile:has(a:focus-visible) .label {
+  opacity: 1;
+  transform: none;
+}
+
+/* Paw prints walk up the corner: left, right, left */
+.paws {
+  position: absolute;
+  right: 22px;
+  top: 14px;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  color: var(--pink);
+  filter: drop-shadow(
+    0 1px 1px color-mix(in srgb, var(--maroon) 35%, transparent)
+  );
+}
+
+.paws app-paw {
+  position: absolute;
+  top: 0;
+  right: 10px;
+  font-size: 18px;
+  opacity: 0;
+  --rot: -14deg;
+}
+
+.paws app-paw:nth-child(1) {
+  top: 54px;
+}
+
+.paws app-paw:nth-child(2) {
+  top: 27px;
+  right: -12px;
+  --rot: 14deg;
+}
+
+.tile:hover .paws app-paw,
+.tile:has(a:focus-visible) .paws app-paw {
+  animation: step-up 1100ms var(--ease-out) forwards;
+}
+
+.tile:hover .paws app-paw:nth-child(2),
+.tile:has(a:focus-visible) .paws app-paw:nth-child(2) {
+  animation-delay: 160ms;
+}
+
+.tile:hover .paws app-paw:nth-child(3),
+.tile:has(a:focus-visible) .paws app-paw:nth-child(3) {
+  animation-delay: 320ms;
+}
+
+@keyframes step-up {
+  0% {
+    opacity: 0;
+    transform: translateY(8px) rotate(var(--rot)) scale(0.6);
+  }
+  25% {
+    opacity: 1;
+    transform: translateY(0) rotate(var(--rot)) scale(1);
+  }
+  75% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-6px) rotate(var(--rot)) scale(1);
+  }
+}

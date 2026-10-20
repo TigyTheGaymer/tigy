@@ -2,7 +2,8 @@ import { DOCUMENT, inject, Service } from '@angular/core';
 import { Meta, type MetaDefinition } from '@angular/platform-browser';
 import { TIGY_ID } from '@tigy/models';
 import type { ArtworkResponse } from '../../api/types';
-import { artworkPath, avatarUrl, fullImageUrl } from '../urls';
+import { pieceTitle } from '../shared/format';
+import { artworkPath, avatarUrl, fullImageUrl } from '../shared/urls';
 
 /** Each page replaces all of these. */
 const MANAGED = [
@@ -41,7 +42,7 @@ export class HeadService {
         ]
       : [];
     this.apply([
-      { property: 'og:title', content: artwork.title ?? 'Untitled' },
+      { property: 'og:title', content: pieceTitle(artwork.title) },
       ...description,
       { property: 'og:image', content: this.url(fullImageUrl(artwork.id)) },
       { property: 'og:url', content: this.url(artworkPath(artwork.id)) },

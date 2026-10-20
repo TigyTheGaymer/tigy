@@ -4,30 +4,33 @@ test('Piece with every field: shows the image, details, credits, tags, file, nei
   page,
 }) => {
   await page.goto('/i/hey-pookie');
-  await expect(page.locator('img.piece')).toHaveAttribute(
+  await expect(page.locator('.piece img')).toHaveAttribute(
     'src',
     '/img/hey-pookie/full.webp',
   );
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(
     'Hey Pookie!',
   );
-  await expect(page.locator('.description')).toHaveText('A three-panel comic.');
+  await expect(page.locator('.desc')).toHaveText('A three-panel comic.');
   await expect(page.locator('.date')).toHaveText('14 Feb 2026');
-  await expect(page.locator('.artists > ul > li > a')).toHaveText([
+  await expect(page.locator('.artists .name')).toHaveText([
     'Artist name (placeholder)',
   ]);
-  await expect(page.locator('.characters > ul > li > a')).toHaveText([
+  await expect(page.locator('.characters .name')).toHaveText([
     'Tigy',
     'Character name (placeholder)',
   ]);
-  await expect(page.locator('.tags a')).toHaveText(['comic', 'couple']);
+  await expect(page.locator('.tags a')).toHaveText(['#comic', '#couple']);
   await expect(page.locator('.file')).toContainText('PNG · 1620 × 2117 px');
-  await expect(page.getByRole('link', { name: 'Download' })).toBeVisible();
-  await expect(page.locator('.previous')).toHaveAttribute(
+  await expect(page.locator('.download')).toBeVisible();
+  await expect(page.locator('.nav.prev')).toHaveAttribute(
     'href',
     '/i/ref-sheet',
   );
-  await expect(page.locator('.next')).toHaveAttribute('href', '/i/chibi-tigy');
+  await expect(page.locator('.nav.next')).toHaveAttribute(
+    'href',
+    '/i/chibi-tigy',
+  );
   await expect(
     page.getByRole('link', { name: 'Back to the gallery' }),
   ).toBeVisible();
@@ -39,8 +42,8 @@ test("Following an artist's credit: opens the gallery filtered by that artist", 
   await page.goto('/i/hey-pookie');
   await page.getByRole('link', { name: 'Artist name (placeholder)' }).click();
   await expect(page).toHaveURL(/\/\?artist=placeholder-artist$/);
-  await expect(page.locator('.active-filters a')).toHaveText([
-    'Artist: Artist name (placeholder) ×',
+  await expect(page.locator('.chip.is-active')).toHaveText([
+    'Artist: Artist name (placeholder)',
   ]);
 });
 
@@ -71,7 +74,7 @@ test('Piece without credits: shows neither an artists nor a characters section',
 }) => {
   await page.goto('/i/chibi-tigy');
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Untitled');
-  await expect(page.locator('img.piece')).toBeVisible();
+  await expect(page.locator('.piece img')).toBeVisible();
   await expect(page.locator('.credits')).toHaveCount(0);
 });
 
@@ -79,7 +82,7 @@ test('Tigy credited as a character: the credit links home and shows no social li
   page,
 }) => {
   await page.goto('/i/happy-tigy');
-  const credit = page.locator('.characters > ul > li');
+  const credit = page.locator('.characters .person').first();
   await expect(credit.getByRole('link', { name: 'Tigy' })).toHaveAttribute(
     'href',
     '/',
@@ -93,12 +96,12 @@ test('Back to a filtered gallery: returns to the gallery with its filter, also a
   await page.goto('/?character=placeholder-character');
   await page.locator('.gallery .tile a').first().click();
   await expect(page).toHaveURL(/\/i\/hey-pookie$/);
-  await page.locator('.next').click();
+  await page.locator('.nav.next').click();
   await expect(page).toHaveURL(/\/i\/chibi-tigy$/);
   await page.getByRole('link', { name: 'Back to the gallery' }).click();
   await expect(page).toHaveURL(/\/\?character=placeholder-character$/);
-  await expect(page.locator('.active-filters a')).toHaveText([
-    'Character: Character name (placeholder) ×',
+  await expect(page.locator('.chip.is-active')).toHaveText([
+    'Character: Character name (placeholder)',
   ]);
 });
 
@@ -179,14 +182,17 @@ test.describe('link previews', () => {
     await expect(page).toHaveTitle('Tigy');
   });
 
-  test('an NSFW piece offers its link and its safe link', async ({
+  test('Safe link of an NSFW piece: the artwork page copies it and confirms', async ({
     page,
+    context,
     baseURL,
   }) => {
+    await context.grantPermissions(['clipboard-read', 'clipboard-write']);
     await page.goto('/i/hey-pookie-nsfw-test');
-    await expect(page.locator('.share a')).toHaveText([
-      `${baseURL}/i/hey-pookie-nsfw-test`,
+    await page.getByRole('button', { name: 'Copy safe link' }).click();
+    await expect(page.locator('.toast')).toHaveText('Safe link copied!');
+    expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(
       `${baseURL}/i/hey-pookie-nsfw-test?safe`,
-    ]);
+    );
   });
 });
