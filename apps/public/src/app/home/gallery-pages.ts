@@ -9,14 +9,11 @@ import type { GalleryPlace } from '../gallery/gallery-place.service';
 
 type MorePages = GalleryPlace['more'];
 
-/**
- * The gallery's pages: the first page for the address, then each page loaded after it. A kept
- * place stands in for the first page, so coming back shows what was loaded without a request.
- */
+/** A kept place stands in for the first page, so coming back shows what was loaded without a request. */
 export function injectGalleryPages(options: {
   query: Signal<GalleryQuery>;
   includeNsfw: Signal<boolean>;
-  /** Which gallery this is; a change starts over from the first page. */
+  /** A change starts over from the first page. */
   key: Signal<string>;
   restored: GalleryPlace | undefined;
 }) {

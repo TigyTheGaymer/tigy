@@ -16,7 +16,6 @@
   scrollbar-width: none;
 }
 
-/* Room on the right for the tail timeline, as in the gallery */
 @media (min-width: 721px) {
   .filters {
     padding-right: calc(var(--gutter) + var(--tail-room));

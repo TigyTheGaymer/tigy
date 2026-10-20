@@ -41,7 +41,7 @@ export class GalleryPlaceService {
     'tigy.gallery',
     { initial: null, parse: onThisSite, serialize: (address) => address },
   );
-  /** The gallery address this tab came from; `null` before the first render reads it. */
+  /** `null` until the first render reads it. */
   readonly rememberedAddress = this.address.value;
 
   rememberAddress(address: string): void {

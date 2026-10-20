@@ -67,7 +67,6 @@ h1 app-mark {
   line-height: 1;
 }
 
-/* Room on the right for the tail timeline */
 .gallery {
   padding-right: calc(var(--gutter) + var(--tail-room));
   padding-bottom: 24px;
