@@ -285,7 +285,7 @@ Only a few things are fully round, because Tigy is: the avatar (Tigy's face) and
 - **Viewer arrows:** 52px paw-pink buttons with 8px corners on either side of the stage.
 
 ### Icons
-- **Interface icons:** Lucide only, drawn on its 24px grid with round line ends and a slightly heavier line (2.4–2.5) to match the chunky type, shown at 18–22px in the current text colour. The Angular build uses `@lucide/angular`.
+- **Interface icons:** Lucide only, drawn on its 24px grid with round line ends and a slightly heavier line (2.4–2.5) to match the chunky type, shown at 18–22px in the current text colour. The Angular build uses ng-icons: a component imports the icon from `@ng-icons/lucide`, registers it with `provideIcons` and shows it with `<ng-icon name="lucideShare2" />`; the line weight is set once with `provideNgIconsConfig`.
 - **Social logos:** Simple Icons (CC0), in a single colour, the button's text colour: maroon in light mode, cream in dark mode, never the networks' own brand colours and never redrawn. Shown at 18px with the handle on desktop; on phones the links become 46px logo-only buttons. Each link's accessible name is "Network: handle".
 - **Tigy's own shapes** (the forehead mark, the paw print, the flank stripes) are custom filled drawings, not icons.
 
