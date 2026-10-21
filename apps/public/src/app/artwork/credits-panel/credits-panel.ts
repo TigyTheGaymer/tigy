@@ -12,11 +12,10 @@ import {
   lucideUsers,
   lucideX,
 } from '@ng-icons/lucide';
-import { formatArtworkDate } from '@tigy/gallery';
+import { fileSize, formatArtworkDate, formatName } from '@tigy/gallery';
 import { TIGY_ID } from '@tigy/models';
 import type { ArtworkResponse, CreditedPerson } from '../../../api/types';
 import { Paw } from '../../markings/paw';
-import { fileSize, formatName } from '../../shared/format';
 import { PieceTitlePipe } from '../../shared/piece-title.pipe';
 import { avatarUrl, originalUrl } from '../../shared/urls';
 import { SocialLink } from '../../social/social-link';

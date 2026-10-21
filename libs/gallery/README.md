@@ -8,6 +8,7 @@
 - `gallery-query/`: filtering, sorting and paging the gallery rows, used by the public server
 - `overview/`: piece count, date range, timeline years, filter choices and previous/next
 - `gallery-params/`: a gallery query to and from its URL parameters
+- `file-details/`: a file's format and size as the public site and the admin show them
 
 `shared/` holds helpers the modules use internally.
 
