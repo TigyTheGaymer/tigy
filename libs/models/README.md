@@ -4,6 +4,7 @@
 
 - `person.model.ts`: `people/{personId}`, and Tigy's fixed ID
 - `image.model.ts`: `images/{imageId}`, and the Storage paths of an image's files
+- `upload.model.ts`: `uploads/{uploadId}`, one file's way through processing, and the Storage paths of an upload
 - `meta.model.ts`: the derived `meta/gallery`, `meta/people` and `meta/tags` documents
 - `firestore.model.ts`: helpers shared by the others
 
