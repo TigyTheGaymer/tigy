@@ -14,7 +14,25 @@
     "skipDefaultLibCheck": true,
     "paths": {
       "@tigy/models": ["./libs/models/src/index.ts"],
-      "@tigy/gallery": ["./libs/gallery/src/index.ts"]
+      "@tigy/gallery": ["./libs/gallery/src/index.ts"],
+      "@tigy/uploads": ["./libs/uploads/src/index.ts"],
+      "@spartan-ng/helm": ["./libs/admin-ui/src/index.ts"],
+      "@spartan-ng/helm/button": ["./libs/admin-ui/button/src/index.ts"],
+      "@spartan-ng/helm/utils": ["./libs/admin-ui/utils/src/index.ts"],
+      "@spartan-ng/helm/card": ["./libs/admin-ui/card/src/index.ts"],
+      "@spartan-ng/helm/progress": ["./libs/admin-ui/progress/src/index.ts"],
+      "@spartan-ng/helm/badge": ["./libs/admin-ui/badge/src/index.ts"],
+      "@spartan-ng/helm/sonner": ["./libs/admin-ui/sonner/src/index.ts"],
+      "@spartan-ng/helm/dropdown-menu": [
+        "./libs/admin-ui/dropdown-menu/src/index.ts"
+      ],
+      "@spartan-ng/helm/avatar": ["./libs/admin-ui/avatar/src/index.ts"],
+      "@spartan-ng/helm/empty": ["./libs/admin-ui/empty/src/index.ts"],
+      "@spartan-ng/helm/spinner": ["./libs/admin-ui/spinner/src/index.ts"],
+      "@spartan-ng/helm/tooltip": ["./libs/admin-ui/tooltip/src/index.ts"],
+      "@spartan-ng/helm/alert-dialog": [
+        "./libs/admin-ui/alert-dialog/src/index.ts"
+      ]
     }
   },
   "exclude": ["node_modules", "tmp"]
