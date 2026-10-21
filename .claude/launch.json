@@ -12,6 +12,18 @@
       "runtimeExecutable": "npx",
       "runtimeArgs": ["nx", "run", "public-e2e:preview"],
       "port": 4300
+    },
+    {
+      "name": "emulators",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["nx", "run", "firebase:emulators"],
+      "port": 4000
+    },
+    {
+      "name": "admin",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["nx", "serve", "admin"],
+      "port": 4201
     }
   ]
 }
