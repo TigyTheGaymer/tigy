@@ -17,6 +17,8 @@ const image = {
   tags: [],
 };
 
+const upload = { fileName: 'piece.png', bytes: 4, status: 'processing' };
+
 beforeAll(async () => {
   env = await rulesEnvironment();
   as = contexts(env);
@@ -33,6 +35,7 @@ beforeEach(async () => {
     await db.doc('meta/gallery').set({ items: '[]' });
     await db.doc('meta/people').set({ items: '[]' });
     await db.doc('meta/tags').set({ counts: { chibi: 1 } });
+    await db.doc('uploads/u1').set(upload);
   });
 });
 
@@ -60,6 +63,12 @@ describe.each(OTHERS)('%s', (who) => {
     await assertFails(db().doc('images/new').set(image));
     await assertFails(db().doc('images/k3x').update({ published: false }));
     await assertFails(db().doc('images/k3x').delete());
+  });
+
+  it('cannot read, write or clear upload records', async () => {
+    await assertFails(db().doc('uploads/u1').get());
+    await assertFails(db().doc('uploads/new').set(upload));
+    await assertFails(db().doc('uploads/u1').delete());
   });
 
   it('cannot write the summaries', async () => {
@@ -102,6 +111,13 @@ describe('owner', () => {
     await assertFails(db().doc('meta/gallery').set({ items: '[]' }));
     await assertFails(db().doc('meta/tags').update({ counts: {} }));
     await assertFails(db().doc('meta/people').delete());
+  });
+
+  it('reads and clears upload records, but cannot create or change them', async () => {
+    await assertSucceeds(db().collection('uploads').get());
+    await assertFails(db().doc('uploads/new').set(upload));
+    await assertFails(db().doc('uploads/u1').update({ status: 'ready' }));
+    await assertSucceeds(db().doc('uploads/u1').delete());
   });
 
   it('cannot write outside people and images', async () => {

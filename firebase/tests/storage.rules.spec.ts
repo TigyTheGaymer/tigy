@@ -12,11 +12,16 @@ let as: Record<Who, RulesTestContext>;
 const bytes = new Uint8Array([82, 73, 70, 70]);
 
 /** Uploads the test bytes; `put` returns a task, which the asserts need as a promise. */
-function upload(context: RulesTestContext, path: string): Promise<unknown> {
+function upload(
+  context: RulesTestContext,
+  path: string,
+  contentType?: string,
+  data: Uint8Array = bytes,
+): Promise<unknown> {
   return context
     .storage()
     .ref(path)
-    .put(bytes)
+    .put(data, contentType ? { contentType } : undefined)
     .then(() => undefined);
 }
 
@@ -36,6 +41,9 @@ beforeEach(async () => {
     await storage.ref('people/tigy/avatar.webp').put(bytes);
     await storage.ref('people/tigy/notes.txt').put(bytes);
     await storage.ref('private/notes.txt').put(bytes);
+    await storage
+      .ref('uploads/u1/source')
+      .put(bytes, { contentType: 'image/png' });
   });
 });
 
@@ -66,19 +74,31 @@ describe.each([...OTHERS, 'owner'] as Who[])('%s', (who) => {
     await assertFails(storage().ref('people/tigy/notes.txt').getDownloadURL());
   });
 
-  it('cannot read or write outside images/ and the avatars', async () => {
+  it('cannot read or write outside images/, the uploads and the avatars', async () => {
     await assertFails(storage().ref('private/notes.txt').getDownloadURL());
     await assertFails(upload(as[who], 'private/new.txt'));
+  });
+
+  it("Writing an artwork file from a browser: cannot upload, replace or delete an image's files", async () => {
+    await assertFails(upload(as[who], 'images/new/original.png', 'image/png'));
+    await assertFails(upload(as[who], 'images/k3x/thumb.webp', 'image/webp'));
+    await assertFails(storage().ref('images/k3x/full.webp').delete());
+  });
+
+  it('Reading an upload: cannot read, list, replace or delete an upload', async () => {
+    await assertFails(storage().ref('uploads/u1/source').getDownloadURL());
+    await assertFails(storage().ref('uploads/u1/source').getMetadata());
+    await assertFails(storage().ref('uploads').listAll());
+    await assertFails(upload(as[who], 'uploads/u1/source', 'image/png'));
+    await assertFails(storage().ref('uploads/u1/source').delete());
   });
 });
 
 describe.each(OTHERS)('%s', (who) => {
   const storage = () => as[who].storage();
 
-  it("cannot upload, replace or delete an image's files", async () => {
-    await assertFails(upload(as[who], 'images/new/original.png'));
-    await assertFails(upload(as[who], 'images/k3x/thumb.webp'));
-    await assertFails(storage().ref('images/k3x/full.webp').delete());
+  it('A stranger tries to upload: cannot upload a file', async () => {
+    await assertFails(upload(as[who], 'uploads/u2/source', 'image/png'));
   });
 
   it('cannot upload, replace or delete an avatar', async () => {
@@ -91,10 +111,43 @@ describe.each(OTHERS)('%s', (who) => {
 describe('owner', () => {
   const storage = () => as.owner.storage();
 
-  it("uploads, replaces and deletes an image's files", async () => {
-    await assertSucceeds(upload(as.owner, 'images/new/original.png'));
-    await assertSucceeds(upload(as.owner, 'images/k3x/thumb.webp'));
-    await assertSucceeds(storage().ref('images/k3x/full.webp').delete());
+  it.each(['image/jpeg', 'image/png', 'image/gif', 'image/webp'])(
+    'uploads a new %s file',
+    async (contentType) => {
+      await assertSucceeds(
+        upload(
+          as.owner,
+          `uploads/new-${contentType.slice(6)}/source`,
+          contentType,
+        ),
+      );
+    },
+  );
+
+  it('Too large: cannot upload a file over 50 MB', async () => {
+    const limit = 50 * 1024 * 1024;
+    await assertSucceeds(
+      upload(
+        as.owner,
+        'uploads/at-limit/source',
+        'image/png',
+        new Uint8Array(limit),
+      ),
+    );
+    await assertFails(
+      upload(
+        as.owner,
+        'uploads/over-limit/source',
+        'image/png',
+        new Uint8Array(limit + 1),
+      ),
+    );
+  });
+
+  it('cannot upload another type, or anywhere else under uploads/', async () => {
+    await assertFails(upload(as.owner, 'uploads/u2/source', 'image/heic'));
+    await assertFails(upload(as.owner, 'uploads/u2/source', 'text/plain'));
+    await assertFails(upload(as.owner, 'uploads/u2/other', 'image/png'));
   });
 
   it('uploads, replaces and deletes an avatar, and nothing else under people/', async () => {

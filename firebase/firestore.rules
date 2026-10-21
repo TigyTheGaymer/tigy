@@ -24,6 +24,12 @@ service cloud.firestore {
       allow create, update, delete: if isOwner();
     }
 
+    // Upload records are written only by the processing function; the owner
+    // clears a row by deleting its record.
+    match /uploads/{uploadId} {
+      allow delete: if isOwner();
+    }
+
     // Everything under meta is derived and written only by Cloud Functions.
   }
 }

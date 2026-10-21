@@ -1,8 +1,9 @@
 rules_version = '2';
 
-// Anyone may fetch an image's files; only the owner (custom claim
-// `owner: true`) may write them. Listing is not public, so the IDs of
-// unpublished images stay unknown. Everything else is denied.
+// Anyone may fetch an image's files, but no browser may write them: they
+// come only from the upload processing function, which uses the Admin SDK.
+// Listing is not public, so the IDs of unpublished images stay unknown.
+// Everything else is denied.
 // See openspec/changes/define-data-model/design.md, D8.
 service firebase.storage {
   match /b/{bucket}/o {
@@ -12,7 +13,15 @@ service firebase.storage {
 
     match /images/{imageId}/{fileName} {
       allow get;
-      allow write: if isOwner();
+    }
+
+    // The admin sets the content type from the file's first bytes; processing
+    // checks the bytes again. 50 MB is MAX_UPLOAD_BYTES in @tigy/uploads.
+    match /uploads/{uploadId}/source {
+      allow create: if isOwner()
+        && resource == null
+        && request.resource.size <= 50 * 1024 * 1024
+        && request.resource.contentType.matches('image/(jpeg|png|gif|webp)');
     }
 
     // One avatar per person, fetchable but not listable, like the images.
