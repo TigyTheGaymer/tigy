@@ -1,0 +1,36 @@
+<header class="flex items-center justify-between border-b px-4 py-2">
+  <span class="font-semibold">Tigy admin</span>
+  <button
+    hlmBtn
+    variant="ghost"
+    size="icon"
+    [hlmDropdownMenuTrigger]="account"
+    align="end"
+    aria-label="Account"
+  >
+    <hlm-avatar size="sm">
+      @if (user()?.photoURL; as photo) {
+        <img hlmAvatarImage [src]="photo" alt="" referrerpolicy="no-referrer" />
+      }
+      <span hlmAvatarFallback>{{ initial() }}</span>
+    </hlm-avatar>
+  </button>
+</header>
+
+<ng-template #account>
+  <hlm-dropdown-menu class="w-56">
+    <hlm-dropdown-menu-label>
+      @if (user()?.displayName; as name) {
+        <span class="block truncate">{{ name }}</span>
+      }
+      <span class="text-muted-foreground block truncate text-xs font-normal">
+        {{ user()?.email }}
+      </span>
+    </hlm-dropdown-menu-label>
+    <hlm-dropdown-menu-separator />
+    <button hlmDropdownMenuItem (triggered)="signOut()">
+      <ng-icon name="lucideLogOut" />
+      Sign out
+    </button>
+  </hlm-dropdown-menu>
+</ng-template>

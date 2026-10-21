@@ -27,7 +27,7 @@
           "budgets": [
             {
               "type": "initial",
-              "maximumWarning": "500kb",
+              "maximumWarning": "650kb",
               "maximumError": "1mb"
             },
             {
@@ -41,7 +41,13 @@
         "development": {
           "optimization": false,
           "extractLicenses": false,
-          "sourceMap": true
+          "sourceMap": true,
+          "fileReplacements": [
+            {
+              "replace": "apps/admin/src/app/firebase/environment.ts",
+              "with": "apps/admin/src/app/firebase/environment.development.ts"
+            }
+          ]
         }
       }
     },
@@ -64,7 +70,8 @@
     "test": {
       "executor": "@angular/build:unit-test",
       "options": {
-        "watch": false
+        "watch": false,
+        "setupFiles": ["apps/admin/src/test-setup.ts"]
       }
     },
     "serve-static": {

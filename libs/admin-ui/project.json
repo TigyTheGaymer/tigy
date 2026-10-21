@@ -1,0 +1,9 @@
+{
+  "name": "admin-ui",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/admin-ui/src",
+  "prefix": "hlm",
+  "projectType": "library",
+  "tags": ["shared"],
+  "targets": {}
+}

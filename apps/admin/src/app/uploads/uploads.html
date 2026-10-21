@@ -1,0 +1,31 @@
+<h1 class="mb-4 text-xl font-semibold">Uploads</h1>
+
+<app-drop-zone (files)="add($event)" />
+
+@if (records.error()) {
+  <p role="alert" class="text-destructive mt-4 text-sm">
+    The upload list couldn't load. Reload the page to try again.
+  </p>
+}
+
+@if (rows().length) {
+  <ul class="mt-4 divide-y">
+    @for (row of rows(); track row.id) {
+      <li>
+        <app-upload-row [row]="row" (clear)="clear(row.id)" />
+      </li>
+    }
+  </ul>
+} @else if (!records.isLoading()) {
+  <div hlmEmpty class="mt-4">
+    <div hlmEmptyHeader>
+      <div hlmEmptyMedia variant="icon">
+        <ng-icon name="lucideImages" />
+      </div>
+      <div hlmEmptyTitle>No uploads yet</div>
+      <div hlmEmptyDescription>
+        Each picture you upload becomes an unpublished artwork.
+      </div>
+    </div>
+  </div>
+}

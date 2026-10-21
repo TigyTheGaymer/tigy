@@ -1,10 +1,13 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { HlmToasterImports } from '@spartan-ng/helm/sonner';
 
 @Component({
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, HlmToasterImports],
   selector: 'app-root',
-  templateUrl: './app.html',
-  styleUrl: './app.css',
+  template: `
+    <router-outlet />
+    <hlm-toaster />
+  `,
 })
 export class App {}

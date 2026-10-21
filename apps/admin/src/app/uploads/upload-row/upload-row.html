@@ -1,0 +1,86 @@
+<div class="flex items-center gap-3 py-3">
+  <div
+    class="bg-muted grid size-14 shrink-0 place-items-center overflow-hidden rounded-md"
+  >
+    @if (thumbnail.hasValue()) {
+      <img [src]="thumbnail.value()" alt="" class="size-full object-cover" />
+    } @else if (row().status === 'processing') {
+      <hlm-spinner />
+    } @else {
+      <ng-icon
+        name="lucideImage"
+        class="text-muted-foreground text-[length:--spacing(5)]"
+      />
+    }
+  </div>
+
+  <div class="grid min-w-0 flex-1 gap-1">
+    <div class="flex items-center gap-2">
+      <span class="truncate font-medium">{{ row().fileName }}</span>
+      <span hlmBadge [variant]="badgeVariant()">
+        {{ label() }}
+      </span>
+    </div>
+    @switch (row().status) {
+      @case ('uploading') {
+        <div class="flex items-center gap-2">
+          <hlm-progress
+            [value]="percent()"
+            class="max-w-xs"
+            aria-label="Upload progress"
+          >
+            <hlm-progress-indicator />
+          </hlm-progress>
+          <span class="text-muted-foreground text-xs tabular-nums"
+            >{{ percent() }}%</span
+          >
+        </div>
+      }
+      @case ('processing') {
+        <span class="text-muted-foreground text-sm"
+          >Making the web versions…</span
+        >
+      }
+      @case ('ready') {
+        <span class="text-muted-foreground text-sm">{{ details() }}</span>
+      }
+      @case ('failed') {
+        <span class="text-destructive text-sm">{{ reason() }}</span>
+      }
+    }
+  </div>
+
+  @if (isClearable()) {
+    <hlm-alert-dialog #confirm="hlmAlertDialog">
+      <button
+        hlmAlertDialogTrigger
+        hlmBtn
+        variant="ghost"
+        size="icon"
+        hlmTooltip="Clear from the list"
+        aria-label="Clear from the list"
+      >
+        <ng-icon name="lucideTrash2" />
+      </button>
+      <hlm-alert-dialog-content *hlmAlertDialogPortal>
+        <hlm-alert-dialog-header>
+          <h2 hlmAlertDialogTitle>Clear {{ row().fileName }}?</h2>
+          <p hlmAlertDialogDescription>
+            @if (row().status === 'ready') {
+              The row leaves the list. The artwork stays, with its files.
+            } @else {
+              The row leaves the list, with anything the failed upload left
+              behind.
+            }
+          </p>
+        </hlm-alert-dialog-header>
+        <hlm-alert-dialog-footer>
+          <button hlmAlertDialogCancel>Cancel</button>
+          <button hlmAlertDialogAction (click)="confirm.close(); clear.emit()">
+            Clear
+          </button>
+        </hlm-alert-dialog-footer>
+      </hlm-alert-dialog-content>
+    </hlm-alert-dialog>
+  }
+</div>
