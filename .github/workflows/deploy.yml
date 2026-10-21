@@ -60,6 +60,9 @@ jobs:
       # with a deploy target must be tagged backend or frontend.
       - name: 'Stage 1: backend (rules, indexes, functions)'
         run: npx nx affected -t deploy --exclude=tag:frontend --parallel=1
+        env:
+          # A secret, not a variable: this repository's logs are public, and only secrets are masked.
+          OWNER_EMAIL: ${{ secrets.OWNER_EMAIL }}
 
       - name: 'Stage 2: frontends (admin, public)'
         run: npx nx affected -t deploy --exclude=tag:backend --parallel=1 --commit=${{ github.sha }}
