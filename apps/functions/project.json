@@ -16,7 +16,14 @@
         "bundle": true,
         "main": "apps/functions/src/main.ts",
         "tsConfig": "apps/functions/tsconfig.app.json",
-        "assets": ["apps/functions/src/assets"],
+        "assets": [
+          "apps/functions/src/assets",
+          {
+            "input": "apps/functions",
+            "glob": ".env.demo-tigy",
+            "output": "."
+          }
+        ],
         "generatePackageJson": true,
         "esbuildOptions": {
           "sourcemap": true,
@@ -74,7 +81,7 @@
       "executor": "nx:run-commands",
       "dependsOn": ["build"],
       "options": {
-        "command": "firebase deploy --only functions --force --project tigy-165cc --non-interactive",
+        "command": "node apps/functions/write-deploy-env.mjs && firebase deploy --only functions --force --project tigy-165cc --non-interactive",
         "cwd": "{workspaceRoot}"
       }
     }
