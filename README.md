@@ -24,6 +24,7 @@ npm ci
 | `functions`  | `apps/functions`  | `backend`  | Cloud Functions (`europe-west6`)                                |
 | `firebase`   | `firebase`        | `backend`  | `firebase.json`, Firestore and Storage rules, Firestore indexes |
 | `models`     | `libs/models`     |            | Types shared by all three apps, imported as `@tigy/models`      |
+| `uploads`    | `libs/uploads`    |            | Upload checks shared by the admin and the functions             |
 | `public-e2e` | `apps/public-e2e` |            | End-to-end tests of the public site, Playwright                 |
 
 ## Run locally
@@ -120,9 +121,28 @@ The workflow is the only thing that ships the public site: App Hosting's own aut
 
 The workflow signs in to Google Cloud with Workload Identity Federation (pool `github`, provider `tigy-repo`, service account `github-deploy`), so no key is stored in GitHub.
 
+### Owner sign-in
+
+Only the owner may sign in to the admin, with Google. The sign-up blocking function `beforeUserCreated` refuses every other account before it is created and gives the owner's account the `owner` claim that the rules check. It needs:
+
+- **Identity Platform:** Authentication upgraded to Firebase Authentication with Identity Platform, which blocking functions require, with the Google provider enabled. Treat the upgrade as permanent; it costs nothing below 50,000 monthly active users.
+- **`OWNER_EMAIL`:** the owner's Google account, kept out of the repository. `functions:deploy` writes it into the build output as `.env.tigy-165cc` and stops if it is unset. CI takes it from the GitHub repository secret `OWNER_EMAIL` (Settings > Secrets and variables > Actions > Secrets): a secret rather than a variable, because this public repository's workflow logs are public and only secrets are masked in them. The emulators use the placeholder `owner@tigy.test` from `apps/functions/.env.demo-tigy`.
+
+A mistyped `OWNER_EMAIL` refuses the owner too. The function logs every refused sign-up with its reason; fix the secret and deploy the functions again. An account created before the blocking function existed has no claim: delete it in Authentication, and sign in again.
+
+### Bucket lifecycle
+
+Uploads wait under `uploads/` in the default bucket until the processing function deletes them. A lifecycle rule deletes anything left there after a day, such as an upload whose processing never started. The Firebase CLI cannot deploy lifecycle rules, so apply [firebase/storage-lifecycle.json](firebase/storage-lifecycle.json) by hand once, and again whenever it changes:
+
+```bash
+gcloud storage buckets update gs://tigy-165cc.appspot.com --lifecycle-file=firebase/storage-lifecycle.json
+```
+
+Check it with `gcloud storage buckets describe gs://tigy-165cc.appspot.com --format="default(lifecycle_config)"`. The emulator ignores it.
+
 `github-deploy` holds only the roles the deploys need. A deploy that fails with HTTP 403 usually names the missing permission; grant the narrowest role that has it, on the narrowest resource, and add it here.
 
-The first deploy of a function with a new kind of trigger (the first Firestore trigger, for example) grants roles to Google's own service accounts, which only the owner may do. Deploy that one by hand with `npx nx run functions:deploy` before pushing; CI handles later updates.
+The first deploy of a function with a new kind of trigger (the first Firestore trigger, the sign-up blocking function, the first Storage trigger) grants roles to Google's own service accounts, which only the owner may do. Deploy that one by hand with `npx nx run functions:deploy` before pushing; CI handles later updates.
 
 | Role                                       | Granted on                                                                        | Needed for                                                        |
 | ------------------------------------------ | --------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
@@ -149,6 +169,8 @@ Signed in with `npx firebase login`, each project deploys on its own:
 ```bash
 npx nx run firebase:deploy
 ```
+
+With `OWNER_EMAIL` set to the owner's Google account (see [Owner sign-in](#owner-sign-in)):
 
 ```bash
 npx nx run functions:deploy

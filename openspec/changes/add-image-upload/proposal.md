@@ -16,6 +16,7 @@ The public site is built and designed, but it only shows the emulator seed: ther
   - an unpublished artwork with no title, credits or tags, sorted by the day it was added.
 
   The uploaded file is then deleted. An upload that is never processed is deleted by a bucket lifecycle rule after a day.
+
 - **Upload list.** An Uploads page lists the uploads newest first, with live status: uploading (with progress), processing, ready (with its thumbnail and file details) or failed (with a reason the owner can act on). The owner can clear finished rows; clearing never deletes the artwork.
 - **Rules.** Only the owner may create an upload, and only of an allowed type and size. Browsers may no longer write under `images/`: its files come from the pipeline only. Upload records are written only by functions.
 
@@ -36,5 +37,5 @@ None. The artwork that processing creates follows `gallery-catalog` as it stands
 
 - **Code:** `apps/admin` (shell, sign-in, guard, Uploads page, Firebase client setup, Tailwind and spartan-ng setup); new spartan-ng helm components in their own library under `libs/`; `apps/functions` (sign-up blocking function, processing trigger, the metadata stripper moved in from the S5 spike, and its tests); `libs/models` (upload record and paths); a new `libs/uploads` (format detection and the size limit, shared by the admin and the functions); `firebase/` (Storage and Firestore rules with their tests, and the bucket lifecycle rule).
 - **Dependencies:** `tailwindcss`, `@tailwindcss/postcss`, `@spartan-ng/brain` and `@spartan-ng/cli` with their peers `@angular/cdk`, `clsx` and `tw-animate-css`; `sharp` (already in the workspace for the seed) becomes a functions dependency.
-- **Firebase:** the owner upgrades Authentication to Identity Platform (needed for blocking functions) and enables Google sign-in. The blocking function and the Storage trigger are new kinds of trigger, so each is deployed by hand once before CI takes over. CI writes the `OWNER_EMAIL` parameter from a GitHub repository variable. The owner applies the lifecycle rule for `uploads/` once with `gcloud`, since the Firebase CLI cannot deploy it.
+- **Firebase:** the owner upgrades Authentication to Identity Platform (needed for blocking functions) and enables Google sign-in. The blocking function and the Storage trigger are new kinds of trigger, so each is deployed by hand once before CI takes over. CI writes the `OWNER_EMAIL` parameter from a GitHub repository secret. The owner applies the lifecycle rule for `uploads/` once with `gcloud`, since the Firebase CLI cannot deploy it.
 - **Other changes:** builds on the archived `define-data-model` (file names, image fields, owner claim) and is followed by `add-admin-editing`.
