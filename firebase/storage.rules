@@ -25,9 +25,13 @@ service firebase.storage {
     }
 
     // One avatar per person, fetchable but not listable, like the images.
+    // The admin makes it as a WebP of at most 512 pixels a side.
     match /people/{personId}/avatar.webp {
       allow get;
-      allow write: if isOwner();
+      allow create, update: if isOwner()
+        && request.resource.size <= 1024 * 1024
+        && request.resource.contentType == 'image/webp';
+      allow delete: if isOwner();
     }
   }
 }

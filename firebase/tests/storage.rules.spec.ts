@@ -102,8 +102,8 @@ describe.each(OTHERS)('%s', (who) => {
   });
 
   it('cannot upload, replace or delete an avatar', async () => {
-    await assertFails(upload(as[who], 'people/ann/avatar.webp'));
-    await assertFails(upload(as[who], 'people/tigy/avatar.webp'));
+    await assertFails(upload(as[who], 'people/ann/avatar.webp', 'image/webp'));
+    await assertFails(upload(as[who], 'people/tigy/avatar.webp', 'image/webp'));
     await assertFails(storage().ref('people/tigy/avatar.webp').delete());
   });
 });
@@ -151,9 +151,35 @@ describe('owner', () => {
   });
 
   it('uploads, replaces and deletes an avatar, and nothing else under people/', async () => {
-    await assertSucceeds(upload(as.owner, 'people/ann/avatar.webp'));
-    await assertSucceeds(upload(as.owner, 'people/tigy/avatar.webp'));
+    await assertSucceeds(
+      upload(as.owner, 'people/ann/avatar.webp', 'image/webp'),
+    );
+    await assertSucceeds(
+      upload(as.owner, 'people/tigy/avatar.webp', 'image/webp'),
+    );
     await assertSucceeds(storage().ref('people/tigy/avatar.webp').delete());
-    await assertFails(upload(as.owner, 'people/tigy/notes.txt'));
+    await assertFails(upload(as.owner, 'people/tigy/notes.txt', 'image/webp'));
+  });
+
+  it('uploads an avatar only as a WebP of at most 1 MB', async () => {
+    const limit = 1024 * 1024;
+    await assertFails(upload(as.owner, 'people/ann/avatar.webp', 'image/png'));
+    await assertFails(upload(as.owner, 'people/ann/avatar.webp'));
+    await assertSucceeds(
+      upload(
+        as.owner,
+        'people/ann/avatar.webp',
+        'image/webp',
+        new Uint8Array(limit),
+      ),
+    );
+    await assertFails(
+      upload(
+        as.owner,
+        'people/ann/avatar.webp',
+        'image/webp',
+        new Uint8Array(2 * limit),
+      ),
+    );
   });
 });

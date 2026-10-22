@@ -1,7 +1,14 @@
 import { parsePeopleItems, withPeopleEntry } from '@tigy/gallery';
-import { META_PEOPLE_DOC, PEOPLE_COLLECTION, type Person } from '@tigy/models';
+import {
+  META_PEOPLE_DOC,
+  PEOPLE_COLLECTION,
+  personPaths,
+  type Person,
+} from '@tigy/models';
 import { FieldValue, getFirestore } from 'firebase-admin/firestore';
+import { getStorage } from 'firebase-admin/storage';
 import { onDocumentWritten } from 'firebase-functions/firestore';
+import { afterCommit } from '../shared/after-commit';
 
 /**
  * Keeps the person's entry in `meta/people` current after a write. The entry
@@ -27,7 +34,22 @@ export async function syncPerson(personId: string): Promise<void> {
   });
 }
 
+export async function deleteAvatar(personId: string): Promise<void> {
+  await getStorage()
+    .bucket()
+    .file(personPaths.avatar(personId))
+    .delete({ ignoreNotFound: true });
+}
+
 export const onPersonWritten = onDocumentWritten(
-  `${PEOPLE_COLLECTION}/{personId}`,
-  (event) => syncPerson(event.params.personId),
+  { document: `${PEOPLE_COLLECTION}/{personId}`, retry: true },
+  async (event) => {
+    const { personId } = event.params;
+    await syncPerson(personId);
+    if (event.data?.before.exists && !event.data.after.exists) {
+      await afterCommit(`Deleting the avatar of person ${personId}`, () =>
+        deleteAvatar(personId),
+      );
+    }
+  },
 );

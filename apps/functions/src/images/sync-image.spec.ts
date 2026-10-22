@@ -136,3 +136,33 @@ it('warns when meta/gallery passes 70% of the 1 MiB document limit', async () =>
     expect.objectContaining({ bytes: expect.any(Number) }),
   );
 });
+
+function deleted(before: Partial<Image>) {
+  return {
+    params: { imageId: 'k3x' },
+    data: { before: { data: () => before }, after: { data: () => undefined } },
+  } as unknown as Parameters<typeof onImageWritten.run>[0];
+}
+
+it('Deleting an artwork: also removes its upload record and leftover upload files', async () => {
+  await bucket.file('images/k3x/thumb.webp').save('x');
+  await bucket.file('uploads/k3x/source').save('x');
+  await db.doc('uploads/k3x').set({ fileName: 'k3x.png', status: 'ready' });
+  await db.doc('uploads/other').set({ fileName: 'o.png', status: 'ready' });
+  await write('k3x', {});
+
+  await db.doc('images/k3x').delete();
+  await onImageWritten.run(deleted(image()));
+
+  expect((await db.doc('uploads/k3x').get()).exists).toBe(false);
+  expect((await db.doc('uploads/other').get()).exists).toBe(true);
+  const [files] = await bucket.getFiles();
+  expect(files.map((file) => file.name)).toEqual([]);
+});
+
+it('deleting an artwork without an upload record resolves', async () => {
+  await write('k3x', {});
+  await db.doc('images/k3x').delete();
+  await expect(onImageWritten.run(deleted(image()))).resolves.not.toThrow();
+  expect(await rows()).toEqual([]);
+});

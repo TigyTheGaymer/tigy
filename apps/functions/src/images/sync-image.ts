@@ -10,11 +10,14 @@ import {
   META_TAGS_DOC,
   type Image,
   type TagCounts,
+  UPLOADS_COLLECTION,
+  uploadPaths,
 } from '@tigy/models';
 import { FieldValue, getFirestore } from 'firebase-admin/firestore';
 import { getStorage } from 'firebase-admin/storage';
 import { onDocumentWritten } from 'firebase-functions/firestore';
 import * as logger from 'firebase-functions/logger';
+import { afterCommit } from '../shared/after-commit';
 
 /** The size of one Firestore document; `meta/gallery` must stay below it. */
 const DOCUMENT_LIMIT = 1024 * 1024;
@@ -69,20 +72,32 @@ export async function syncImage(
   }
 }
 
-/** Removes every file of a deleted image, so none of them can still be opened. */
+/**
+ * Removes every file of a deleted image, so none of them can still be opened,
+ * and its upload record, so its row leaves the upload list. Deleting the
+ * record also fires `onUploadDeleted`, which finds nothing left to do.
+ */
 export async function deleteImageFiles(imageId: string): Promise<void> {
-  await getStorage()
-    .bucket()
-    .deleteFiles({ prefix: imagePaths.folder(imageId), force: true });
+  const bucket = getStorage().bucket();
+  await bucket.deleteFiles({ prefix: imagePaths.folder(imageId), force: true });
+  await bucket.deleteFiles({
+    prefix: uploadPaths.folder(imageId),
+    force: true,
+  });
+  await getFirestore().collection(UPLOADS_COLLECTION).doc(imageId).delete();
 }
 
 export const onImageWritten = onDocumentWritten(
-  `${IMAGES_COLLECTION}/{imageId}`,
+  { document: `${IMAGES_COLLECTION}/{imageId}`, retry: true },
   async (event) => {
     const { imageId } = event.params;
     const before = event.data?.before.data() as Image | undefined;
     const after = event.data?.after.data() as Image | undefined;
     await syncImage(imageId, before?.tags ?? [], after?.tags ?? []);
-    if (before && !after) await deleteImageFiles(imageId);
+    if (before && !after) {
+      await afterCommit(`Deleting the files of image ${imageId}`, () =>
+        deleteImageFiles(imageId),
+      );
+    }
   },
 );
