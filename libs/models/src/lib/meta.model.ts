@@ -1,7 +1,6 @@
 import type { TimestampLike } from './firestore.model';
 
-// Everything under `meta` is derived from `people` and `images` and written only by Cloud Functions
-// (define-data-model, design D3 and D4).
+// Everything under `meta` is derived from `people` and `images` and written only by Cloud Functions.
 
 export const META_GALLERY_DOC = 'meta/gallery';
 export const META_PEOPLE_DOC = 'meta/people';
