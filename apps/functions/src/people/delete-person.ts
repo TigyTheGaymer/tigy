@@ -11,10 +11,7 @@ export interface CreditingImage {
 export type DeletePersonResult =
   { deleted: true } | { deleted: false; creditedBy: CreditingImage[] };
 
-/**
- * Deletes a person only when no image, published or not, credits them as an
- * artist or a character; otherwise names the images that do (design D8).
- */
+/** Deletes a person only when no image, published or not, credits them; otherwise names the images that do. */
 export async function deletePerson(
   personId: string,
 ): Promise<DeletePersonResult> {

@@ -23,10 +23,7 @@ export interface RebuildResult {
   tags: number;
 }
 
-/**
- * Rewrites `meta/gallery`, `meta/people` and `meta/tags` from every image and
- * person: the recovery path when a summary has drifted (design D4).
- */
+/** Rewrites `meta/gallery`, `meta/people` and `meta/tags` from every image and person, for when a summary has drifted. */
 export async function rebuildSummaries(): Promise<RebuildResult> {
   const db = getFirestore();
   const [imageSnaps, personSnaps] = await Promise.all([

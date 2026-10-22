@@ -24,11 +24,9 @@ const DOCUMENT_LIMIT = 1024 * 1024;
 const WARN_AT = 0.7;
 
 /**
- * Keeps `meta/gallery` and `meta/tags` current after an image is written
- * (design D4). The row comes from the image as it is now, re-read inside the
- * transaction, so events that arrive out of order cannot write a stale row.
- * Tag counts move by the difference between the image's tags before and after
- * this write.
+ * Keeps `meta/gallery` and `meta/tags` current after an image is written. The row comes from the
+ * image as it is now, re-read inside the transaction, so events that arrive out of order cannot
+ * write a stale row. Tag counts move by the difference between the tags before and after.
  */
 export async function syncImage(
   imageId: string,

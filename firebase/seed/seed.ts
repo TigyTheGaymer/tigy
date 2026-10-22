@@ -1,7 +1,5 @@
-// Fills the running emulators with the mockup's content: Tigy, placeholder
-// people and the mockup's pieces, with thumbnails, full images and originals.
-// Run it with `npx nx run firebase:seed` while `npx nx run firebase:emulators`
-// is running. It replaces everything in the emulators.
+// Fills the running emulators with the mockup's content, replacing everything in them.
+// Run `npx nx run firebase:seed` while `npx nx run firebase:emulators` is running.
 
 import {
   buildGalleryItems,

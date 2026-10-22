@@ -1,8 +1,7 @@
 import type { RulesTestEnvironment } from '@firebase/rules-unit-testing';
 import { rulesEnvironment } from './environment';
 
-// The summaries keep every row in one text field (design D3), so a summary
-// must fit in a single document of at most 1 MiB.
+// The summaries keep every row in one text field, so a summary must fit in a document of 1 MiB.
 const ONE_MIB = 1024 * 1024;
 
 let env: RulesTestEnvironment;

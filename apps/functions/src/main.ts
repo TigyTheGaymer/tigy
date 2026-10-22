@@ -5,7 +5,7 @@ import { initializeApp } from 'firebase-admin/app';
 
 initializeApp();
 
-// Keep the derived summaries under meta current (define-data-model, D4).
+// Keep the derived summaries under meta current.
 export { onImageWritten } from './images/sync-image';
 export { onPersonWritten } from './people/sync-person';
 

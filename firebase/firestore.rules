@@ -3,7 +3,7 @@ rules_version = '2';
 // Only the owner may use the database from a browser: the account with the
 // custom claim `owner: true`, which the sign-up blocking function sets. Public
 // pages read through the site's server with the Admin SDK, which these rules
-// do not apply to. See openspec/changes/define-data-model/design.md, D8.
+// do not apply to.
 service cloud.firestore {
   match /databases/{database}/documents {
     function isOwner() {
