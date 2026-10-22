@@ -1,0 +1,41 @@
+{
+  "name": "admin-e2e",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/admin-e2e/src",
+  "tags": ["e2e"],
+  "implicitDependencies": ["admin", "functions", "firebase"],
+  "targets": {
+    "e2e": {
+      "executor": "nx:run-commands",
+      "dependsOn": [
+        {
+          "projects": ["functions"],
+          "target": "build"
+        }
+      ],
+      "cache": true,
+      "parallelism": false,
+      "inputs": [
+        "default",
+        "^production",
+        "{workspaceRoot}/firebase.json",
+        "{workspaceRoot}/firebase/firestore.rules",
+        "{workspaceRoot}/firebase/storage.rules",
+        "{workspaceRoot}/firebase/seed/**/*",
+        "{workspaceRoot}/design/mockups/assets/**/*",
+        {
+          "externalDependencies": ["@playwright/test", "firebase-tools"]
+        }
+      ],
+      "outputs": [
+        "{workspaceRoot}/dist/.playwright/apps/admin-e2e/test-output",
+        "{workspaceRoot}/dist/.playwright/apps/admin-e2e/playwright-report"
+      ],
+      "options": {
+        "command": "firebase emulators:exec --only auth,functions,firestore,storage --project demo-tigy \"playwright test --config apps/admin-e2e/playwright.config.mts\"",
+        "cwd": "{workspaceRoot}"
+      }
+    }
+  }
+}
