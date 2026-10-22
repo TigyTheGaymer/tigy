@@ -63,7 +63,6 @@ test('A person from creation to deletion: links, an avatar from a photo, and ref
   await link(page, 2).getByLabel('Address').press('Tab');
   await page.getByRole('button', { name: 'Move link 2 up' }).click();
 
-  // "Setting an avatar from a photo".
   await page.locator('input[type=file]').setInputFiles({
     name: 'photo.jpg',
     mimeType: 'image/jpeg',

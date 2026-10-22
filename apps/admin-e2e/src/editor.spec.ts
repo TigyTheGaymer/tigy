@@ -68,7 +68,6 @@ test('Publishing a new upload, marking it NSFW, then deleting it from the editor
     .poll(async () => (await readDoc(`images/${id}`))?.['nsfw'])
     .toBe(true);
 
-  // "Deleting from the editor".
   await page.getByRole('button', { name: 'Delete' }).click();
   await page
     .getByRole('alertdialog')

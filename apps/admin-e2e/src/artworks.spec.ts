@@ -115,19 +115,19 @@ test('Uploading from the Artworks page, editing the fresh upload, then deleting 
   await expect(uploads.getByRole('listitem')).toHaveCount(0);
   await expect(tiles(page)).toContainText('Untitled');
 
-  // "Uploading from the Artworks page": the Uploads page lists it.
+  // The Uploads page lists it.
   await page.getByRole('link', { name: 'Uploads' }).first().click();
   const row = page.getByRole('link', { name: 'tigy-chibi.png' });
   await expect(row).toBeVisible();
 
-  // "Editing a fresh upload": the ready row opens the artwork's editor.
+  // The ready row opens the artwork's editor.
   await row.click();
   await expect(page).toHaveURL(/\/artworks\/[A-Za-z0-9]+$/);
   const id = page.url().split('/').pop() ?? '';
   await expect(page.getByRole('img', { name: 'Untitled' })).toBeVisible();
   expect(await readDoc(`uploads/${id}`)).toBeDefined();
 
-  // "Artwork deleted": its row leaves the upload list.
+  // Its row leaves the upload list.
   await page.getByRole('button', { name: 'Delete' }).click();
   await dialog(page).getByRole('button', { name: 'Delete' }).click();
   await expect(page).toHaveURL(/\/artworks$/);
