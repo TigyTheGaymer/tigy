@@ -1,19 +1,5 @@
 import { TestBed } from '@angular/core/testing';
 import { SocialLink } from './social-link';
-import { brandFor } from './brands';
-
-describe('brandFor', () => {
-  it('knows the four networks however they are written', () => {
-    expect(brandFor('bluesky')?.name).toBe('Bluesky');
-    expect(brandFor('Fur Affinity')?.name).toBe('Fur Affinity');
-    expect(brandFor('Telegram')?.name).toBe('Telegram');
-    expect(brandFor('X')?.name).toBe('Twitter');
-  });
-
-  it('has no logo for other networks', () => {
-    expect(brandFor('Mastodon')).toBeUndefined();
-  });
-});
 
 describe('SocialLink', () => {
   function render(network: string) {

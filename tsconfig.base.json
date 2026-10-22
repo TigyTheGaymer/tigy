@@ -33,6 +33,7 @@
       "@spartan-ng/helm/alert-dialog": [
         "./libs/admin-ui/alert-dialog/src/index.ts"
       ],
+      "@tigy/social": ["./libs/social/src/index.ts"],
       "@spartan-ng/helm/input": ["./libs/admin-ui/input/src/index.ts"],
       "@spartan-ng/helm/textarea": ["./libs/admin-ui/textarea/src/index.ts"],
       "@spartan-ng/helm/label": ["./libs/admin-ui/label/src/index.ts"],

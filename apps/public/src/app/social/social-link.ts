@@ -2,7 +2,7 @@ import { Component, computed, input } from '@angular/core';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideLink } from '@ng-icons/lucide';
 import type { SocialLink as Link } from '@tigy/models';
-import { brandFor } from './brands';
+import { brandFor } from '@tigy/social';
 
 @Component({
   selector: 'app-social-link',
