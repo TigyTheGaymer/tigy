@@ -37,7 +37,7 @@ test('Publishing a batch: all five are published and the counts change by five @
   await expectNoSidewaysScroll(page);
 
   await page
-    .getByRole('checkbox', { name: 'Select every artwork in this view' })
+    .getByRole('checkbox', { name: 'Select all', exact: true })
     .click();
   const bar = page.getByRole('toolbar', { name: 'Selected artworks' });
   await expect(bar).toContainText('5 selected');
@@ -65,7 +65,7 @@ test('Publishing a batch with uncredited pieces: asks, and confirming publishes 
   );
   await signInAsOwner(page, '/artworks?view=unpublished');
   await page
-    .getByRole('checkbox', { name: 'Select every artwork in this view' })
+    .getByRole('checkbox', { name: 'Select all', exact: true })
     .click();
   await page
     .getByRole('toolbar', { name: 'Selected artworks' })
