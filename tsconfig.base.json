@@ -32,7 +32,34 @@
       "@spartan-ng/helm/tooltip": ["./libs/admin-ui/tooltip/src/index.ts"],
       "@spartan-ng/helm/alert-dialog": [
         "./libs/admin-ui/alert-dialog/src/index.ts"
-      ]
+      ],
+      "@spartan-ng/helm/input": ["./libs/admin-ui/input/src/index.ts"],
+      "@spartan-ng/helm/textarea": ["./libs/admin-ui/textarea/src/index.ts"],
+      "@spartan-ng/helm/label": ["./libs/admin-ui/label/src/index.ts"],
+      "@spartan-ng/helm/field": ["./libs/admin-ui/field/src/index.ts"],
+      "@spartan-ng/helm/separator": ["./libs/admin-ui/separator/src/index.ts"],
+      "@spartan-ng/helm/switch": ["./libs/admin-ui/switch/src/index.ts"],
+      "@spartan-ng/helm/checkbox": ["./libs/admin-ui/checkbox/src/index.ts"],
+      "@spartan-ng/helm/combobox": ["./libs/admin-ui/combobox/src/index.ts"],
+      "@spartan-ng/helm/input-group": [
+        "./libs/admin-ui/input-group/src/index.ts"
+      ],
+      "@spartan-ng/helm/autocomplete": [
+        "./libs/admin-ui/autocomplete/src/index.ts"
+      ],
+      "@spartan-ng/helm/popover": ["./libs/admin-ui/popover/src/index.ts"],
+      "@spartan-ng/helm/select": ["./libs/admin-ui/select/src/index.ts"],
+      "@spartan-ng/helm/table": ["./libs/admin-ui/table/src/index.ts"],
+      "@spartan-ng/helm/tabs": ["./libs/admin-ui/tabs/src/index.ts"],
+      "@spartan-ng/helm/dialog": ["./libs/admin-ui/dialog/src/index.ts"],
+      "@spartan-ng/helm/sheet": ["./libs/admin-ui/sheet/src/index.ts"],
+      "@spartan-ng/helm/kbd": ["./libs/admin-ui/kbd/src/index.ts"],
+      "@spartan-ng/helm/skeleton": ["./libs/admin-ui/skeleton/src/index.ts"],
+      "@spartan-ng/helm/slider": ["./libs/admin-ui/slider/src/index.ts"],
+      "@spartan-ng/helm/toggle-group": [
+        "./libs/admin-ui/toggle-group/src/index.ts"
+      ],
+      "@spartan-ng/helm/toggle": ["./libs/admin-ui/toggle/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
