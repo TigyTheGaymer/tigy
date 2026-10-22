@@ -1,8 +1,7 @@
 import type { GalleryOverview } from '@tigy/gallery';
 import type { GalleryRow, ImageFile, SocialLink } from '@tigy/models';
 
-// The JSON the server's data endpoints return, shared by the Express server
-// and the Angular services that call it.
+// The JSON the data endpoints return, shared by the Express server and the Angular services.
 
 /** `GET /api/gallery`: one page of the filtered, sorted gallery. */
 export interface GalleryResponse {

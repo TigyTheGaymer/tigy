@@ -18,10 +18,9 @@ interface Entry {
 }
 
 /**
- * Keeps the parsed `meta/gallery` and `meta/people` in memory for at most
- * `maxAgeMs` (design D5), so later pages and filter changes cost no Firestore
- * reads. Each summary is read only when first asked for; requests that arrive
- * while it loads share that one read, and a failed read is not kept.
+ * Keeps the parsed `meta/gallery` and `meta/people` in memory for at most `maxAgeMs`, so later
+ * pages and filter changes cost no Firestore reads. Each summary is read when first asked for;
+ * requests that arrive while it loads share that read, and a failed read is not kept.
  */
 export class SummaryCache {
   private readonly entries = new Map<string, Entry>();

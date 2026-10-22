@@ -58,7 +58,6 @@ type QueryParam = string | string[] | undefined;
   styleUrl: './home.css',
 })
 export class HomePage {
-  // Bound from the query string by the router.
   readonly character = input<QueryParam>();
   readonly artist = input<QueryParam>();
   readonly tag = input<QueryParam>();

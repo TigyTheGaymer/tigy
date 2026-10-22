@@ -11,8 +11,8 @@ export interface GalleryPlace {
 }
 
 /**
- * Where to go back to: the place (loaded pages) lives in memory, so a reload starts fresh, and the
- * router restores the scroll position itself. The address lives in session storage, per tab.
+ * Where to go back to: the loaded pages live in memory, so a reload starts fresh; the address lives
+ * in session storage, per tab. The router restores the scroll position itself.
  */
 @Service()
 export class GalleryPlaceService {

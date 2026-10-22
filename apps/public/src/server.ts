@@ -28,18 +28,12 @@ const catalog = firestoreCatalog();
 // So req.protocol and req.host give the public address behind App Hosting's proxy.
 app.set('trust proxy', true);
 
-/**
- * The data endpoints the pages read, during server rendering and in the
- * browser (define-data-model, design D5 to D7).
- */
+/** The data endpoints the pages read, during server rendering and in the browser. */
 app.use('/api', apiRouter(catalog));
 
 app.use(crawlingRouter(catalog.summaries));
 app.use(filesRouter(storageFiles(), catalog.summaries));
 
-/**
- * Serve static files from /browser
- */
 app.use(
   express.static(browserDistFolder, {
     maxAge: '1y',
@@ -48,9 +42,6 @@ app.use(
   }),
 );
 
-/**
- * Handle all other requests by rendering the Angular application.
- */
 app.use((req, res, next) => {
   const context: RenderContext = {
     apiOrigin: `http://localhost:${req.socket.localPort}`,
@@ -63,10 +54,7 @@ app.use((req, res, next) => {
     .catch(next);
 });
 
-/**
- * Start the server if this module is the main entry point, or it is ran via PM2.
- * The server listens on the port defined by the `PORT` environment variable, or defaults to 4000.
- */
+/** Starts the server when this module is the entry point or runs via PM2, on `PORT` or 4000. */
 if (isMainModule(import.meta.url) || process.env['pm_id']) {
   const port = process.env['PORT'] || 4000;
   app.listen(port, (error) => {
@@ -78,7 +66,5 @@ if (isMainModule(import.meta.url) || process.env['pm_id']) {
   });
 }
 
-/**
- * Request handler used by the Angular CLI (for dev-server and during build) or Firebase Cloud Functions.
- */
+/** The request handler the Angular CLI (dev server and build) and Cloud Functions use. */
 export const reqHandler = createNodeRequestHandler(app);

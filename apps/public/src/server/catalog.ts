@@ -20,7 +20,7 @@ export interface Catalog {
   people(ids: readonly string[]): Promise<Map<string, WithId<Person>>>;
 }
 
-/** The security rules do not apply to the Admin SDK (define-data-model, D8). */
+/** The security rules do not apply to the Admin SDK. */
 function firebaseApp(): App {
   return getApps().length ? getApp() : initializeApp();
 }

@@ -69,7 +69,6 @@ export function yearPositions(years: readonly YearMark[]): YearPosition[] {
 export class TailTimeline {
   /** Matching pieces per year, in gallery order. */
   readonly years = input.required<readonly YearMark[]>();
-  /** How many pieces are loaded so far. */
   readonly loaded = input.required<number>();
   /** The index of the piece to bring into view. */
   readonly travel = output<number>();

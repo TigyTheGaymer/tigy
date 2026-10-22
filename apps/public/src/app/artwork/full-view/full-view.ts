@@ -103,10 +103,7 @@ export class FullView {
     this.apply(true);
   }
 
-  /**
-   * The browser closes the dialog first (Escape or the close button), which returns focus to
-   * whatever opened it; only then does the page remove it.
-   */
+  /** The browser closes the dialog first (Escape, close button) and returns focus; only then does the page remove it. */
   protected onClosed(): void {
     if (!this.isDestroyed) this.closed.emit();
   }

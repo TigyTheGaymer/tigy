@@ -32,9 +32,8 @@ import { CDN_CACHE_CONTROL } from './cache-control';
 import type { Catalog } from './catalog';
 
 /**
- * The data endpoints the pages read (design D5 and D6). Every response may be
- * cached by the CDN per URL, and none is indexed by search engines. The NSFW
- * flag (`nsfw=1`) is the only way to receive NSFW rows.
+ * The data endpoints the pages read. Every response may be cached by the CDN per URL, and none is
+ * indexed by search engines. The NSFW flag (`nsfw=1`) is the only way to receive NSFW rows.
  */
 export function apiRouter(catalog: Catalog): Router {
   const router = Router();
