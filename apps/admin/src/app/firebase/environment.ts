@@ -10,4 +10,5 @@ export const environment: FirebaseEnvironment = {
     messagingSenderId: '418667371179',
     appId: '1:418667371179:web:64f053d71a27f1eb06b5ee',
   },
+  publicSite: 'https://public--tigy-165cc.europe-west4.hosted.app',
 };

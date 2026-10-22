@@ -1,11 +1,5 @@
-import {
-  Component,
-  computed,
-  inject,
-  input,
-  output,
-  resource,
-} from '@angular/core';
+import { Component, computed, input, output } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideImage, lucideTrash2 } from '@ng-icons/lucide';
 import { HlmAlertDialogImports } from '@spartan-ng/helm/alert-dialog';
@@ -15,15 +9,16 @@ import { HlmProgressImports } from '@spartan-ng/helm/progress';
 import { HlmSpinnerImports } from '@spartan-ng/helm/spinner';
 import { HlmTooltipImports } from '@spartan-ng/helm/tooltip';
 import { fileSize, formatName } from '@tigy/gallery';
+import { imagePaths } from '@tigy/models';
+import { storageUrl } from '../../firebase/storage-url';
 import {
   isClearable,
   type UploadListStatus,
   type FailureReason,
   type UploadListItem,
 } from '../upload-list';
-import { UploadsService } from '../uploads.service';
 
-const FAILURE_MESSAGES: Record<FailureReason, string> = {
+export const FAILURE_MESSAGES: Record<FailureReason, string> = {
   unsupported: 'Only JPEG, PNG, GIF and WebP are supported.',
   damaged: 'The file is damaged. Export it again and upload the new file.',
   'too-large':
@@ -57,13 +52,12 @@ const BADGE_VARIANTS: Record<UploadListStatus, BadgeVariants['variant']> = {
     HlmSpinnerImports,
     HlmTooltipImports,
     NgIcon,
+    RouterLink,
   ],
   providers: [provideIcons({ lucideImage, lucideTrash2 })],
   templateUrl: './upload-row.html',
 })
 export class UploadRow {
-  private readonly uploads = inject(UploadsService);
-
   readonly row = input.required<UploadListItem>();
   readonly clear = output<void>();
 
@@ -85,8 +79,9 @@ export class UploadRow {
     return `${formatName(file.mime)}${animated}, ${file.w} × ${file.h}, ${fileSize(file.bytes)}`;
   });
   protected readonly isClearable = computed(() => isClearable(this.row()));
-  protected readonly thumbnail = resource({
-    params: () => (this.row().status === 'ready' ? this.row().id : undefined),
-    loader: ({ params }) => this.uploads.thumbnailUrl(params),
-  });
+  protected readonly thumbnail = computed(() =>
+    this.row().status === 'ready'
+      ? storageUrl(imagePaths.thumb(this.row().id))
+      : null,
+  );
 }

@@ -10,4 +10,6 @@ export const environment: FirebaseEnvironment = {
     appId: 'demo-app',
   },
   emulatorHost: '127.0.0.1',
+  // public-e2e:preview serves the public site against the same emulators.
+  publicSite: 'http://localhost:4300',
 };

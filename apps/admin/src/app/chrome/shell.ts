@@ -7,7 +7,7 @@ import { TopBar } from './top-bar';
   imports: [RouterOutlet, TopBar],
   template: `
     <app-top-bar />
-    <main class="mx-auto w-full max-w-5xl p-4">
+    <main class="mx-auto w-full max-w-6xl p-4">
       <router-outlet />
     </main>
   `,

@@ -1,0 +1,36 @@
+<div class="grid justify-items-center gap-3">
+  <div
+    class="bg-muted relative cursor-grab touch-none overflow-hidden rounded-full select-none [clip-path:circle(50%)] active:cursor-grabbing"
+    [style.width.px]="frame"
+    [style.height.px]="frame"
+    role="img"
+    aria-label="Avatar crop: drag to move, pinch or scroll to zoom"
+    (pointerdown)="onPointerDown($event)"
+    (pointermove)="onPointerMove($event)"
+    (pointerup)="onPointerUp($event)"
+    (pointercancel)="onPointerUp($event)"
+    (wheel)="onWheel($event)"
+  >
+    <img
+      [src]="picture().url"
+      alt=""
+      draggable="false"
+      class="pointer-events-none absolute top-0 left-0 max-w-none origin-top-left"
+      [style.width.px]="picture().width"
+      [style.height.px]="picture().height"
+      [style.transform]="transform()"
+    />
+  </div>
+  <label class="flex w-full max-w-72 items-center gap-2 text-sm">
+    Zoom
+    <input
+      type="range"
+      class="accent-primary flex-1"
+      min="1"
+      [max]="maxZoom"
+      step="0.01"
+      [value]="crop().zoom"
+      (input)="setZoom(+$any($event.target).value)"
+    />
+  </label>
+</div>

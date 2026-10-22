@@ -1,0 +1,91 @@
+<app-page-header heading="People" />
+
+<div class="mb-4 grid gap-3 md:grid-cols-2">
+  <div class="relative">
+    <ng-icon
+      name="lucideSearch"
+      class="text-muted-foreground absolute top-1/2 left-2.5 -translate-y-1/2"
+    />
+    <input
+      hlmInput
+      type="search"
+      class="w-full pl-8"
+      placeholder="Search names"
+      aria-label="Search names"
+      [value]="search()"
+      (input)="setSearch($any($event.target).value)"
+    />
+  </div>
+  <form
+    class="grid gap-1"
+    aria-label="New person"
+    (submit)="$event.preventDefault(); create()"
+  >
+    <div class="flex gap-2">
+      <input
+        hlmInput
+        class="flex-1"
+        placeholder="New person's name"
+        aria-label="New person's name"
+        [attr.aria-invalid]="nameError() ? true : null"
+        [value]="newName()"
+        (input)="newName.set($any($event.target).value); nameError.set(null)"
+      />
+      <button hlmBtn type="submit" [disabled]="isCreating()">
+        <ng-icon name="lucidePlus" />
+        Create
+      </button>
+    </div>
+    @if (nameError(); as message) {
+      <p role="alert" class="text-destructive text-sm">{{ message }}</p>
+    }
+  </form>
+</div>
+
+@if (error()) {
+  <p role="alert" class="text-destructive text-sm">
+    The people couldn't load. Reload the page to try again.
+  </p>
+} @else if (isLoading()) {
+  <div class="grid gap-2">
+    @for (i of [1, 2, 3]; track i) {
+      <div hlmSkeleton class="h-12 rounded-md"></div>
+    }
+  </div>
+} @else if (rows().length) {
+  <ul aria-label="People" class="divide-y rounded-md border">
+    @for (row of rows(); track row.id) {
+      <li>
+        <a
+          class="hover:bg-muted/50 flex items-center gap-3 px-3 py-2"
+          [routerLink]="['/people', row.id]"
+        >
+          <hlm-avatar>
+            @if (row.avatar; as src) {
+              <img hlmAvatarImage [src]="src" alt="" />
+            }
+            <span hlmAvatarFallback>{{
+              row.name.charAt(0).toUpperCase()
+            }}</span>
+          </hlm-avatar>
+          <span class="min-w-0 flex-1 truncate font-medium">{{
+            row.name
+          }}</span>
+          @if (row.isTigy) {
+            <span hlmBadge variant="secondary">The site's own person</span>
+          }
+          <span class="text-muted-foreground text-sm tabular-nums">
+            {{ row.credits }} {{ row.credits === 1 ? 'artwork' : 'artworks' }}
+          </span>
+        </a>
+      </li>
+    }
+  </ul>
+} @else {
+  <div hlmEmpty>
+    <div hlmEmptyHeader>
+      <div hlmEmptyMedia variant="icon"><ng-icon name="lucideUsers" /></div>
+      <div hlmEmptyTitle>No one matches</div>
+    </div>
+  </div>
+}

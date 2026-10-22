@@ -1,13 +1,9 @@
-import {
-  computed,
-  DOCUMENT,
-  effect,
-  inject,
-  Service,
-  signal,
-} from '@angular/core';
+import { computed, inject, Service, signal } from '@angular/core';
+import { toast } from '@spartan-ng/brain/sonner';
 import { uploadPaths } from '@tigy/models';
 import { IMAGE_FORMATS, type ImageFormat } from '@tigy/uploads';
+import { warnBeforeLeaving } from '../shared/leave-warning';
+import { checkFile, REFUSAL_MESSAGES } from './check-file';
 import { UPLOADS_API } from './uploads-api';
 
 export const MAX_PARALLEL_UPLOADS = 3;
@@ -31,7 +27,6 @@ export interface FileToUpload {
 @Service()
 export class UploadService {
   private readonly api = inject(UPLOADS_API);
-  private readonly view = inject(DOCUMENT).defaultView;
   private readonly uploads = signal<LocalUpload[]>([]);
   private readonly waiting = new Map<string, FileToUpload>();
 
@@ -44,14 +39,21 @@ export class UploadService {
   );
 
   constructor() {
-    effect((onCleanup) => {
-      const view = this.view;
-      if (!view || this.activeCount() === 0) return;
-      // The browser shows its own "Leave site?" dialog.
-      const warn = (event: BeforeUnloadEvent) => event.preventDefault();
-      view.addEventListener('beforeunload', warn);
-      onCleanup(() => view.removeEventListener('beforeunload', warn));
-    });
+    warnBeforeLeaving(() => this.activeCount() > 0);
+  }
+
+  /** Checks each file as processing would, says why any is refused, and uploads the rest. */
+  async add(files: readonly File[]): Promise<void> {
+    const accepted: FileToUpload[] = [];
+    for (const file of files) {
+      const check = await checkFile(file);
+      if ('format' in check) accepted.push({ file, format: check.format });
+      else
+        toast.error(`${file.name} wasn't uploaded`, {
+          description: REFUSAL_MESSAGES[check.refusal],
+        });
+    }
+    this.start(accepted);
   }
 
   start(files: readonly FileToUpload[]): void {

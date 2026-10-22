@@ -1,0 +1,118 @@
+@if (person(); as current) {
+  <form
+    class="grid gap-5"
+    aria-label="Person details"
+    (submit)="$event.preventDefault(); save()"
+  >
+    <section class="grid gap-3" aria-label="Avatar">
+      <span class="text-sm font-medium">Avatar</span>
+      <input
+        #picker
+        type="file"
+        hidden
+        accept="image/jpeg,image/png,image/gif,image/webp"
+        (change)="pick($event)"
+      />
+      @if (cropping(); as picture) {
+        <app-avatar-cropper [picture]="picture" [(crop)]="crop" />
+        <div class="flex flex-wrap justify-center gap-2">
+          <button
+            hlmBtn
+            type="button"
+            variant="outline"
+            size="sm"
+            (click)="picker.click()"
+          >
+            <ng-icon name="lucideImageUp" />
+            Choose another picture
+          </button>
+          <button
+            hlmBtn
+            type="button"
+            variant="ghost"
+            size="sm"
+            (click)="keepAvatar()"
+          >
+            {{ current.avatar ? 'Keep the current avatar' : 'Cancel' }}
+          </button>
+        </div>
+      } @else {
+        <div class="flex flex-wrap items-center gap-3">
+          <hlm-avatar size="lg">
+            @if (avatarChange().kind !== 'remove' && currentAvatar(); as src) {
+              <img hlmAvatarImage [src]="src" alt="" />
+            }
+            <span hlmAvatarFallback>{{
+              current.name.charAt(0).toUpperCase()
+            }}</span>
+          </hlm-avatar>
+          <button
+            hlmBtn
+            type="button"
+            variant="outline"
+            size="sm"
+            (click)="picker.click()"
+          >
+            <ng-icon name="lucideImageUp" />
+            {{ current.avatar ? 'Replace' : 'Choose a picture' }}
+          </button>
+          @if (current.avatar && avatarChange().kind !== 'remove') {
+            <button
+              hlmBtn
+              type="button"
+              variant="ghost"
+              size="sm"
+              (click)="removeAvatar()"
+            >
+              <ng-icon name="lucideTrash2" />
+              Remove
+            </button>
+          }
+          @if (avatarChange().kind === 'remove') {
+            <span class="text-muted-foreground text-sm">
+              Removed when you save.
+              <button type="button" class="underline" (click)="keepAvatar()">
+                Undo
+              </button>
+            </span>
+          }
+        </div>
+      }
+    </section>
+
+    <div class="grid gap-2">
+      <label class="flex items-center gap-2 text-sm font-medium" for="name">
+        Name
+        @if (isTigy()) {
+          <span hlmBadge variant="secondary">The site's own person</span>
+        }
+      </label>
+      <input hlmInput id="name" [formField]="form.name" />
+      @if (form.name().touched() && form.name().errors().length) {
+        <p role="alert" class="text-destructive text-sm">
+          {{ form.name().errors()[0].message }}
+        </p>
+      }
+    </div>
+
+    <app-links-editor
+      [links]="model().links"
+      (linksChange)="setLinks($event)"
+      [fields]="form.links"
+    />
+
+    <!-- Stays in view while the form scrolls, in the panel as on the page. -->
+    <div
+      class="sticky bottom-0 flex flex-wrap items-center gap-2 border-t py-3"
+      [class.bg-popover]="isInPanel()"
+      [class.bg-background]="!isInPanel()"
+    >
+      <ng-content />
+      <button hlmBtn type="submit" class="ml-auto" [disabled]="isSaving()">
+        Save
+      </button>
+    </div>
+  </form>
+} @else {
+  <p class="text-muted-foreground text-sm">This person was not found.</p>
+}

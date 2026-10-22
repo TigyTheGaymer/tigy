@@ -1,0 +1,126 @@
+<fieldset class="@container grid gap-2">
+  <legend class="mb-2 text-sm font-medium">Links</legend>
+
+  @if (fields().length) {
+    <!-- Column names once, for the one-row layout. -->
+    <div
+      aria-hidden="true"
+      class="text-muted-foreground hidden gap-2 px-2 text-xs font-medium @xl:grid @xl:grid-cols-[11rem_minmax(0,1fr)_minmax(0,1.6fr)_6.5rem]"
+    >
+      <span>Network</span><span>Handle</span><span>Address</span>
+    </div>
+  }
+
+  @for (link of fields(); track $index; let i = $index, last = $last) {
+    <div
+      role="group"
+      [attr.aria-label]="'Link ' + (i + 1)"
+      class="grid grid-cols-2 items-start gap-2 rounded-md border p-2 @xl:grid-cols-[11rem_minmax(0,1fr)_minmax(0,1.6fr)_6.5rem]"
+    >
+      <div class="grid min-w-0 gap-2">
+        <div class="flex min-w-0 items-center gap-2">
+          <span
+            class="text-muted-foreground grid size-5 shrink-0 place-items-center"
+            aria-hidden="true"
+          >
+            @if (brandOf(link.network().value()); as brand) {
+              <svg viewBox="0 0 24 24" class="size-4 fill-current">
+                <path [attr.d]="brand.path" />
+              </svg>
+            } @else {
+              <ng-icon name="lucideLink" />
+            }
+          </span>
+          <select
+            class="border-input dark:bg-input/30 focus-visible:border-ring focus-visible:ring-ring/50 [&>option]:bg-popover [&>option]:text-popover-foreground h-9 min-w-0 flex-1 rounded-md border bg-transparent px-2 text-sm outline-none focus-visible:ring-3"
+            aria-label="Network"
+            (change)="pick(i, $any($event.target).value)"
+          >
+            <!-- [selected] per option: a [value] on the select runs before the options exist. -->
+            <option value="" disabled [selected]="choiceOf(i) === ''">
+              Network
+            </option>
+            @for (network of networks; track network) {
+              <option [value]="network" [selected]="choiceOf(i) === network">
+                {{ network }}
+              </option>
+            }
+            <option [value]="other" [selected]="choiceOf(i) === other">
+              Something else…
+            </option>
+          </select>
+        </div>
+        @if (choiceOf(i) === other) {
+          <input
+            hlmInput
+            aria-label="Network name"
+            placeholder="Network name"
+            [formField]="link.network"
+          />
+        }
+      </div>
+      <input
+        hlmInput
+        aria-label="Handle"
+        placeholder="Handle"
+        [formField]="link.handle"
+      />
+      <input
+        hlmInput
+        inputmode="url"
+        class="col-span-2 @xl:col-span-1"
+        aria-label="Address"
+        placeholder="https://…"
+        [formField]="link.url"
+        (change)="fillFromAddress(i, $any($event.target).value)"
+        (input)="onAddressInput($event, i)"
+      />
+      <div class="col-span-2 flex justify-end @xl:col-span-1">
+        <button
+          hlmBtn
+          type="button"
+          variant="ghost"
+          size="icon-sm"
+          [attr.aria-label]="'Move link ' + (i + 1) + ' up'"
+          [disabled]="i === 0"
+          (click)="move(i, -1)"
+        >
+          <ng-icon name="lucideArrowUp" />
+        </button>
+        <button
+          hlmBtn
+          type="button"
+          variant="ghost"
+          size="icon-sm"
+          [attr.aria-label]="'Move link ' + (i + 1) + ' down'"
+          [disabled]="last"
+          (click)="move(i, 1)"
+        >
+          <ng-icon name="lucideArrowDown" />
+        </button>
+        <button
+          hlmBtn
+          type="button"
+          variant="ghost"
+          size="icon-sm"
+          [attr.aria-label]="'Remove link ' + (i + 1)"
+          (click)="remove(i)"
+        >
+          <ng-icon name="lucideX" />
+        </button>
+      </div>
+      @for (field of [link.network, link.handle, link.url]; track $index) {
+        @if (field().touched() && field().errors().length) {
+          <p role="alert" class="text-destructive col-span-full text-sm">
+            {{ field().errors()[0].message }}
+          </p>
+        }
+      }
+    </div>
+  }
+
+  <button hlmBtn type="button" variant="outline" class="w-fit" (click)="add()">
+    <ng-icon name="lucidePlus" />
+    Add a link
+  </button>
+</fieldset>

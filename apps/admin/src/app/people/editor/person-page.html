@@ -1,0 +1,51 @@
+<app-page-header
+  [heading]="heading()"
+  back="/people"
+  backLabel="Back to the people"
+/>
+
+@if (person(); as current) {
+  <div class="max-w-2xl">
+    <app-person-editor [personId]="current.id">
+      @if (!isTigy()) {
+        <button
+          hlmBtn
+          type="button"
+          variant="ghost"
+          class="text-destructive"
+          [disabled]="isDeleting()"
+          (click)="delete()"
+        >
+          <ng-icon name="lucideTrash2" />
+          Delete
+        </button>
+      }
+    </app-person-editor>
+
+    @if (creditedBy(); as artworks) {
+      <div role="alert" class="border-destructive mt-4 rounded-md border p-3">
+        <p class="text-sm font-medium">
+          {{ current.name }} can't be deleted while artworks credit them:
+        </p>
+        <ul class="mt-2 list-disc pl-5 text-sm">
+          @for (artwork of artworks; track artwork.id) {
+            <li>
+              <a class="underline" [routerLink]="['/artworks', artwork.id]">{{
+                artwork.title || 'Untitled (' + artwork.id + ')'
+              }}</a>
+            </li>
+          }
+        </ul>
+      </div>
+    }
+  </div>
+} @else if (!isLoading()) {
+  <div hlmEmpty>
+    <div hlmEmptyHeader>
+      <div hlmEmptyDescription>
+        They may have been deleted.
+        <a routerLink="/people" class="underline">Back to the people</a>
+      </div>
+    </div>
+  </div>
+}

@@ -1,5 +1,42 @@
-<header class="flex items-center justify-between border-b px-4 py-2">
+<header class="flex items-center gap-2 border-b px-4 py-2">
+  <button
+    hlmBtn
+    variant="ghost"
+    size="icon"
+    class="md:hidden"
+    [hlmDropdownMenuTrigger]="pages"
+    aria-label="Pages"
+  >
+    <ng-icon name="lucideMenu" />
+  </button>
   <span class="font-semibold">Tigy admin</span>
+
+  <nav aria-label="Admin pages" class="ml-4 hidden gap-1 md:flex">
+    @for (page of pageLinks; track page.path) {
+      <a
+        hlmBtn
+        variant="ghost"
+        size="sm"
+        [routerLink]="page.path"
+        routerLinkActive="bg-muted"
+        ariaCurrentWhenActive="page"
+        >{{ page.label }}</a
+      >
+    }
+  </nav>
+
+  <button
+    hlmBtn
+    variant="ghost"
+    size="icon"
+    class="ml-auto"
+    [hlmDropdownMenuTrigger]="tools"
+    align="end"
+    aria-label="Site tools"
+    hlmTooltip="Site tools"
+  >
+    <ng-icon name="lucideWrench" />
+  </button>
   <button
     hlmBtn
     variant="ghost"
@@ -17,6 +54,45 @@
   </button>
 </header>
 
+<ng-template #pages>
+  <hlm-dropdown-menu class="w-48">
+    @for (page of pageLinks; track page.path) {
+      <a
+        hlmDropdownMenuItem
+        [routerLink]="page.path"
+        routerLinkActive="bg-accent"
+        ariaCurrentWhenActive="page"
+        >{{ page.label }}</a
+      >
+    }
+  </hlm-dropdown-menu>
+</ng-template>
+
+<ng-template #tools>
+  <hlm-dropdown-menu class="w-64">
+    <hlm-dropdown-menu-label>Site tools</hlm-dropdown-menu-label>
+    <a hlmDropdownMenuItem [href]="publicSite" target="_blank">
+      <ng-icon name="lucideExternalLink" />
+      View public site
+    </a>
+    <hlm-dropdown-menu-separator />
+    <button
+      hlmDropdownMenuItem
+      class="h-auto items-start text-left"
+      [disabled]="isRebuilding()"
+      (triggered)="rebuildSummaries()"
+    >
+      <ng-icon name="lucideRefreshCw" class="mt-0.5" />
+      <span class="grid justify-items-start gap-0.5">
+        Rebuild summaries
+        <span class="text-muted-foreground text-xs">
+          Only if the public site is out of step with the artworks.
+        </span>
+      </span>
+    </button>
+  </hlm-dropdown-menu>
+</ng-template>
+
 <ng-template #account>
   <hlm-dropdown-menu class="w-56">
     <hlm-dropdown-menu-label>
@@ -27,6 +103,24 @@
         {{ user()?.email }}
       </span>
     </hlm-dropdown-menu-label>
+    <hlm-dropdown-menu-separator />
+    <hlm-dropdown-menu-label class="text-muted-foreground text-xs font-normal">
+      Theme
+    </hlm-dropdown-menu-label>
+    @for (option of themes; track option.value) {
+      <button
+        hlmDropdownMenuItem
+        role="menuitemradio"
+        [attr.aria-checked]="theme.choice() === option.value"
+        (triggered)="theme.choose(option.value)"
+      >
+        <ng-icon [name]="option.icon" />
+        {{ option.label }}
+        @if (theme.choice() === option.value) {
+          <ng-icon name="lucideCheck" class="ml-auto" />
+        }
+      </button>
+    }
     <hlm-dropdown-menu-separator />
     <button hlmDropdownMenuItem (triggered)="signOut()">
       <ng-icon name="lucideLogOut" />

@@ -50,8 +50,4 @@ export class UploadsService {
     await this.api.deleteRecord(id);
     this.upload.forget(id);
   }
-
-  thumbnailUrl(id: string): Promise<string> {
-    return this.api.thumbnailUrl(id);
-  }
 }

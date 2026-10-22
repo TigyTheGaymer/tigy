@@ -1,4 +1,4 @@
-export const HOME = '/uploads';
+export const HOME = '/artworks';
 
 /** Only a path inside the admin, never another site. */
 export function nextPath(next: string | null | undefined): string {

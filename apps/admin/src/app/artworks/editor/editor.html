@@ -1,0 +1,320 @@
+<app-page-header
+  [heading]="heading()"
+  back="/artworks"
+  [backParams]="params()"
+  backLabel="Back to the artworks"
+>
+  @if (isDirty()) {
+    <span pageSubtitle hlmBadge variant="outline" role="status"
+      >Unsaved edits</span
+    >
+  }
+  @if (artwork()) {
+    <button
+      hlmBtn
+      variant="outline"
+      size="icon"
+      aria-label="Previous artwork"
+      aria-keyshortcuts="Alt+ArrowLeft"
+      [hlmTooltip]="previousTip"
+      [disabled]="!previous()"
+      (click)="go(previous())"
+    >
+      <ng-icon name="lucideChevronLeft" />
+    </button>
+    @if (next()) {
+      <button
+        hlmBtn
+        variant="outline"
+        size="icon"
+        aria-label="Next artwork"
+        aria-keyshortcuts="Alt+ArrowRight"
+        [hlmTooltip]="nextTip"
+        (click)="go(next())"
+      >
+        <ng-icon name="lucideChevronRight" />
+      </button>
+    }
+  }
+</app-page-header>
+
+@if (artwork(); as piece) {
+  <div class="grid gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+    <section class="grid content-start gap-3" aria-label="Picture">
+      <img
+        [src]="fullImage()"
+        [alt]="title()"
+        class="bg-muted max-h-[35dvh] w-full rounded-lg object-contain md:max-h-[70dvh]"
+      />
+      <div class="flex flex-wrap gap-2">
+        <button
+          hlmBtn
+          type="button"
+          variant="outline"
+          size="sm"
+          class="md:hidden"
+          aria-controls="file-info"
+          [attr.aria-expanded]="isFileInfoShown()"
+          (click)="isFileInfoShown.set(!isFileInfoShown())"
+        >
+          <ng-icon
+            name="lucideChevronDown"
+            class="transition-transform"
+            [class.rotate-180]="isFileInfoShown()"
+          />
+          File info
+        </button>
+        <a
+          hlmBtn
+          variant="outline"
+          size="sm"
+          [href]="original()"
+          target="_blank"
+        >
+          <ng-icon name="lucideExternalLink" />
+          Original file
+        </a>
+        @if (piece.published) {
+          <a
+            hlmBtn
+            variant="outline"
+            size="sm"
+            [href]="publicPage()"
+            target="_blank"
+          >
+            <ng-icon name="lucideExternalLink" />
+            Public page
+          </a>
+        }
+      </div>
+      <!-- Folded away on a phone, where the form matters more. -->
+      <dl
+        id="file-info"
+        class="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm max-md:data-[shown=false]:hidden"
+        [attr.data-shown]="isFileInfoShown()"
+      >
+        @for (detail of fileDetails(); track detail[0]) {
+          <dt class="text-muted-foreground">{{ detail[0] }}</dt>
+          <dd>{{ detail[1] }}</dd>
+        }
+        <dt class="text-muted-foreground">Added</dt>
+        <dd>{{ added() }}</dd>
+      </dl>
+    </section>
+
+    <form
+      class="grid content-start gap-5 max-md:pb-20"
+      aria-label="Artwork details"
+      (submit)="$event.preventDefault(); save()"
+    >
+      @if (gaps().length) {
+        <div
+          role="group"
+          aria-label="Missing details"
+          class="flex flex-wrap items-center gap-2"
+        >
+          @for (gap of gaps(); track gap) {
+            <button
+              type="button"
+              class="focus-visible:ring-ring/50 rounded-md outline-none focus-visible:ring-3"
+              [attr.aria-label]="gapLabels[gap] + ': go to the field'"
+              (click)="focusGap(gap)"
+            >
+              <app-warning-badge>{{ gapLabels[gap] }}</app-warning-badge>
+            </button>
+          }
+        </div>
+      }
+
+      <div class="grid gap-2">
+        <label class="text-sm font-medium" for="title">Title</label>
+        <input hlmInput id="title" [formField]="form.title" />
+      </div>
+
+      <div class="grid gap-2">
+        <label class="text-sm font-medium" for="description">Description</label>
+        <textarea
+          hlmTextarea
+          id="description"
+          rows="3"
+          [formField]="form.description"
+        ></textarea>
+      </div>
+
+      <fieldset class="grid gap-2">
+        <legend class="mb-2 text-sm font-medium">Date</legend>
+        <div class="grid grid-cols-3 gap-2 sm:max-w-sm">
+          <label class="grid gap-1">
+            <span class="text-muted-foreground text-xs">Year</span>
+            <input
+              hlmInput
+              id="year"
+              inputmode="numeric"
+              aria-label="Year"
+              placeholder="Year"
+              [attr.aria-invalid]="
+                isDateErrorShown() && dateErrorField() === 'year'
+              "
+              [formField]="form.year"
+            />
+          </label>
+          <label class="grid gap-1">
+            <span class="text-muted-foreground text-xs">Month</span>
+            <input
+              hlmInput
+              inputmode="numeric"
+              aria-label="Month"
+              placeholder="Month"
+              [attr.aria-invalid]="
+                isDateErrorShown() && dateErrorField() === 'month'
+              "
+              [formField]="form.month"
+            />
+          </label>
+          <label class="grid gap-1">
+            <span class="text-muted-foreground text-xs">Day</span>
+            <input
+              hlmInput
+              inputmode="numeric"
+              aria-label="Day"
+              placeholder="Day"
+              [attr.aria-invalid]="
+                isDateErrorShown() && dateErrorField() === 'day'
+              "
+              [formField]="form.day"
+            />
+          </label>
+        </div>
+        @if (isDateErrorShown() && dateError(); as error) {
+          <p role="alert" class="text-destructive text-sm">
+            {{ dateMessages[error] }}
+          </p>
+        } @else {
+          <p class="text-muted-foreground text-xs">
+            A year, a year and month, or a full date.
+          </p>
+        }
+      </fieldset>
+
+      <div class="flex flex-wrap gap-6">
+        <div class="flex items-center gap-2">
+          <hlm-switch
+            inputId="published-switch"
+            [checked]="model().published"
+            (checkedChange)="patch({ published: $event })"
+            aria-label="Published"
+          />
+          <label class="text-sm font-medium" for="published-switch"
+            >Published</label
+          >
+        </div>
+        <div class="flex items-center gap-2">
+          <hlm-switch
+            inputId="nsfw-switch"
+            [checked]="model().nsfw"
+            (checkedChange)="patch({ nsfw: $event })"
+            aria-label="NSFW"
+          />
+          <label class="text-sm font-medium" for="nsfw-switch">NSFW</label>
+        </div>
+        @if (model().published && gaps().length) {
+          <p
+            role="status"
+            class="basis-full text-sm text-amber-800 dark:text-amber-300"
+          >
+            Published pieces show on the public site, and this one has
+            {{ gapSummary() }}.
+          </p>
+        }
+      </div>
+
+      <app-credits-picker
+        label="Artists"
+        [ids]="model().artistIds"
+        (idsChange)="patch({ artistIds: $event })"
+        (edit)="editingPerson.set($event)"
+      />
+      <app-credits-picker
+        label="Characters"
+        [ids]="model().characterIds"
+        (idsChange)="patch({ characterIds: $event })"
+        (edit)="editingPerson.set($event)"
+      />
+
+      <app-tags-input
+        [tags]="model().tags"
+        (tagsChange)="patch({ tags: $event })"
+        [counts]="tagCounts.value()"
+      />
+
+      <div
+        class="bg-background fixed inset-x-0 bottom-0 z-30 flex flex-wrap items-center gap-2 border-t px-4 py-3 md:sticky md:px-0"
+      >
+        <button
+          hlmBtn
+          type="button"
+          variant="ghost"
+          class="text-destructive mr-auto"
+          (click)="delete()"
+        >
+          <ng-icon name="lucideTrash2" />
+          Delete
+        </button>
+        @if (next()) {
+          <button
+            hlmBtn
+            type="button"
+            variant="secondary"
+            [attr.aria-keyshortcuts]="keys + '+Enter'"
+            [hlmTooltip]="saveNextTip"
+            [disabled]="isSaving()"
+            (click)="saveAndNext()"
+          >
+            Save and next
+          </button>
+        }
+        <button
+          hlmBtn
+          type="submit"
+          [attr.aria-keyshortcuts]="keys + '+S'"
+          [hlmTooltip]="saveTip"
+          [disabled]="isSaving()"
+        >
+          Save
+        </button>
+      </div>
+    </form>
+  </div>
+
+  @if (editingPerson(); as personId) {
+    <app-person-sheet
+      [personId]="personId"
+      (closed)="editingPerson.set(null)"
+    />
+  }
+} @else if (!isLoading()) {
+  <div hlmEmpty>
+    <div hlmEmptyHeader>
+      <div hlmEmptyDescription>
+        It may have been deleted.
+        <a routerLink="/artworks" class="underline">Back to the artworks</a>
+      </div>
+    </div>
+  </div>
+}
+
+<ng-template #saveTip>
+  Save <kbd hlmKbd>{{ modifier }}</kbd
+  ><kbd hlmKbd>S</kbd>
+</ng-template>
+<ng-template #saveNextTip>
+  Save and open the next artwork
+  <kbd hlmKbd>{{ modifier }}</kbd
+  ><kbd hlmKbd>Enter</kbd>
+</ng-template>
+<ng-template #previousTip>
+  Previous artwork <kbd hlmKbd>Alt</kbd><kbd hlmKbd>←</kbd>
+</ng-template>
+<ng-template #nextTip>
+  Next artwork <kbd hlmKbd>Alt</kbd><kbd hlmKbd>→</kbd>
+</ng-template>

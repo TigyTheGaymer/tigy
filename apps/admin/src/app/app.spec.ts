@@ -23,9 +23,9 @@ describe('admin routes', () => {
     expect(path()).toBe('/sign-in?next=%2Fuploads');
   });
 
-  it('Unknown admin address: shows the Uploads page to the owner', async () => {
+  it('Unknown admin address: shows the Artworks page to the owner', async () => {
     await open('/no-such-page', OWNER);
-    expect(path()).toBe('/uploads');
+    expect(path()).toBe('/artworks');
   });
 
   it('sends the owner past sign-in to the address asked for', async () => {
@@ -33,8 +33,14 @@ describe('admin routes', () => {
     expect(path()).toBe('/uploads');
   });
 
-  it('opens the Uploads page at the root', async () => {
+  it('opens the Artworks page at the root', async () => {
     await open('/', OWNER);
-    expect(path()).toBe('/uploads');
+    expect(path()).toBe('/artworks');
+  });
+
+  it('Signed-out link to an artwork: shows sign-in and none of the artwork', async () => {
+    const { harness } = await open('/artworks/k3x?view=unpublished', null);
+    expect(path()).toBe('/sign-in?next=%2Fartworks%2Fk3x%3Fview%3Dunpublished');
+    expect(harness.routeNativeElement?.textContent).toContain('Sign in');
   });
 });

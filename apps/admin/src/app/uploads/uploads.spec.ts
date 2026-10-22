@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 import { FakeUploadsApi, record, settle } from '../testing';
 import { PROCESSING_LIMIT_MS } from './upload-list';
 import { UploadService } from './upload.service';
@@ -8,7 +9,7 @@ import { UploadsPage } from './uploads';
 async function open() {
   const api = new FakeUploadsApi();
   TestBed.configureTestingModule({
-    providers: [{ provide: UPLOADS_API, useValue: api }],
+    providers: [{ provide: UPLOADS_API, useValue: api }, provideRouter([])],
   });
   const fixture = TestBed.createComponent(UploadsPage);
   await fixture.whenStable();
@@ -106,7 +107,9 @@ describe('UploadsPage', () => {
     ]);
     await update();
     expect(rows()).toEqual([expect.stringMatching(/piece\.png Ready/)]);
-    expect(page.querySelector('li img')?.getAttribute('src')).toContain('#u1');
+    expect(page.querySelector('li img')?.getAttribute('src')).toContain(
+      '/o/images%2Fu1%2Fthumb.webp?alt=media',
+    );
   });
 
   it('offers clearing only for finished rows, and clears after confirming', async () => {

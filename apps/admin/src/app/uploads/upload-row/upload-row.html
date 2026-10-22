@@ -2,8 +2,8 @@
   <div
     class="bg-muted grid size-14 shrink-0 place-items-center overflow-hidden rounded-md"
   >
-    @if (thumbnail.hasValue()) {
-      <img [src]="thumbnail.value()" alt="" class="size-full object-cover" />
+    @if (thumbnail(); as src) {
+      <img [src]="src" alt="" class="size-full object-cover" />
     } @else if (row().status === 'processing') {
       <hlm-spinner />
     } @else {
@@ -16,7 +16,15 @@
 
   <div class="grid min-w-0 flex-1 gap-1">
     <div class="flex items-center gap-2">
-      <span class="truncate font-medium">{{ row().fileName }}</span>
+      @if (row().status === 'ready') {
+        <a
+          class="truncate font-medium hover:underline"
+          [routerLink]="['/artworks', row().id]"
+          >{{ row().fileName }}</a
+        >
+      } @else {
+        <span class="truncate font-medium">{{ row().fileName }}</span>
+      }
       <span hlmBadge [variant]="badgeVariant()">
         {{ label() }}
       </span>

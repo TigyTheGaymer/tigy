@@ -9,7 +9,10 @@ export const ownerGuard: CanMatchFn = async (_route, segments) => {
   const { user, isOwner } = await auth.whenReady();
   if (isOwner) return true;
   if (user) await auth.signOut();
-  const next = '/' + segments.map((segment) => segment.path).join('/');
+  // The whole address, so a list's view and search survive signing in.
+  const next =
+    router.currentNavigation()?.extractedUrl.toString() ??
+    '/' + segments.map((segment) => segment.path).join('/');
   return router.createUrlTree(['/sign-in'], {
     queryParams: next === '/' ? {} : { next },
   });

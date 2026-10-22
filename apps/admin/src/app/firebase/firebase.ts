@@ -14,7 +14,12 @@ import {
 import { environment } from './environment';
 
 // The ports in firebase.json.
-export const EMULATOR_PORTS = { auth: 9099, firestore: 8080, storage: 9199 };
+export const EMULATOR_PORTS = {
+  auth: 9099,
+  firestore: 8080,
+  storage: 9199,
+  functions: 5001,
+};
 
 export const FIREBASE_APP = new InjectionToken<FirebaseApp>('FIREBASE_APP', {
   factory: () => initializeApp(environment.firebase),
@@ -26,7 +31,10 @@ export const AUTH = new InjectionToken<Auth>('AUTH', {
     const auth = getAuth(inject(FIREBASE_APP));
     const host = environment.emulatorHost;
     if (host) {
-      connectAuthEmulator(auth, `http://${host}:${EMULATOR_PORTS.auth}`);
+      // The warning banner would cover the bottom bars on a phone.
+      connectAuthEmulator(auth, `http://${host}:${EMULATOR_PORTS.auth}`, {
+        disableWarnings: true,
+      });
     }
     return auth;
   },

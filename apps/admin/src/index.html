@@ -8,6 +8,20 @@
     <meta name="robots" content="noindex, nofollow" />
     <meta name="referrer" content="same-origin" />
     <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <!-- Before the first paint, so the page never flashes the other theme. ThemeService keeps it current. -->
+    <script>
+      (function () {
+        var choice;
+        try {
+          choice = localStorage.getItem('tigy-admin-theme');
+        } catch (e) {}
+        var isDark =
+          choice === 'dark' ||
+          (choice !== 'light' &&
+            matchMedia('(prefers-color-scheme: dark)').matches);
+        document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
+      })();
+    </script>
   </head>
   <body>
     <app-root></app-root>

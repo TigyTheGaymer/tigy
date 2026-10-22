@@ -1,0 +1,34 @@
+<div
+  class="fixed inset-0 z-50 bg-black/50"
+  aria-hidden="true"
+  (click)="requestClose()"
+></div>
+<aside
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="person-sheet-title"
+  cdkTrapFocus
+  cdkTrapFocusAutoCapture
+  class="bg-popover text-popover-foreground fixed inset-x-0 bottom-0 z-50 grid content-start max-h-[90dvh] gap-4 overflow-y-auto rounded-t-xl border-t p-4 shadow-lg md:inset-y-0 md:right-0 md:left-auto md:max-h-none md:w-full md:max-w-md md:rounded-none md:border-t-0 md:border-l"
+>
+  <div class="flex items-center gap-2">
+    <h2 id="person-sheet-title" class="mr-auto text-lg font-semibold">
+      {{ name() }}
+    </h2>
+    <button
+      hlmBtn
+      type="button"
+      variant="ghost"
+      size="icon-sm"
+      aria-label="Close"
+      (click)="requestClose()"
+    >
+      <ng-icon name="lucideX" />
+    </button>
+  </div>
+  <app-person-editor
+    [personId]="personId()"
+    [isInPanel]="true"
+    (saved)="closed.emit()"
+  />
+</aside>

@@ -1,7 +1,6 @@
 import { inject, InjectionToken } from '@angular/core';
 import {
   IMAGES_COLLECTION,
-  imagePaths,
   UPLOADS_COLLECTION,
   type Upload,
   type WithId,
@@ -17,7 +16,6 @@ import {
   type Unsubscribe,
 } from 'firebase/firestore';
 import {
-  getDownloadURL,
   ref,
   uploadBytesResumable,
   type UploadMetadata,
@@ -45,7 +43,6 @@ export interface UploadsApi {
     error: (error: Error) => void,
   ): Unsubscribe;
   deleteRecord(uploadId: string): Promise<void>;
-  thumbnailUrl(imageId: string): Promise<string>;
 }
 
 export const UPLOADS_API = new InjectionToken<UploadsApi>('UPLOADS_API', {
@@ -81,8 +78,6 @@ export const UPLOADS_API = new InjectionToken<UploadsApi>('UPLOADS_API', {
         ),
       deleteRecord: (uploadId) =>
         deleteDoc(doc(db, UPLOADS_COLLECTION, uploadId)),
-      thumbnailUrl: (imageId) =>
-        getDownloadURL(ref(storage, imagePaths.thumb(imageId))),
     };
   },
 });

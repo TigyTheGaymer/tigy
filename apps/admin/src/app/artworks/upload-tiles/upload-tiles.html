@@ -1,0 +1,48 @@
+<ul
+  aria-label="Uploads in progress"
+  class="grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-5"
+>
+  @for (tile of tiles(); track tile.id) {
+    <li
+      class="bg-muted/50 relative grid aspect-square content-center justify-items-center gap-2 rounded-lg border border-dashed p-3 text-center text-sm"
+      [class.border-destructive]="tile.status === 'failed'"
+    >
+      <span class="w-full truncate font-medium">{{ tile.fileName }}</span>
+      @switch (tile.status) {
+        @case ('uploading') {
+          <hlm-progress
+            [value]="tile.percent"
+            class="w-3/4"
+            aria-label="Upload progress"
+          >
+            <hlm-progress-indicator />
+          </hlm-progress>
+          <span class="text-muted-foreground text-xs tabular-nums"
+            >Uploading {{ tile.percent }}%</span
+          >
+        }
+        @case ('processing') {
+          <hlm-spinner />
+          <span class="text-muted-foreground text-xs">Processing</span>
+        }
+        @case ('failed') {
+          <ng-icon
+            name="lucideTriangleAlert"
+            class="text-destructive text-[length:--spacing(6)]"
+          />
+          <span class="text-destructive text-xs">{{ tile.reason }}</span>
+          <button
+            hlmBtn
+            variant="ghost"
+            size="icon-sm"
+            class="absolute top-1 right-1"
+            [attr.aria-label]="'Dismiss ' + tile.fileName"
+            (click)="dismiss.emit(tile.id)"
+          >
+            <ng-icon name="lucideX" />
+          </button>
+        }
+      }
+    </li>
+  }
+</ul>

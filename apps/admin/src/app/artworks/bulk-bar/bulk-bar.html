@@ -1,0 +1,58 @@
+<div
+  role="toolbar"
+  aria-label="Selected artworks"
+  class="mx-auto flex max-w-6xl flex-wrap items-center gap-2"
+>
+  <span class="mr-auto pr-2 text-sm font-medium">
+    {{ selected().length }} selected
+  </span>
+  <button hlmBtn size="sm" [disabled]="isBusy()" (click)="run('publish')">
+    Publish
+  </button>
+  <button
+    hlmBtn
+    size="sm"
+    variant="outline"
+    [disabled]="isBusy()"
+    (click)="run('unpublish')"
+  >
+    Unpublish
+  </button>
+  <button
+    hlmBtn
+    size="sm"
+    variant="outline"
+    [disabled]="isBusy()"
+    (click)="run('mark-nsfw')"
+  >
+    Mark NSFW
+  </button>
+  <button
+    hlmBtn
+    size="sm"
+    variant="outline"
+    [disabled]="isBusy()"
+    (click)="run('unmark-nsfw')"
+  >
+    Unmark NSFW
+  </button>
+  <button
+    hlmBtn
+    size="sm"
+    variant="destructive"
+    [disabled]="isBusy()"
+    (click)="run('delete')"
+  >
+    <ng-icon name="lucideTrash2" />
+    Delete
+  </button>
+  <button
+    hlmBtn
+    size="icon-sm"
+    variant="ghost"
+    aria-label="Clear the selection"
+    (click)="done.emit()"
+  >
+    <ng-icon name="lucideX" />
+  </button>
+</div>

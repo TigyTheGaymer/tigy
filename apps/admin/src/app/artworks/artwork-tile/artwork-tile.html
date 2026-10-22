@@ -1,0 +1,59 @@
+<div class="group relative grid gap-2">
+  <a
+    [routerLink]="['/artworks', artwork().id]"
+    [queryParams]="listParams()"
+    class="bg-muted focus-visible:ring-ring/50 ring-offset-background block aspect-square overflow-hidden rounded-lg outline-none focus-visible:ring-3"
+    [class.ring-2]="isSelected()"
+    [class.ring-primary]="isSelected()"
+    [class.ring-offset-2]="isSelected()"
+  >
+    <img
+      [src]="thumbnail()"
+      alt=""
+      loading="lazy"
+      class="size-full object-cover"
+    />
+  </a>
+  <!-- A solid chip, so the box shows on any picture. -->
+  <!-- Shift is read before the click toggles the box. -->
+  <span
+    class="bg-background/90 ring-foreground/20 absolute top-2 left-2 flex rounded-md p-1.5 shadow-lg ring-1 backdrop-blur-sm"
+  >
+    <hlm-checkbox
+      class="border-foreground/50"
+      (mousedown)="onPress($event)"
+      (keydown)="isRange = $event.shiftKey"
+      [checked]="isSelected()"
+      (checkedChange)="selectedChange.emit({ isSelected: $event, isRange })"
+      [aria-label]="'Select ' + title()"
+    />
+  </span>
+  <div class="grid min-w-0 gap-1">
+    <a
+      [routerLink]="['/artworks', artwork().id]"
+      [queryParams]="listParams()"
+      class="truncate text-sm font-medium hover:underline"
+      [class.text-muted-foreground]="!artwork().title"
+      >{{ title() }}</a
+    >
+    <span class="text-muted-foreground text-xs">{{ date() }}</span>
+    <div class="flex flex-wrap gap-1">
+      @if (artwork().published) {
+        <span hlmBadge variant="outline">Published</span>
+      } @else {
+        <span
+          hlmBadge
+          variant="outline"
+          class="border-sky-500/40 bg-sky-500/10 text-sky-800 dark:text-sky-300"
+          >Unpublished</span
+        >
+      }
+      @if (artwork().nsfw) {
+        <span hlmBadge variant="secondary">NSFW</span>
+      }
+      @for (warning of warnings(); track warning) {
+        <app-warning-badge>{{ warning }}</app-warning-badge>
+      }
+    </div>
+  </div>
+</div>

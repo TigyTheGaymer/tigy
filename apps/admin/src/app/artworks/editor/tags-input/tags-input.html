@@ -1,0 +1,72 @@
+<div class="grid gap-2">
+  <label class="text-sm font-medium" for="tags-input">Tags</label>
+  <div class="relative">
+    <!-- Looks like one input: the chips, then the typing area after them. -->
+    <div
+      class="dark:bg-input/30 border-input focus-within:border-ring focus-within:ring-ring/50 flex min-h-9 cursor-text flex-wrap items-center gap-1 rounded-md border px-1.5 py-1 shadow-xs transition-[color,box-shadow] focus-within:ring-3"
+      (mousedown)="focusInput($event)"
+    >
+      @if (tags().length) {
+        <ul role="list" class="contents" aria-label="Tags">
+          @for (tag of tags(); track tag) {
+            <li
+              class="bg-muted text-foreground inline-flex h-6 items-center gap-1 rounded-sm border pr-0.5 pl-2 text-xs"
+            >
+              {{ tag }}
+              <button
+                type="button"
+                class="text-muted-foreground hover:bg-foreground/10 hover:text-foreground focus-visible:ring-ring/50 grid size-5 place-items-center rounded-sm outline-none focus-visible:ring-2"
+                [attr.aria-label]="'Remove ' + tag"
+                (click)="remove(tag)"
+              >
+                <ng-icon name="lucideX" class="text-[length:--spacing(3)]" />
+              </button>
+            </li>
+          }
+        </ul>
+      }
+      <input
+        #field
+        id="tags-input"
+        class="placeholder:text-muted-foreground h-7 min-w-28 flex-1 bg-transparent px-1 text-base outline-none md:text-sm"
+        role="combobox"
+        autocomplete="off"
+        aria-autocomplete="list"
+        aria-controls="tag-suggestions"
+        [attr.aria-expanded]="isOpen() && suggestions().length > 0"
+        [placeholder]="
+          tags().length ? 'Add a tag' : 'Add a tag, then Enter or a comma'
+        "
+        [value]="query()"
+        (input)="type($any($event.target).value)"
+        (keydown)="onKey($event)"
+        (focus)="isOpen.set(true)"
+        (blur)="isOpen.set(false)"
+      />
+    </div>
+    @if (isOpen() && suggestions().length) {
+      <ul
+        id="tag-suggestions"
+        role="listbox"
+        aria-label="Tag suggestions"
+        class="bg-popover text-popover-foreground absolute z-40 mt-1 grid max-h-64 w-full overflow-auto rounded-md border p-1 shadow-md"
+      >
+        @for (tag of suggestions(); track tag) {
+          <li
+            role="option"
+            [attr.aria-selected]="$index === active()"
+            class="cursor-pointer rounded-sm px-2 py-1.5 text-sm"
+            [class.bg-accent]="$index === active()"
+            (mousedown)="$event.preventDefault(); add(tag)"
+            (mouseenter)="active.set($index)"
+          >
+            {{ tag }}
+            <span class="text-muted-foreground text-xs">{{
+              counts()[tag]
+            }}</span>
+          </li>
+        }
+      </ul>
+    }
+  </div>
+</div>
