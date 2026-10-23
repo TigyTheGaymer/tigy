@@ -10,6 +10,7 @@ import {
   lucideMoon,
   lucideRefreshCw,
   lucideSun,
+  lucideUserPlus,
   lucideWrench,
 } from '@ng-icons/lucide';
 import { toast } from '@spartan-ng/brain/sonner';
@@ -43,6 +44,7 @@ import { ThemeService, type ThemeChoice } from '../theme/theme.service';
       lucideMoon,
       lucideRefreshCw,
       lucideSun,
+      lucideUserPlus,
       lucideWrench,
     }),
   ],
@@ -88,6 +90,28 @@ export class TopBar {
       toast.error("The summaries couldn't be rebuilt. Try again.");
     } finally {
       this.isRebuilding.set(false);
+    }
+  }
+
+  protected readonly isCreditingTigy = signal(false);
+
+  protected async creditTigy(): Promise<void> {
+    this.isCreditingTigy.set(true);
+    try {
+      const { changed } = await this.callables.creditTigy();
+      if (changed === 0) {
+        toast.success('Nothing to change', {
+          description: 'Every artwork already credits Tigy.',
+        });
+      } else {
+        toast.success('Tigy credited', {
+          description: `Added to ${changed} ${changed === 1 ? 'artwork' : 'artworks'}.`,
+        });
+      }
+    } catch {
+      toast.error("Tigy couldn't be credited. Try again.");
+    } finally {
+      this.isCreditingTigy.set(false);
     }
   }
 

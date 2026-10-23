@@ -119,6 +119,7 @@ describe('TopBar pages', () => {
       /^https?:\/\//,
     );
     expect(item('Rebuild summaries')).toBeDefined();
+    expect(item('Credit Tigy on every artwork')).toBeDefined();
     expect(item('Sign out')).toBeUndefined();
   });
 
@@ -164,5 +165,54 @@ describe('TopBar pages', () => {
     expect(error).toHaveBeenCalledWith(
       "The summaries couldn't be rebuilt. Try again.",
     );
+  });
+
+  it.each([
+    [3, 'Tigy credited', 'Added to 3 artworks.'],
+    [1, 'Tigy credited', 'Added to 1 artwork.'],
+    [0, 'Nothing to change', 'Every artwork already credits Tigy.'],
+  ])(
+    'Credit Tigy: says what changed for %i',
+    async (changed, title, description) => {
+      const creditTigy = vi.fn(async () => ({ changed }));
+      const success = vi.spyOn(toast, 'success');
+      const { openMenu, harness } = await open({ creditTigy });
+      await openMenu('"Site tools"');
+      item('Credit Tigy on every artwork')?.click();
+      await harness.fixture.whenStable();
+      expect(creditTigy).toHaveBeenCalledTimes(1);
+      expect(success).toHaveBeenCalledWith(title, { description });
+    },
+  );
+
+  it('disables Credit Tigy while it runs', async () => {
+    let finish!: (result: { changed: number }) => void;
+    const creditTigy = vi.fn(
+      () => new Promise<{ changed: number }>((resolve) => (finish = resolve)),
+    );
+    const { openMenu } = await open({ creditTigy });
+    // A menu that is closing keeps its items until it is gone, so take the newest.
+    const isDisabled = () =>
+      [...document.querySelectorAll<HTMLElement>('[hlmDropdownMenuItem]')]
+        .filter((el) => el.textContent?.includes('Credit Tigy'))
+        .at(-1)
+        ?.hasAttribute('disabled');
+    await openMenu('"Site tools"');
+    item('Credit Tigy on every artwork')?.click();
+    await openMenu('"Site tools"');
+    expect(isDisabled()).toBe(true);
+    finish({ changed: 0 });
+    await vi.waitFor(() => expect(isDisabled()).toBe(false));
+  });
+
+  it('says when crediting Tigy fails', async () => {
+    const error = vi.spyOn(toast, 'error');
+    const { openMenu, harness } = await open({
+      creditTigy: () => Promise.reject(new Error('internal')),
+    });
+    await openMenu('"Site tools"');
+    item('Credit Tigy on every artwork')?.click();
+    await harness.fixture.whenStable();
+    expect(error).toHaveBeenCalledWith("Tigy couldn't be credited. Try again.");
   });
 });

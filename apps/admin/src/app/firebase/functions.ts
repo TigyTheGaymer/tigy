@@ -12,6 +12,10 @@ export interface RebuildResult {
   tags: number;
 }
 
+export interface CreditTigyResult {
+  changed: number;
+}
+
 export interface CreditingImage {
   id: string;
   title?: string;
@@ -23,6 +27,7 @@ export type DeletePersonResult =
 /** The owner-only callables, behind a token so tests can replace them. */
 export interface Callables {
   rebuildSummaries(): Promise<RebuildResult>;
+  creditTigy(): Promise<CreditTigyResult>;
   deletePerson(personId: string): Promise<DeletePersonResult>;
 }
 
@@ -46,6 +51,7 @@ export const CALLABLES = new InjectionToken<Callables>('CALLABLES', {
     };
     return {
       rebuildSummaries: () => call('rebuildSummaries'),
+      creditTigy: () => call('creditTigy'),
       deletePerson: (personId) => call('deletePerson', { personId }),
     };
   },

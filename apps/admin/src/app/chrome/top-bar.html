@@ -90,6 +90,20 @@
         </span>
       </span>
     </button>
+    <button
+      hlmDropdownMenuItem
+      class="h-auto items-start text-left"
+      [disabled]="isCreditingTigy()"
+      (triggered)="creditTigy()"
+    >
+      <ng-icon name="lucideUserPlus" class="mt-0.5" />
+      <span class="grid justify-items-start gap-0.5">
+        Credit Tigy on every artwork
+        <span class="text-muted-foreground text-xs">
+          Adds Tigy as a character where it’s missing.
+        </span>
+      </span>
+    </button>
   </hlm-dropdown-menu>
 </ng-template>
 
