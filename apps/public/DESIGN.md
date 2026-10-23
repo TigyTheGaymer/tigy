@@ -155,7 +155,7 @@ A photo album that wears Tigy's coat. The mechanics are those of a familiar phot
 
 The art always leads. Tigy's markings live on the frame — the page, the header, the dividers, the controls — and never on top of a piece. The page is light and fur-orange by day and turns to Tigy's maroon stripes at night, with the fur becoming the accent. Cute is welcome, but in small doses: a paw-print hover, paw prints while more art loads, a tail that fills as you scroll.
 
-The site is not a card stack: content sits straight on the page, the credits panel is a flat side panel, and there is no footer.
+The site is not a card stack: content sits straight on the page, the credits panel is a flat side panel, and the only footer is a thin strip holding the privacy link.
 
 **Key Characteristics:**
 - Fur-orange page (light) and stripe-maroon page (dark), both from Tigy's own colours; visitors can pick Automatic, Light or Dark.
@@ -307,7 +307,7 @@ A ringed tail on the right edge (desktop) that fills as you scroll, alternating 
 ### Do:
 - **Do** keep thumbnails at each piece's real shape; never crop to squares.
 - **Do** keep the gallery one continuous run, newest first, with no year or month headings.
-- **Do** keep content straight on the page: an open header, a flat credits panel, no footer.
+- **Do** keep content straight on the page: an open header, a flat credits panel, and a footer that holds only the privacy link.
 - **Do** keep the art on a calm surface: cream behind thumbnails, the dark stage behind the open piece.
 - **Do** use Paw Pink only for things you press and Tigy's own accents.
 - **Do** use the forehead mark (one long stroke, two crossings) as the logo mark.
@@ -317,7 +317,7 @@ A ringed tail on the right edge (desktop) that fills as you scroll, alternating 
 - **Don't** put stripes or other markings over or behind a piece of art.
 - **Don't** wrap content in cards: no card around the header, the credits or the NSFW toggle.
 - **Don't** round everything: no pills, and circles only for faces, the tail and the paw thumb.
-- **Don't** add a footer; social links live in the home header.
+- **Don't** put anything but the privacy link in the footer; social links live in the home header.
 - **Don't** replace the browser's scrollbar; the tail timeline sits beside it.
 - **Don't** use Grandstander for running text or controls.
 - **Don't** mix icon sets, or show social logos in their brand colours.

@@ -117,12 +117,18 @@ test.describe('theme', () => {
 });
 
 test.describe('home', () => {
-  test('No footer: neither the home page nor an artwork page has one', async ({
+  test('Privacy footer: every page ends with one, holding only the privacy link', async ({
     page,
   }) => {
-    for (const path of ['/', '/i/hey-pookie']) {
+    for (const path of ['/', '/i/hey-pookie', '/no-such-page', '/privacy']) {
       await page.goto(path);
-      await expect(page.locator('footer')).toHaveCount(0);
+      const footer = page.locator('footer');
+      await expect(footer, path).toHaveCount(1);
+      await expect(footer.getByRole('link'), path).toHaveCount(1);
+      await expect(footer.getByRole('link'), path).toHaveAttribute(
+        'href',
+        '/privacy',
+      );
     }
     await expect(page.locator('.socials')).toHaveCount(0);
   });

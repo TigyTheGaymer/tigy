@@ -12,6 +12,11 @@ export const appRoutes: Route[] = [
     loadComponent: () => import('./artwork/artwork').then((m) => m.ArtworkPage),
   },
   {
+    path: 'privacy',
+    loadComponent: () =>
+      import('./privacy/privacy').then((m) => m.PrivacyPage),
+  },
+  {
     path: '**',
     loadComponent: () =>
       import('./not-found/not-found').then((m) => m.NotFoundPage),
