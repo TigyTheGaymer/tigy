@@ -312,6 +312,14 @@ describe('PersonPage', () => {
       expect(confirm.asked[0].title).toBe('Leave without saving?');
       expect(TestBed.inject(Router).url).toBe('/people/bramble');
     });
+
+    it('offers only Stay and Leave', async () => {
+      const confirm = new FakeConfirmService(false);
+      const { page, type } = await open('bramble', { confirm });
+      await type(page().querySelector<HTMLInputElement>('#name')!, 'Brambles');
+      await TestBed.inject(Router).navigateByUrl('/people');
+      expect(confirm.asked[0].alternative).toBeUndefined();
+    });
   });
 
   describe('pasting a profile address', () => {

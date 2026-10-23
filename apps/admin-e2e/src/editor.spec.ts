@@ -1,4 +1,4 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Locator, type Page } from '@playwright/test';
 import { addImages, batchPieces, db, readDoc, seed } from './support/emulators';
 import { dropFiles } from './support/files';
 import { expectNoSidewaysScroll } from './support/layout';
@@ -151,6 +151,39 @@ test('Leaving with unsaved edits asks, and staying keeps the edit', async ({
   await expect(page.getByLabel('Title', { exact: true })).toHaveValue(
     'Happier Tigy',
   );
+});
+
+test('Saving on the way out: Save and leave stores the edit and opens People', async ({
+  page,
+}) => {
+  await signInAsOwner(page, '/artworks/happy-tigy');
+  await page.getByLabel('Title', { exact: true }).fill('Happier Tigy');
+  await page.getByRole('link', { name: 'People' }).first().click();
+  const dialog = page.getByRole('alertdialog');
+  await expect(dialog.getByRole('button', { name: 'Stay' })).toBeFocused();
+  await dialog.getByRole('button', { name: 'Save and leave' }).click();
+  await expect(page).toHaveURL(/\/people$/);
+  await expect
+    .poll(async () => (await readDoc('images/happy-tigy'))?.['title'])
+    .toBe('Happier Tigy');
+});
+
+test('The leave question on a phone puts Save and leave on top and focuses Stay @phone', async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(!isMobile, 'A phone layout');
+  await signInAsOwner(page, '/artworks/happy-tigy');
+  await page.getByLabel('Title', { exact: true }).fill('Happier Tigy');
+  await page.getByRole('link', { name: 'Back to the artworks' }).click();
+  const dialog = page.getByRole('alertdialog');
+  const stay = dialog.getByRole('button', { name: 'Stay' });
+  const saveAndLeave = dialog.getByRole('button', { name: 'Save and leave' });
+  await expect(stay).toBeFocused();
+  const top = async (button: Locator) => (await button.boundingBox())!.y;
+  expect(await top(saveAndLeave)).toBeLessThan(await top(stay));
+  await stay.click();
+  await expect(page).toHaveURL(/\/artworks\/happy-tigy$/);
 });
 
 test('Editing on a phone: the image is above the form and nothing scrolls sideways @phone', async ({

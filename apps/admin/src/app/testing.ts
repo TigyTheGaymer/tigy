@@ -8,6 +8,7 @@ import type {
 } from './artworks/artworks-api';
 import type { AuthApi } from './firebase/firebase';
 import type { PeopleApi, PersonEdits } from './people/people-api';
+import type { Answer, Confirmation } from './shared/confirm.service';
 import type { UploadsApi } from './uploads/uploads-api';
 
 // For the app's unit tests only.
@@ -240,14 +241,25 @@ function applyEdits(image: WithId<Image>, edits: ImageEdits): WithId<Image> {
   return result as unknown as WithId<Image>;
 }
 
-/** Answers every question the admin asks with `answer`, and remembers the questions. */
+/**
+ * Answers every question the admin asks with `answer`, and remembers the
+ * questions. `choose()` gives `choices` first, in order.
+ */
 export class FakeConfirmService {
-  readonly asked: { title: string; description?: string }[] = [];
-  constructor(public answer = true) {}
+  readonly asked: Confirmation[] = [];
+  constructor(
+    public answer = true,
+    readonly choices: Answer[] = [],
+  ) {}
 
-  async ask(question: { title: string; description?: string }) {
+  async ask(question: Confirmation) {
     this.asked.push(question);
     return this.answer;
+  }
+
+  async choose(question: Confirmation): Promise<Answer> {
+    this.asked.push(question);
+    return this.choices.shift() ?? (this.answer ? 'confirm' : 'cancel');
   }
 }
 

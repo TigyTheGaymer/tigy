@@ -8,7 +8,7 @@ import { RouterTestingHarness } from '@angular/router/testing';
 import { toast } from '@spartan-ng/brain/sonner';
 import type { Image, Person, WithId } from '@tigy/models';
 import { PEOPLE_API } from '../../people/people-api';
-import { ConfirmService } from '../../shared/confirm.service';
+import { ConfirmService, type Answer } from '../../shared/confirm.service';
 import { unsavedEditsGuard } from '../../shared/unsaved-edits.guard';
 import {
   artwork,
@@ -416,6 +416,118 @@ describe('ArtworkEditorPage', () => {
       await harness.fixture.whenStable();
       expect(confirm.asked).toEqual([]);
       expect(url()).toBe('/people');
+    });
+  });
+
+  describe('leaving with unsaved edits', () => {
+    async function leaveAs(answer: Answer, options: Options = {}) {
+      const confirm = new FakeConfirmService(false, [answer]);
+      const opened = await open('/artworks/k3x', {
+        images: [artwork('k3x')],
+        confirm,
+        ...options,
+      });
+      await opened.type(opened.field('Title'), 'Pool day');
+      const leave = async () => {
+        await TestBed.inject(Router).navigateByUrl('/people');
+        await opened.update();
+      };
+      return { ...opened, leave };
+    }
+
+    it('offers Save and leave besides Stay and Leave', async () => {
+      const { confirm, leave } = await leaveAs('cancel');
+      await leave();
+      expect(confirm.asked).toEqual([
+        expect.objectContaining({
+          title: 'Leave without saving?',
+          cancel: 'Stay',
+          confirm: 'Leave',
+          alternative: 'Save and leave',
+        }),
+      ]);
+    });
+
+    it('Saving on the way out: stores the title, confirms, and opens the People page', async () => {
+      const success = vi.spyOn(toast, 'success');
+      const { api, leave } = await leaveAs('alternative');
+      await leave();
+      expect(api.updates).toEqual([
+        { id: 'k3x', edits: { title: 'Pool day' } },
+      ]);
+      expect(success).toHaveBeenCalledWith('Saved');
+      expect(url()).toBe('/people');
+    });
+
+    it('Leaving without saving: opens the People page and stores nothing', async () => {
+      const { api, leave } = await leaveAs('confirm');
+      await leave();
+      expect(api.updates).toEqual([]);
+      expect(url()).toBe('/people');
+    });
+
+    it('Staying: keeps the editor open with the title unsaved', async () => {
+      const { api, page, field, leave } = await leaveAs('cancel');
+      await leave();
+      expect(api.updates).toEqual([]);
+      expect(url()).toBe('/artworks/k3x');
+      expect(field('Title')?.value).toBe('Pool day');
+      expect(text(page())).toContain('Unsaved edits');
+    });
+
+    it('Moving to the next artwork: Alt+Right with Save and leave stores the title and opens the next piece', async () => {
+      const confirm = new FakeConfirmService(false, ['alternative']);
+      const { api, field, type, press, update } = await open(
+        '/artworks/first',
+        { images: unpublished(), confirm },
+      );
+      await type(field('Title'), 'Renamed');
+      await press('ArrowRight', { altKey: true });
+      await update();
+      expect(api.updates).toEqual([
+        { id: 'first', edits: { title: 'Renamed' } },
+      ]);
+      expect(url()).toBe('/artworks/second');
+    });
+
+    it('Date that does not exist: stays, shows the date error and keeps the edits', async () => {
+      const { api, page, field, type, leave } = await leaveAs('alternative');
+      await type(field('Year'), '2024');
+      await type(field('Month'), '2');
+      await type(field('Day'), '31');
+      await leave();
+      expect(text(page().querySelector('[role=alert]'))).toBe(
+        'This date does not exist.',
+      );
+      expect(api.updates).toEqual([]);
+      expect(url()).toBe('/artworks/k3x');
+      expect(field('Title')?.value).toBe('Pool day');
+    });
+
+    it('Backing out of publishing with missing details: stores nothing and stays', async () => {
+      const { api, confirm, page, toggle, leave } = await leaveAs('alternative');
+      await toggle('Published');
+      await leave();
+      expect(confirm.asked.map((question) => question.title)).toEqual([
+        'Leave without saving?',
+        'Publish with missing details?',
+      ]);
+      expect(api.updates).toEqual([]);
+      expect(url()).toBe('/artworks/k3x');
+      expect(text(page())).toContain('Unsaved edits');
+    });
+
+    it('Save fails on the way out: says so, stays and keeps the edits', async () => {
+      const error = vi.spyOn(toast, 'error');
+      const { api, page, field, leave } = await leaveAs('alternative');
+      api.shouldFail = true;
+      await leave();
+      expect(error).toHaveBeenCalledWith('The edits were not saved', {
+        description: 'Check the connection and try again. Your edits are kept.',
+      });
+      expect(url()).toBe('/artworks/k3x');
+      expect(field('Title')?.value).toBe('Pool day');
+      expect(text(page())).toContain('Unsaved edits');
     });
   });
 

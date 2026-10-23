@@ -8,20 +8,28 @@ export interface Confirmation {
   description?: string;
   confirm: string;
   cancel?: string;
+  /** A third button, shown as the main choice. */
+  alternative?: string;
   isDestructive?: boolean;
 }
 
-/** Asks the owner a yes-or-no question in an alert dialog; closing it any other way means no. */
+export type Answer = 'confirm' | 'alternative' | 'cancel';
+
+/** Asks the owner a question in an alert dialog; closing it any other way means cancel. */
 @Service()
 export class ConfirmService {
   private readonly dialog = inject(HlmDialogService);
 
-  async ask(confirmation: Confirmation): Promise<boolean> {
-    const ref = this.dialog.open<boolean, Confirmation>(ConfirmDialog, {
+  async choose(confirmation: Confirmation): Promise<Answer> {
+    const ref = this.dialog.open<Answer, Confirmation>(ConfirmDialog, {
       context: confirmation,
       role: 'alertdialog',
       showCloseButton: false,
     });
-    return (await firstValueFrom(ref.closed$)) === true;
+    return (await firstValueFrom(ref.closed$)) ?? 'cancel';
+  }
+
+  async ask(confirmation: Confirmation): Promise<boolean> {
+    return (await this.choose(confirmation)) === 'confirm';
   }
 }
