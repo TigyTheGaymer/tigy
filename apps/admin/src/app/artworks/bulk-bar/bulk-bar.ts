@@ -39,16 +39,14 @@ export const artworkCount = (n: number) =>
   selector: 'app-bulk-bar',
   imports: [HlmButtonImports, NgIcon],
   providers: [provideIcons({ lucideTrash2, lucideX })],
-  host: {
-    class:
-      'bg-background block fixed inset-x-0 bottom-0 z-40 border-t p-3 shadow-lg md:inset-x-auto md:bottom-6 md:left-1/2 md:w-max md:max-w-[calc(100%-2rem)] md:-translate-x-1/2 md:rounded-xl md:border',
-  },
   templateUrl: './bulk-bar.html',
 })
 export class BulkBar {
   private readonly artworks = inject(ArtworksService);
   private readonly confirm = inject(ConfirmService);
 
+  // Always rendered: an action can empty the view before its write returns,
+  // and a destroyed bar could no longer say it is done.
   readonly selected = input.required<Artwork[]>();
   /** The action ran, or the owner cleared the selection. */
   readonly done = output<void>();

@@ -84,9 +84,7 @@
   </div>
 </div>
 
-@if (selected().length) {
-  <app-bulk-bar [selected]="selected()" (done)="clearSelection()" />
-}
+<app-bulk-bar [selected]="selected()" (done)="clearSelection()" />
 
 <app-upload-tiles
   class="mb-4 block"

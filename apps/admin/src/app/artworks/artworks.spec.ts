@@ -342,6 +342,31 @@ describe('ArtworksPage', () => {
       expect(tiles()).toHaveLength(2);
     });
 
+    it('Publishing from the Unpublished view: the selection is cleared although the pieces leave the view before the write returns', async () => {
+      const { api, button, page, select, update } = await openArtworks(
+        '/artworks?view=unpublished',
+        five(),
+      );
+      let finish = () => undefined as void;
+      vi.spyOn(api, 'updateMany').mockImplementation(async (ids, edits) => {
+        api.emit(
+          api.images.map((i) => (ids.includes(i.id) ? { ...i, ...edits } : i)),
+        );
+        await new Promise<void>((resolve) => (finish = resolve));
+      });
+      await select('Piece c');
+      await select('Piece d');
+      button('Publish')?.click();
+      await update();
+      finish();
+      await update();
+
+      // Unpublished elsewhere, they come back unselected.
+      api.emit(five());
+      await update();
+      expect(page().querySelector('[role=toolbar]')).toBeNull();
+    });
+
     it('says when a batch fails, and keeps the selection', async () => {
       const error = vi.spyOn(toast, 'error');
       const { api, button, page, select, update } = await openArtworks(

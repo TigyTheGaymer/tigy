@@ -1,58 +1,64 @@
-<div
-  role="toolbar"
-  aria-label="Selected artworks"
-  class="mx-auto flex max-w-6xl flex-wrap items-center gap-2"
->
-  <span class="mr-auto pr-2 text-sm font-medium">
-    {{ selected().length }} selected
-  </span>
-  <button hlmBtn size="sm" [disabled]="isBusy()" (click)="run('publish')">
-    Publish
-  </button>
-  <button
-    hlmBtn
-    size="sm"
-    variant="outline"
-    [disabled]="isBusy()"
-    (click)="run('unpublish')"
+@if (selected().length) {
+  <div
+    class="bg-background fixed inset-x-0 bottom-0 z-40 border-t p-3 shadow-lg md:inset-x-auto md:bottom-6 md:left-1/2 md:w-max md:max-w-[calc(100%-2rem)] md:-translate-x-1/2 md:rounded-xl md:border"
   >
-    Unpublish
-  </button>
-  <button
-    hlmBtn
-    size="sm"
-    variant="outline"
-    [disabled]="isBusy()"
-    (click)="run('mark-nsfw')"
-  >
-    Mark NSFW
-  </button>
-  <button
-    hlmBtn
-    size="sm"
-    variant="outline"
-    [disabled]="isBusy()"
-    (click)="run('unmark-nsfw')"
-  >
-    Unmark NSFW
-  </button>
-  <button
-    hlmBtn
-    size="sm"
-    variant="destructive"
-    [disabled]="isBusy()"
-    (click)="run('delete')"
-  >
-    <ng-icon name="lucideTrash2" />
-    Delete
-  </button>
-  <button
-    hlmBtn
-    size="icon-sm"
-    variant="ghost"
-    aria-label="Clear the selection"
-    (click)="done.emit()"
-  >
-    <ng-icon name="lucideX" />
-  </button>
-</div>
+    <div
+      role="toolbar"
+      aria-label="Selected artworks"
+      class="mx-auto flex max-w-6xl flex-wrap items-center gap-2"
+    >
+      <span class="mr-auto pr-2 text-sm font-medium">
+        {{ selected().length }} selected
+      </span>
+      <button hlmBtn size="sm" [disabled]="isBusy()" (click)="run('publish')">
+        Publish
+      </button>
+      <button
+        hlmBtn
+        size="sm"
+        variant="outline"
+        [disabled]="isBusy()"
+        (click)="run('unpublish')"
+      >
+        Unpublish
+      </button>
+      <button
+        hlmBtn
+        size="sm"
+        variant="outline"
+        [disabled]="isBusy()"
+        (click)="run('mark-nsfw')"
+      >
+        Mark NSFW
+      </button>
+      <button
+        hlmBtn
+        size="sm"
+        variant="outline"
+        [disabled]="isBusy()"
+        (click)="run('unmark-nsfw')"
+      >
+        Unmark NSFW
+      </button>
+      <button
+        hlmBtn
+        size="sm"
+        variant="destructive"
+        [disabled]="isBusy()"
+        (click)="run('delete')"
+      >
+        <ng-icon name="lucideTrash2" />
+        Delete
+      </button>
+      <button
+        hlmBtn
+        size="icon-sm"
+        variant="ghost"
+        aria-label="Clear the selection"
+        (click)="done.emit()"
+      >
+        <ng-icon name="lucideX" />
+      </button>
+    </div>
+  </div>
+}
