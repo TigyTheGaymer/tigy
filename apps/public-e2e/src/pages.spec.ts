@@ -18,9 +18,7 @@ for (const path of ['/no-such-page', '/p/tigy']) {
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(
       'No tiger here',
     );
-    await expect(
-      page.locator('.stage-panel a'),
-    ).toHaveAttribute('href', '/');
+    await expect(page.locator('.stage-panel a')).toHaveAttribute('href', '/');
   });
 }
 
