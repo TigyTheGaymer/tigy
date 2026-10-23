@@ -19,3 +19,4 @@ export { beforeUserCreatedBlocking as beforeUserCreated } from './owner/before-u
 // Owner-only tools for the admin.
 export { rebuildSummariesCallable as rebuildSummaries } from './summaries/rebuild-summaries';
 export { deletePersonCallable as deletePerson } from './people/delete-person';
+export { creditTigyCallable as creditTigy } from './people/credit-tigy';

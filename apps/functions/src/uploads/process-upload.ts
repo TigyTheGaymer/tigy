@@ -2,6 +2,7 @@ import { sortDateFor } from '@tigy/gallery';
 import {
   IMAGES_COLLECTION,
   imagePaths,
+  TIGY_ID,
   UPLOADS_COLLECTION,
   type Image,
   type Upload,
@@ -114,7 +115,7 @@ export async function processUploadedObject(
       published: false,
       nsfw: false,
       artistIds: [],
-      characterIds: [],
+      characterIds: [TIGY_ID],
       tags: [],
       sortDate: sortDateFor(undefined, now.toDate()),
       file: { original: originalPath, ...file },

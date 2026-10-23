@@ -123,6 +123,13 @@ test('Uploading from the Artworks page, editing the fresh upload, then deleting 
   await expect(page.getByRole('img', { name: 'Untitled' })).toBeVisible();
   expect(await readDoc(`uploads/${id}`)).toBeDefined();
 
+  // Tigy comes credited, and removing the credit sticks.
+  await page.getByRole('button', { name: 'Remove Tigy' }).click();
+  await page.getByRole('button', { name: 'Save', exact: true }).click();
+  await expect
+    .poll(async () => (await readDoc(`images/${id}`))?.['characterIds'])
+    .toEqual([]);
+
   // Its row leaves the upload list.
   await page.getByRole('button', { name: 'Delete' }).click();
   await dialog(page).getByRole('button', { name: 'Delete' }).click();

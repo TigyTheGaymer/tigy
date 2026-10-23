@@ -34,7 +34,7 @@ const files = async (prefix: string) =>
 beforeEach(() => clearEmulators());
 
 describe('a supported upload', () => {
-  it('A sticker is processed: becomes an unpublished artwork with its three files', async () => {
+  it('A sticker is processed: becomes an unpublished artwork crediting Tigy, with its three files', async () => {
     const sticker = await picture(500, 500, { alpha: 0 }).png().toBuffer();
     await upload('s1', sticker, 'sticker.png');
 
@@ -42,7 +42,7 @@ describe('a supported upload', () => {
       published: false,
       nsfw: false,
       artistIds: [],
-      characterIds: [],
+      characterIds: ['tigy'],
       tags: [],
       sortDate: sortDateFor(undefined, new Date()),
       file: {

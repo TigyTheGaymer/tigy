@@ -23,6 +23,9 @@ test('Publishing a new upload, marking it NSFW, then deleting it from the editor
   await tiles(page).getByRole('link').first().click();
   await expect(page).toHaveURL(/\/artworks\/[A-Za-z0-9]+\?view=unpublished$/);
   const id = imageId(page);
+  await expect(page.getByRole('list', { name: 'Characters' })).toContainText(
+    'Tigy',
+  );
 
   await page.getByLabel('Title', { exact: true }).fill('Happy hearts');
   await page.getByLabel('Year').fill('2024');
@@ -52,6 +55,7 @@ test('Publishing a new upload, marking it NSFW, then deleting it from the editor
         date: '2024-02',
         sortDate: '2024-02-01',
         artistIds: [bramble.docs[0].id],
+        characterIds: ['tigy'],
         tags: ['hearts'],
         published: true,
         nsfw: false,
