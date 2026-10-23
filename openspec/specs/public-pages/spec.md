@@ -7,7 +7,7 @@ Defines the public site's pages before styling: which addresses exist, what the 
 ## Requirements
 
 ### Requirement: Public addresses
-The public site SHALL serve the home page at `/`, an artwork's page at `/i/{id}`, `/sitemap.xml`, `/robots.txt`, image files under `/img/` and avatars under `/avatars/`. People and tags SHALL NOT have pages of their own. Every other address, and an artwork that does not exist or is not published, SHALL render the not-found page with HTTP status 404 and a link to the home page.
+The public site SHALL serve the home page at `/`, an artwork's page at `/i/{id}`, the privacy page at `/privacy`, `/sitemap.xml`, `/robots.txt`, image files under `/img/` and avatars under `/avatars/`. People and tags SHALL NOT have pages of their own. Every other address, and an artwork that does not exist or is not published, SHALL render the not-found page with HTTP status 404 and a link to the home page.
 
 #### Scenario: Unknown address
 - **WHEN** a visitor opens `/no-such-page` or `/p/tigy`
@@ -16,6 +16,10 @@ The public site SHALL serve the home page at `/`, an artwork's page at `/i/{id}`
 #### Scenario: Unpublished artwork link
 - **WHEN** a visitor opens the address of an unpublished artwork
 - **THEN** the not-found page is shown with status 404
+
+#### Scenario: Privacy page
+- **WHEN** a visitor opens `/privacy`
+- **THEN** the privacy page is shown with status 200
 
 ### Requirement: Home page lists the gallery
 The home page SHALL show the home header (Tigy's name, avatar and social links, and the count and date range of the pieces the visitor may see) and the first page of the gallery, each piece linking to its artwork page and shown at its own shape. Without Tigy's person the header SHALL show just the name "Tigy"; without any piece it SHALL leave out the count and date range and say "No art yet."
@@ -120,11 +124,15 @@ Every page, including artwork and not-found pages, SHALL have the title "Tigy", 
 - **THEN** the browser tab says "Tigy"
 
 ### Requirement: Link previews and the safe link
-An artwork page SHALL carry its real title, description and full image in link-preview metadata. With `?safe` in the address, and on the home and not-found pages, it SHALL carry only the site card: the name "Tigy", the description "Tigy" and Tigy's avatar as a small card. An NSFW artwork page SHALL offer both its link and its safe link.
+An artwork page SHALL carry its real title, description and full image in link-preview metadata. With `?safe` in the address, and on the home, privacy and not-found pages, it SHALL carry only the site card: the name "Tigy", the description "Tigy" and Tigy's avatar as a small card. An NSFW artwork page SHALL offer both its link and its safe link.
 
 #### Scenario: Safe link to an NSFW piece
 - **WHEN** a chat app fetches `/i/{id}?safe` for an NSFW piece
 - **THEN** the preview metadata carries only the site card, with no title, description or image of the piece
+
+#### Scenario: Link to the privacy page
+- **WHEN** a chat app fetches `/privacy`
+- **THEN** the preview metadata carries only the site card
 
 ### Requirement: Crawlers stay out of NSFW pages, files and data
 NSFW artwork pages SHALL tell search engines not to index them, with or without `?safe`, and so SHALL every image file of an NSFW piece. `robots.txt` SHALL disallow `/api/` and name the sitemap.

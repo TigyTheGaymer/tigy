@@ -7,7 +7,7 @@ Defines the public site's designed browsing experience on top of its pages: the 
 ## Requirements
 
 ### Requirement: Home header with social links
-The home page SHALL open with a header showing Tigy's avatar, the name, the bio "A tiger", the number of published pieces and the owner's social links. The public site SHALL have no footer.
+The home page SHALL open with a header showing Tigy's avatar, the name, the bio "A tiger", the number of published pieces and the owner's social links. The public site's only footer SHALL be the privacy footer, which holds nothing but the link to the privacy page.
 
 #### Scenario: Visitor opens the home page
 - **WHEN** a visitor opens the home page
@@ -15,7 +15,7 @@ The home page SHALL open with a header showing Tigy's avatar, the name, the bio 
 
 #### Scenario: No footer
 - **WHEN** a visitor scrolls to the end of the home page or opens an artwork page
-- **THEN** there is no footer and the social links are not repeated
+- **THEN** the only footer is the privacy footer, and the social links are not repeated
 
 ### Requirement: Social links show the network's logo
 Each social link, in the home header and on credits, SHALL show its network's logo in a single colour, the colour of the link's text, together with the handle; a network without a logo SHALL show a generic link icon. On phone-sized screens each header link SHALL show only the icon. Every social link SHALL have an accessible name made of the network and the handle.
