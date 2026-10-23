@@ -144,21 +144,33 @@ Check it with `gcloud storage buckets describe gs://tigy-165cc.appspot.com --for
 
 The first deploy of a function with a new kind of trigger (the first Firestore trigger, the sign-up blocking function, the first Storage trigger) grants roles to Google's own service accounts, which only the owner may do. Deploy that one by hand with `npx nx run functions:deploy` before pushing; CI handles later updates.
 
-| Role                                       | Granted on                                                                        | Needed for                                                        |
-| ------------------------------------------ | --------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
-| `roles/firebaserules.admin`                | project                                                                           | Firestore and Storage rules                                       |
-| `roles/datastore.indexAdmin`               | project                                                                           | Firestore indexes and field overrides                             |
-| `roles/firebasestorage.viewer`             | project                                                                           | finding the default Storage bucket before releasing its rules     |
-| `roles/storage.bucketViewer`               | bucket `tigy-165cc.appspot.com`                                                   | reading that bucket's metadata (no access to its files)           |
-| `roles/cloudfunctions.admin`               | project                                                                           | Cloud Functions                                                   |
-| `roles/iam.serviceAccountUser`             | service account `tigy-165cc@appspot.gserviceaccount.com`                          | the functions deploy's permission check, which tests this account |
-| `roles/iam.serviceAccountUser`             | service account `418667371179-compute@developer.gserviceaccount.com`              | deploying functions, which run as it                              |
-| `roles/artifactregistry.reader`            | project                                                                           | Cloud Functions images                                            |
-| `roles/firebasehosting.admin`              | project                                                                           | the admin on Firebase Hosting                                     |
-| `roles/firebaseapphosting.admin`           | project                                                                           | public site rollouts on App Hosting                               |
-| `roles/developerconnect.readTokenAccessor` | project                                                                           | App Hosting reading the commit through the GitHub connection      |
-| `roles/iam.serviceAccountUser`             | service account `firebase-app-hosting-compute@tigy-165cc.iam.gserviceaccount.com` | starting App Hosting builds, which run as it                      |
-| `roles/serviceusage.serviceUsageConsumer`  | project                                                                           | checking that the needed APIs are enabled                         |
+| Role                                                                                   | Granted on                                                                        | Needed for                                                                           |
+| -------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| `roles/firebaserules.admin`                                                            | project                                                                           | Firestore and Storage rules                                                          |
+| `roles/datastore.indexAdmin`                                                           | project                                                                           | Firestore indexes and field overrides                                                |
+| `roles/firebasestorage.viewer`                                                         | project                                                                           | finding the default Storage bucket before releasing its rules                        |
+| `roles/storage.bucketViewer`                                                           | bucket `tigy-165cc.appspot.com`                                                   | reading that bucket's metadata (no access to its files)                              |
+| `roles/cloudfunctions.admin`                                                           | project                                                                           | Cloud Functions                                                                      |
+| `roles/iam.serviceAccountUser`                                                         | service account `tigy-165cc@appspot.gserviceaccount.com`                          | the functions deploy's permission check, which tests this account                    |
+| `roles/iam.serviceAccountUser`                                                         | service account `418667371179-compute@developer.gserviceaccount.com`              | deploying functions, which run as it                                                 |
+| `roles/artifactregistry.reader`                                                        | project                                                                           | Cloud Functions images                                                               |
+| `roles/firebasehosting.admin`                                                          | project                                                                           | the admin on Firebase Hosting                                                        |
+| `roles/firebaseapphosting.admin`                                                       | project                                                                           | public site rollouts on App Hosting                                                  |
+| `roles/developerconnect.readTokenAccessor`                                             | project                                                                           | App Hosting reading the commit through the GitHub connection                         |
+| `roles/iam.serviceAccountUser`                                                         | service account `firebase-app-hosting-compute@tigy-165cc.iam.gserviceaccount.com` | starting App Hosting builds, which run as it                                         |
+| `roles/serviceusage.serviceUsageConsumer`                                              | project                                                                           | checking that the needed APIs are enabled                                            |
+| `projects/tigy-165cc/roles/authConfigReader` (custom: `firebaseauth.configs.get` only) | project                                                                           | reading the sign-up blocking function's registration in the Identity Platform config |
+
+Each deploy of the sign-up blocking function reads the Identity Platform config and rewrites it when the trigger's address or forwarded tokens differ. `github-deploy` may only read it, so it can never change sign-in settings. A first deploy registers the `cloudfunctions.net` address but an update compares the function's `run.app` one, so after the function is created, or its token options change, CI fails with a 403 on `identitytoolkit.googleapis.com/.../config`. The owner then writes what CI would have, once:
+
+```sh
+curl -X PATCH "https://identitytoolkit.googleapis.com/admin/v2/projects/tigy-165cc/config?updateMask=blockingFunctions" \
+  -H "Authorization: Bearer $(gcloud auth print-access-token)" -H "x-goog-user-project: tigy-165cc" \
+  -H "Content-Type: application/json" \
+  -d '{"blockingFunctions":{"triggers":{"beforeCreate":{"functionUri":"<serviceConfig.uri from gcloud functions describe beforeUserCreated --region europe-west6>"}},"forwardInboundCredentials":{}}}'
+```
+
+Then re-run the failed deploy.
 
 Changing only the `hosting` section of `firebase.json` marks the `firebase` project, not `admin`. Deploy the admin by hand afterwards (see below).
 
