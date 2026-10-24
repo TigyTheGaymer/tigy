@@ -26,15 +26,23 @@ const LABEL_GAP = 0.035;
 /** Year marks in gallery order (`years` already sorted that way), spaced so labels never overlap. */
 export function yearPositions(years: readonly YearMark[]): YearPosition[] {
   const total = years.reduce((sum, year) => sum + year.count, 0);
+  const gap = Math.min(LABEL_GAP, 1 / Math.max(1, years.length - 1));
   let index = 0;
   let last = -Infinity;
-  return years.map(({ year, count }) => {
-    const at = Math.max(total ? index / total : 0, last + LABEL_GAP);
-    const position = { year, at: Math.min(at, 1), index };
+  const positions = years.map(({ year, count }) => {
+    const at = Math.max(total ? index / total : 0, last + gap);
     last = at;
+    const position = { year, at, index };
     index += count;
     return position;
   });
+  // Pushing down can run past the end, so pull the tail back up.
+  let next = 1 + gap;
+  for (let i = positions.length - 1; i >= 0; i--) {
+    positions[i].at = Math.max(0, Math.min(positions[i].at, next - gap));
+    next = positions[i].at;
+  }
+  return positions;
 }
 
 /** Spans the whole filtered gallery, loaded or not; the page loads pages until a chosen piece arrives. */

@@ -24,6 +24,29 @@ describe('yearPositions', () => {
     expect(second.index).toBe(1);
   });
 
+  it('keeps years at the end of the gallery apart', () => {
+    const marks = yearPositions([
+      { year: 2026, count: 97 },
+      { year: 2021, count: 1 },
+      { year: 2019, count: 1 },
+      { year: 2018, count: 1 },
+      { year: 2016, count: 1 },
+    ]);
+    const ats = marks.map((mark) => mark.at);
+    expect(ats.at(-1)).toBeLessThanOrEqual(1);
+    for (let i = 1; i < ats.length; i++) {
+      expect(ats[i] - ats[i - 1]).toBeGreaterThanOrEqual(0.035 - 1e-9);
+    }
+  });
+
+  it('fits every year on the tail when there are many', () => {
+    const marks = yearPositions(
+      Array.from({ length: 50 }, (_, i) => ({ year: 2026 - i, count: 1 })),
+    );
+    expect(marks[0].at).toBeGreaterThanOrEqual(0);
+    expect(marks.at(-1)?.at).toBeLessThanOrEqual(1);
+  });
+
   it('is empty for an empty gallery', () => {
     expect(yearPositions([])).toEqual([]);
   });
