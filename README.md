@@ -100,18 +100,18 @@ npx nx run public-e2e:preview
 Everything lives in one Firebase project, `tigy-165cc`. Every push to `main` runs [.github/workflows/deploy.yml](.github/workflows/deploy.yml), which deploys only what changed since the last successful run:
 
 1. **Gate**: `nx affected -t lint test build e2e`. If anything fails, nothing deploys. The end-to-end tests run only when the public site, its libraries, the seed or the rules change.
-2. **Stage 1, backend** (`tag:backend`): `firebase` deploys the Firestore rules and indexes and the Storage rules; `functions` deploys the Cloud Functions.
+2. **Stage 1, backend** (`tag:backend`): `firebase` deploys the Firestore rules and indexes, the Storage rules and the short link https://tigy.web.app, a Hosting site that redirects to the public site; `functions` deploys the Cloud Functions.
 3. **Stage 2, frontends** (`tag:frontend`): `admin` deploys to Firebase Hosting (https://tigy-165cc.web.app); `public` creates an App Hosting rollout of the pushed commit (https://public--tigy-165cc.europe-west4.hosted.app).
 
-| You change                        | What deploys           |
-| --------------------------------- | ---------------------- |
-| `firebase/*` or `firebase.json`   | rules and indexes      |
-| `apps/functions`                  | functions              |
-| `apps/admin`                      | admin                  |
-| `apps/public`                     | public site            |
-| `libs/models`                     | every app using it     |
-| a dependency in `package.json`    | every project using it |
-| `nx.json` or `tsconfig.base.json` | everything             |
+| You change                        | What deploys                      |
+| --------------------------------- | --------------------------------- |
+| `firebase/*` or `firebase.json`   | rules, indexes and the short link |
+| `apps/functions`                  | functions                         |
+| `apps/admin`                      | admin                             |
+| `apps/public`                     | public site                       |
+| `libs/models`                     | every app using it                |
+| a dependency in `package.json`    | every project using it            |
+| `nx.json` or `tsconfig.base.json` | everything                        |
 
 Backend always deploys before frontends, so a page never ships before the rules or indexes it needs. Newly added composite indexes can take a few minutes to build, so a new query can briefly fail right after a deploy.
 

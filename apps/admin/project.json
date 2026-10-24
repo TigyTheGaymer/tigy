@@ -89,7 +89,7 @@
       "options": {
         "commands": [
           {
-            "command": "firebase deploy --only hosting --project tigy-165cc --non-interactive",
+            "command": "firebase deploy --only hosting:admin --project tigy-165cc --non-interactive",
             "forwardAllArgs": false
           }
         ],

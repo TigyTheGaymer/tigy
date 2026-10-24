@@ -1,5 +1,17 @@
 {
   "projects": {
     "default": "tigy-165cc"
+  },
+  "targets": {
+    "tigy-165cc": {
+      "hosting": {
+        "admin": [
+          "tigy-165cc"
+        ],
+        "short-link": [
+          "tigy"
+        ]
+      }
+    }
   }
 }

@@ -75,7 +75,7 @@
     "deploy": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "firebase deploy --only firestore,storage --project tigy-165cc --non-interactive",
+        "command": "firebase deploy --only firestore,storage,hosting:short-link --project tigy-165cc --non-interactive",
         "cwd": "{workspaceRoot}"
       }
     }
