@@ -51,4 +51,52 @@ describe('HeadService', () => {
     expect(content('property="og:title"')).toBe('Untitled');
     expect(content('name="robots"')).toBe('noindex');
   });
+
+  it('GIF: the preview links the original, which embedders animate', () => {
+    head.artwork(
+      artwork({
+        id: 'wave',
+        file: {
+          ...artwork().artwork.file,
+          original: 'images/wave/original.gif',
+          mime: 'image/gif',
+          animated: true,
+        },
+      }),
+    );
+    expect(content('property="og:image"')).toBe(
+      `${location.origin}/img/wave/original.gif`,
+    );
+    expect(content('property="og:video"')).toBeUndefined();
+  });
+
+  it('Video: the preview plays the MP4 over its poster, and the next page drops it', () => {
+    head.artwork(
+      artwork({
+        id: 'dance',
+        file: {
+          ...artwork().artwork.file,
+          original: 'images/dance/original.mov',
+          mime: 'video/quicktime',
+          animated: true,
+          w: 1920,
+          h: 1080,
+        },
+      }),
+    );
+    expect(content('property="og:image"')).toBe(
+      `${location.origin}/img/dance/full.webp`,
+    );
+    expect(content('property="og:type"')).toBe('video.other');
+    expect(content('property="og:video"')).toBe(
+      `${location.origin}/img/dance/full.mp4`,
+    );
+    expect(content('property="og:video:type"')).toBe('video/mp4');
+    expect(content('property="og:video:width"')).toBe('1920');
+    expect(content('property="og:video:height"')).toBe('1080');
+
+    head.siteCard();
+    expect(content('property="og:video"')).toBeUndefined();
+    expect(content('property="og:type"')).toBeUndefined();
+  });
 });
