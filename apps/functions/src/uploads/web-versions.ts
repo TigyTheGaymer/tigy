@@ -19,7 +19,9 @@ export async function makeWebVersions(
 ): Promise<WebVersions> {
   const sharp = await loadSharp();
   // libvips reads only the first frame of an APNG, so its web versions are still.
-  const image = () => sharp(original, { animated: true });
+  // processUpload checks MAX_PIXELS first; sharp's own limit is lower and would refuse long GIFs.
+  const image = () =>
+    sharp(original, { animated: true, limitInputPixels: false });
   const webp = (size: number) =>
     image()
       .rotate()
