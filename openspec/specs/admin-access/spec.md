@@ -11,7 +11,7 @@ The admin SHALL offer only Google sign-in. When the owner signs in with the owne
 
 #### Scenario: Owner signs in
 - **WHEN** the owner opens the admin while signed out and signs in with the owner's Google account
-- **THEN** the admin opens the Uploads page
+- **THEN** the admin opens the Artworks page
 
 #### Scenario: Coming back later
 - **WHEN** the owner closes the admin and opens it again in the same browser
@@ -31,9 +31,13 @@ Every admin page SHALL show its content only to the signed-in owner. Opening any
 - **WHEN** a signed-out visitor opens the admin's Uploads address
 - **THEN** the sign-in page is shown, no upload is listed, and after the owner signs in the Uploads page opens
 
+#### Scenario: Signed-out link to an artwork
+- **WHEN** a signed-out visitor opens the admin address of an artwork's editor
+- **THEN** the sign-in page is shown, nothing of the artwork is shown, and after the owner signs in that artwork's editor opens
+
 #### Scenario: Unknown admin address
 - **WHEN** the signed-in owner opens an admin address that does not exist
-- **THEN** the admin shows the Uploads page
+- **THEN** the admin shows the Artworks page
 
 ### Requirement: The owner can sign out
 The admin SHALL show which account is signed in and SHALL let the owner sign out. After signing out, the admin SHALL show the sign-in page and SHALL NOT show any data until the owner signs in again.
