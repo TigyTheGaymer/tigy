@@ -3,7 +3,7 @@
   top: var(--bar-h);
   z-index: var(--z-filter-row);
   margin-bottom: 14px;
-  padding: 8px 0 10px;
+  padding: 4px 0 6px;
   background: color-mix(in srgb, var(--page) 94%, transparent);
   backdrop-filter: blur(8px);
 }
@@ -12,6 +12,8 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  /* Scrolling clips vertically too, so leave room for the hover lift. */
+  padding-block: 4px;
   overflow-x: auto;
   scrollbar-width: none;
 }
