@@ -33,6 +33,19 @@
       "port": 4000
     },
     {
+      "name": "emulators-admin",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "firebase",
+        "emulators:start",
+        "--only",
+        "auth,functions,firestore,storage",
+        "--project",
+        "demo-tigy"
+      ],
+      "port": 4000
+    },
+    {
       "name": "admin",
       "runtimeExecutable": "npx",
       "runtimeArgs": ["nx", "serve", "admin"],
