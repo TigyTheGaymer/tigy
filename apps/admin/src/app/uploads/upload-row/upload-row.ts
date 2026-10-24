@@ -22,7 +22,7 @@ export const FAILURE_MESSAGES: Record<FailureReason, string> = {
   unsupported: 'Only JPEG, PNG, GIF and WebP are supported.',
   damaged: 'The file is damaged. Export it again and upload the new file.',
   'too-large':
-    'The picture is too large to process (over 250 million pixels). Make it smaller and upload it again.',
+    'The picture is too large to process (over 1 billion pixels, counting every frame). Make it smaller and upload it again.',
   internal: 'Processing failed. Upload the file again.',
   'too-long': 'Processing took too long. Upload the file again.',
   'not-sent': "The upload didn't finish. Upload the file again.",

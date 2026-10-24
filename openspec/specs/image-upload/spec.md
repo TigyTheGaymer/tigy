@@ -104,14 +104,14 @@ The Uploads page SHALL list uploads newest first and SHALL update without reload
 - **THEN** those uploads are still listed with their status
 
 ### Requirement: Failed uploads say why and leave nothing behind
-When processing cannot finish, the row SHALL show failed with a reason the owner can act on, such as a damaged file, a picture too large to process or processing that took too long. A failed upload SHALL leave no artwork and no files behind. Processing SHALL refuse a picture of more than 250 million pixels, counting every animation frame.
+When processing cannot finish, the row SHALL show failed with a reason the owner can act on, such as a damaged file, a picture too large to process or processing that took too long. A failed upload SHALL leave no artwork and no files behind. Processing SHALL refuse a picture of more than 1 billion pixels, counting every animation frame.
 
 #### Scenario: Damaged file
 - **WHEN** the owner uploads a PNG that is cut off halfway
 - **THEN** its row shows failed with a message that the file is damaged, and no artwork is created
 
 #### Scenario: Picture too large to process
-- **WHEN** the owner uploads an image of 20,000 by 20,000 pixels
+- **WHEN** the owner uploads an image of 40,000 by 40,000 pixels
 - **THEN** its row shows failed with a message that the picture is too large to process, and no artwork is created
 
 #### Scenario: Processing never finishes

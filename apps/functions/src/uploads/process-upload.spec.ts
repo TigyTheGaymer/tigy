@@ -176,10 +176,10 @@ describe('a failed upload', () => {
     await expectNothingLeft('d1');
   });
 
-  it('Picture too large to process: fails 20,000 by 20,000 pixels from the header alone', async () => {
+  it('Picture too large to process: fails 40,000 by 40,000 pixels from the header alone', async () => {
     await upload(
       't1',
-      withSize(await picture(64, 64).png().toBuffer(), 20_000, 20_000),
+      withSize(await picture(64, 64).png().toBuffer(), 40_000, 40_000),
     );
     expect(await record('t1')).toMatchObject({
       status: 'failed',

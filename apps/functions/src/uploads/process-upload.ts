@@ -26,8 +26,8 @@ import {
 } from './strip-metadata/strip-metadata';
 import { makeWebVersions } from './web-versions';
 
-/** Width × height × frames. About 1 GB once decoded to RGBA, which 4 GiB of memory leaves room to resize. */
-export const MAX_PIXELS = 250_000_000;
+/** Width × height × frames. 500 million (a 320-frame 1440×1080 GIF) peaked at 1.4 GB, well inside 4 GiB. */
+export const MAX_PIXELS = 1_000_000_000;
 
 export interface UploadedObject {
   name: string;
