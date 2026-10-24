@@ -17,6 +17,8 @@ export interface GalleryRow {
   artistIds: string[];
   characterIds: string[];
   tags: string[];
+  // Absent for images, so their rows don't grow.
+  isVideo?: true;
 }
 
 /** One person in `meta/people`, for the filter pickers and chips. */

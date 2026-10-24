@@ -1,10 +1,11 @@
-import type {
-  GalleryRow,
-  Image,
-  PeopleEntry,
-  Person,
-  TagCounts,
-  WithId,
+import {
+  isVideoFile,
+  type GalleryRow,
+  type Image,
+  type PeopleEntry,
+  type Person,
+  type TagCounts,
+  type WithId,
 } from '@tigy/models';
 import { compareText } from '../shared/compare';
 import { compareNewestFirst } from '../gallery-query/gallery-query';
@@ -22,6 +23,7 @@ export function toGalleryRow(image: WithId<Image>): GalleryRow {
     tags: [...image.tags],
   };
   if (image.title) row.title = image.title;
+  if (isVideoFile(image.file)) row.isVideo = true;
   return row;
 }
 

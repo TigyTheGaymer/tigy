@@ -6,7 +6,15 @@ export const UPLOADS_COLLECTION = 'uploads';
 export type UploadStatus = 'processing' | 'ready' | 'failed';
 
 /** Stored as a code; the admin turns it into words. */
-export type UploadError = 'unsupported' | 'damaged' | 'too-large' | 'internal';
+export type UploadError =
+  | 'unsupported'
+  | 'damaged'
+  | 'too-large'
+  | 'file-too-large'
+  | 'video-too-long'
+  | 'video-too-large'
+  | 'unreadable'
+  | 'internal';
 
 /**
  * `uploads/{uploadId}`: one file's way through processing, written only by Cloud Functions.
@@ -20,7 +28,10 @@ export interface Upload {
   status: UploadStatus;
   error?: UploadError;
   /** Copied from the image when ready, so the upload list needs no image reads. */
-  file?: Pick<ImageFile, 'w' | 'h' | 'bytes' | 'mime' | 'animated'>;
+  file?: Pick<
+    ImageFile,
+    'w' | 'h' | 'bytes' | 'mime' | 'animated' | 'durationMs'
+  >;
   createdAt: TimestampLike;
   updatedAt: TimestampLike;
 }

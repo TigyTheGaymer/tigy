@@ -40,6 +40,13 @@ describe('toGalleryRow', () => {
   it('leaves out a missing title', () => {
     expect(toGalleryRow(anImage('k3x'))).not.toHaveProperty('title');
   });
+
+  it('marks a video row, and leaves an image row without the field', () => {
+    const video = anImage('vid');
+    video.file.mime = 'video/mp4';
+    expect(toGalleryRow(video).isVideo).toBe(true);
+    expect(toGalleryRow(anImage('k3x'))).not.toHaveProperty('isVideo');
+  });
 });
 
 describe('buildGalleryItems', () => {

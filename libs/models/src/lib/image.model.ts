@@ -11,6 +11,9 @@ export interface ImageFile {
   mime: string;
   animated: boolean;
   transparent: boolean;
+  // Set only for a video, whose `mime` starts with `video/`.
+  durationMs?: number;
+  hasAudio?: boolean;
 }
 
 /** `images/{imageId}`: the source of truth for one artwork. */
@@ -39,6 +42,12 @@ export const imagePaths = {
   folder: (imageId: string) => `images/${imageId}/`,
   thumb: (imageId: string) => `images/${imageId}/thumb.webp`,
   full: (imageId: string) => `images/${imageId}/full.webp`,
+  video: (imageId: string) => `images/${imageId}/full.mp4`,
+  preview: (imageId: string) => `images/${imageId}/preview.mp4`,
   original: (imageId: string, ext: string) =>
     `images/${imageId}/original.${ext}`,
 };
+
+export function isVideoFile(file: Pick<ImageFile, 'mime'>): boolean {
+  return file.mime.startsWith('video/');
+}

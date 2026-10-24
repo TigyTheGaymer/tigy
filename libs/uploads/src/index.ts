@@ -1,1 +1,1 @@
-export * from './lib/image-format';
+export * from './lib/format';
