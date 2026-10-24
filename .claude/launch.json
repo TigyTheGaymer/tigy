@@ -14,6 +14,19 @@
       "port": 4300
     },
     {
+      "name": "public-on-emulators",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["dist/apps/public/server/server.mjs"],
+      "env": {
+        "PORT": "4300",
+        "GCLOUD_PROJECT": "demo-tigy",
+        "FIREBASE_CONFIG": "{\"projectId\":\"demo-tigy\",\"storageBucket\":\"demo-tigy.appspot.com\"}",
+        "FIRESTORE_EMULATOR_HOST": "127.0.0.1:8080",
+        "FIREBASE_STORAGE_EMULATOR_HOST": "127.0.0.1:9199"
+      },
+      "port": 4300
+    },
+    {
       "name": "emulators",
       "runtimeExecutable": "npx",
       "runtimeArgs": ["nx", "run", "firebase:emulators"],
