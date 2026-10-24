@@ -227,7 +227,7 @@ test.describe('home', () => {
     // Hiding the page's scrollbar would shift the page under the dropdown.
     await expect(page.locator('html')).not.toHaveCSS('overflow-y', 'hidden');
     await expect(page).toHaveURL(/\/$/);
-    await expect(tiles(page)).toHaveCount(5);
+    await expect(tiles(page)).toHaveCount(6);
     await expect(page.getByText('coming later')).toHaveCount(0);
   });
 

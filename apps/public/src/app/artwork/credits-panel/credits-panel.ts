@@ -12,8 +12,13 @@ import {
   lucideUsers,
   lucideX,
 } from '@ng-icons/lucide';
-import { fileSize, formatArtworkDate, formatName } from '@tigy/gallery';
-import { TIGY_ID } from '@tigy/models';
+import {
+  fileSize,
+  formatArtworkDate,
+  fileDuration,
+  formatName,
+} from '@tigy/gallery';
+import { isVideoFile, TIGY_ID } from '@tigy/models';
 import type { ArtworkResponse, CreditedPerson } from '../../../api/types';
 import { Paw } from '../../markings/paw';
 import { PieceTitlePipe } from '../../shared/piece-title.pipe';
@@ -56,15 +61,22 @@ export class CreditsPanel {
       ? formatArtworkDate(date)
       : `Added ${formatArtworkDate(sortDate)}`;
   });
+  protected readonly isVideo = computed(() => isVideoFile(this.artwork().file));
   protected readonly file = computed(() => {
     const { file } = this.artwork();
+    const duration = fileDuration(file);
+    const kind = this.isVideo()
+      ? [
+          formatName(file.mime),
+          ...(duration ? [duration] : []),
+          file.hasAudio ? 'With sound' : 'Silent',
+        ]
+      : [formatName(file.mime) + (file.animated ? ' (animated)' : '')];
     return {
       href: originalUrl(this.artwork()),
-      summary: [
-        formatName(file.mime) + (file.animated ? ' (animated)' : ''),
-        `${file.w} × ${file.h} px`,
-        fileSize(file.bytes),
-      ].join(' · '),
+      summary: [...kind, `${file.w} × ${file.h} px`, fileSize(file.bytes)].join(
+        ' · ',
+      ),
     };
   });
   protected readonly sections = computed(() =>

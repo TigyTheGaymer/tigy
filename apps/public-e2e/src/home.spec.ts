@@ -20,7 +20,7 @@ test.describe('with 30 more pieces', () => {
     const html = (await response?.text()) ?? '';
     expect(html).toContain('<h1');
     expect(html).toContain('Tigy');
-    expect(html).toContain('35 pieces · Jan 2025 – May 2026');
+    expect(html).toContain('36 pieces · Jan 2025 – May 2026');
     const links = [
       ...html.matchAll(/class="tile[^"]*"[^>]*>\s*<a[^>]*href="([^"]+)"/g),
     ].map((m) => m[1]);
@@ -154,7 +154,7 @@ test.describe('filters', () => {
     await page.getByRole('link', { name: 'comic, 1 piece, selected' }).click();
     await expect(page).toHaveURL(/\/\?character=tigy&sort=oldest$/);
     // chibi-tigy credits nobody.
-    await expect(tiles(page)).toHaveCount(4);
+    await expect(tiles(page)).toHaveCount(5);
     await expect(tiles(page).first()).toHaveAttribute('href', '/i/happy-tigy');
     await expect(page.locator('.pickers .chip.is-active')).toHaveAttribute(
       'aria-label',
@@ -176,7 +176,7 @@ test.describe('filters', () => {
     ).toBeVisible();
     await page.getByRole('link', { name: 'Clear the filters' }).click();
     await expect(page).toHaveURL(/\/\?sort=oldest$/);
-    await expect(tiles(page)).toHaveCount(5);
+    await expect(tiles(page)).toHaveCount(6);
   });
 
   test('No matches: the gallery says nothing matches and offers to clear the filters', async ({
@@ -251,7 +251,7 @@ test.describe('filters', () => {
       .getByRole('link', { name: 'comic, 1 piece, selected' })
       .click();
     await expect(page).toHaveURL(/\/$/);
-    await expect(tiles(page)).toHaveCount(5);
+    await expect(tiles(page)).toHaveCount(6);
     await expect(
       picker.getByRole('link', { name: 'comic, 1 piece' }),
     ).toBeVisible();
@@ -358,7 +358,7 @@ test.describe('filters', () => {
 
     await page.getByRole('link', { name: 'Clear all' }).click();
     await expect(page).toHaveURL(/\/\?sort=oldest$/);
-    await expect(tiles(page)).toHaveCount(5);
+    await expect(tiles(page)).toHaveCount(6);
     await expect(page.locator('.pickers .chip.is-active')).toHaveCount(0);
     await expect(page.getByRole('link', { name: 'Clear all' })).toHaveCount(0);
   });

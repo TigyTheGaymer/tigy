@@ -13,6 +13,9 @@
           [loading]="index < eagerTiles ? 'eager' : 'lazy'"
           decoding="async"
         />
+        @if (tile.preview; as preview) {
+          <app-video-preview [src]="preview" />
+        }
         @if (tile.isNsfw) {
           <span class="badge" aria-hidden="true">NSFW</span>
         }

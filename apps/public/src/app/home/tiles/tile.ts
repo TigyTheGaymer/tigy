@@ -1,6 +1,6 @@
 import type { GalleryRow } from '@tigy/models';
 import { pieceTitle } from '../../shared/format';
-import { thumbnailUrl } from '../../shared/urls';
+import { previewUrl, thumbnailUrl } from '../../shared/urls';
 
 export interface Tile {
   id: string;
@@ -14,6 +14,7 @@ export interface Tile {
   title?: string;
   name: string;
   isNsfw: boolean;
+  preview?: string;
 }
 
 const NARROWEST = 0.5;
@@ -30,5 +31,6 @@ export function toTile(row: GalleryRow): Tile {
     title: row.title,
     name: pieceTitle(row.title),
     isNsfw: row.nsfw,
+    ...(row.isVideo ? { preview: previewUrl(row.id) } : {}),
   };
 }

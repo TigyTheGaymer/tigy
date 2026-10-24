@@ -8,6 +8,7 @@ import { TestBed } from '@angular/core/testing';
 import { provideRouter, withComponentInputBinding } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { appRoutes } from '../app.routes';
+import { StageBar } from '../chrome/stage-bar';
 import { AgeCheckService } from '../nsfw/age-check.service';
 import { NsfwSwitchService } from '../nsfw/nsfw-switch.service';
 import { artwork, requested, settled } from '../testing';
@@ -229,5 +230,241 @@ describe('ArtworkPage', () => {
     expect(hrefs('[aria-label="Back to the gallery"]')).toEqual([
       '/?character=pookie',
     ]);
+  });
+
+  describe('a video piece', () => {
+    const VIDEO_FILE = {
+      original: 'images/clip/original.mp4',
+      w: 1080,
+      h: 1920,
+      bytes: 12_300_000,
+      mime: 'video/mp4',
+      animated: true,
+      transparent: false,
+      durationMs: 42_000,
+      hasAudio: true,
+    };
+    const clip = (fields: Parameters<typeof artwork>[0] = {}) =>
+      artwork({
+        id: 'clip',
+        title: 'Hey Pookie!',
+        file: VIDEO_FILE,
+        ...fields,
+      });
+
+    let play: ReturnType<typeof vi.fn<() => Promise<void>>>;
+    let pause: ReturnType<typeof vi.fn<() => void>>;
+
+    function stubPlayer({ isMotionReduced = false } = {}): void {
+      vi.stubGlobal('matchMedia', (query: string) => ({
+        matches: query.includes('reduced-motion') && isMotionReduced,
+        addEventListener: () => undefined,
+        removeEventListener: () => undefined,
+      }));
+      play = vi.fn<() => Promise<void>>(() => Promise.resolve());
+      pause = vi.fn<() => void>();
+      vi.spyOn(HTMLMediaElement.prototype, 'play').mockImplementation(play);
+      vi.spyOn(HTMLMediaElement.prototype, 'pause').mockImplementation(pause);
+      vi.spyOn(HTMLMediaElement.prototype, 'load').mockImplementation(
+        () => undefined,
+      );
+      onTestFinished(() => {
+        vi.restoreAllMocks();
+      });
+    }
+
+    const player = () => page().querySelector<HTMLVideoElement>('video');
+
+    it('Opening a video piece: plays the web copy muted in a loop, with controls and the still as its poster', async () => {
+      stubPlayer();
+      (await open('/i/clip', 'clip')).flush(clip());
+      await settled();
+
+      const video = player()!;
+      expect(video.getAttribute('src')).toBe('/img/clip/full.mp4');
+      expect(video.getAttribute('poster')).toBe('/img/clip/full.webp');
+      expect(video.muted).toBe(true);
+      expect(video.volume).toBe(0.5);
+      expect(video.loop).toBe(true);
+      expect(video.controls).toBe(true);
+      expect(video.hasAttribute('playsinline')).toBe(true);
+      expect(video.hasAttribute('autoplay')).toBe(false);
+      expect(video.getAttribute('preload')).toBe('metadata');
+      expect(video.getAttribute('width')).toBe('1080');
+      expect(video.getAttribute('aria-label')).toBe('Hey Pookie!');
+      expect(play).toHaveBeenCalledTimes(1);
+      expect(page().querySelector('.piece')).toBeNull();
+      expect(hrefs('.download')).toEqual(['/img/clip/original.mp4']);
+    });
+
+    it('Video full screen: offers no zooming full view', async () => {
+      stubPlayer();
+      (await open('/i/clip', 'clip')).flush(clip());
+      await settled();
+      expect(page().querySelector('[aria-label="Full view"]')).toBeNull();
+      expect(text('app-credits-panel')).not.toContain('Full view');
+      expect(page().querySelector('app-full-view')).toBeNull();
+    });
+
+    it('Reduced motion: leaves the player paused on its still', async () => {
+      stubPlayer({ isMotionReduced: true });
+      (await open('/i/clip', 'clip')).flush(clip());
+      await settled();
+      expect(player()).not.toBeNull();
+      expect(play).not.toHaveBeenCalled();
+    });
+
+    it('keeps playing silently when autoplay is refused', async () => {
+      stubPlayer();
+      play.mockImplementation(() => Promise.reject(new Error('NotAllowed')));
+      (await open('/i/clip', 'clip')).flush(clip());
+      await settled();
+      expect(player()).not.toBeNull();
+    });
+
+    it('Moving to the next piece: stops the video and clears it, so its sound does not carry over', async () => {
+      stubPlayer();
+      (await open('/i/clip', 'clip')).flush(clip());
+      await settled();
+      const first = player()!;
+
+      void harness.navigateByUrl('/i/hey-pookie');
+      (await requested(http, '/api/artworks/hey-pookie')).flush(artwork());
+      await settled();
+
+      expect(pause).toHaveBeenCalled();
+      expect(first.hasAttribute('src')).toBe(false);
+      expect(player()).toBeNull();
+      expect(page().querySelector('.piece img')).not.toBeNull();
+    });
+
+    it('stops the video when the page is left', async () => {
+      stubPlayer();
+      (await open('/i/clip', 'clip')).flush(clip());
+      await settled();
+      const video = player()!;
+      void harness.navigateByUrl('/privacy');
+      await settled();
+      expect(pause).toHaveBeenCalled();
+      expect(video.hasAttribute('src')).toBe(false);
+    });
+
+    it('lets the arrow keys seek a focused player instead of changing piece', async () => {
+      stubPlayer();
+      (await open('/i/clip', 'clip')).flush(
+        artwork({ id: 'clip', file: VIDEO_FILE }, { next: { id: 'after' } }),
+      );
+      await settled();
+      player()!.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }),
+      );
+      await settled();
+      expect(http.match('/api/artworks/after')).toEqual([]);
+      document.body.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }),
+      );
+      (await requested(http, '/api/artworks/after')).flush(
+        artwork({ id: 'after' }),
+      );
+    });
+
+    it('still goes back to the gallery on Escape from a focused player', async () => {
+      stubPlayer();
+      const goBack = vi
+        .spyOn(StageBar.prototype, 'goBack')
+        .mockImplementation(() => undefined);
+      (await open('/i/clip', 'clip')).flush(clip());
+      await settled();
+      player()!.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }),
+      );
+      expect(goBack).toHaveBeenCalled();
+    });
+
+    /** jsdom has no Touch, so the events carry plain points. */
+    function swipe(
+      target: Element,
+      from: [number, number],
+      to: [number, number],
+    ) {
+      const event = (type: string, touches: object[], changed: object[]) => {
+        const e = new Event(type, { bubbles: true });
+        Object.defineProperty(e, 'touches', { value: touches });
+        Object.defineProperty(e, 'changedTouches', { value: changed });
+        target.dispatchEvent(e);
+      };
+      const point = ([clientX, clientY]: [number, number]) => ({
+        clientX,
+        clientY,
+      });
+      event('touchstart', [point(from)], [point(from)]);
+      event('touchend', [], [point(to)]);
+    }
+
+    it('changes piece on a swipe across the picture, but not on one along the controls', async () => {
+      stubPlayer();
+      (await open('/i/clip', 'clip')).flush(
+        artwork({ id: 'clip', file: VIDEO_FILE }, { next: { id: 'after' } }),
+      );
+      await settled();
+      vi.spyOn(player()!, 'getBoundingClientRect').mockReturnValue({
+        top: 0,
+        bottom: 500,
+      } as DOMRect);
+
+      swipe(player()!, [300, 470], [100, 470]);
+      await settled();
+      expect(http.match('/api/artworks/after')).toEqual([]);
+
+      swipe(player()!, [300, 200], [100, 210]);
+      (await requested(http, '/api/artworks/after')).flush(
+        artwork({ id: 'after' }),
+      );
+    });
+
+    it('NSFW video behind the confirm screen: loads no video or still until confirmed', async () => {
+      stubPlayer();
+      localStorage.setItem('tigy.nsfw.age', '1');
+      (await open('/i/clip', 'clip')).flush(clip({ nsfw: true }));
+      await settled();
+      expect(player()).toBeNull();
+      expect(page().querySelector('img')).toBeNull();
+      expect(text('.confirm')).toContain('Show this piece');
+
+      page().querySelector<HTMLButtonElement>('.confirm button')!.click();
+      await settled();
+      expect(player()?.getAttribute('src')).toBe('/img/clip/full.mp4');
+    });
+
+    it('Video details: shows the format, duration, sound, size and dimensions', async () => {
+      stubPlayer();
+      (await open('/i/clip', 'clip')).flush(clip());
+      await settled();
+      expect(text('.file')).toBe(
+        'MP4 video · 0:42 · With sound · 1080 × 1920 px · 12.3 MB',
+      );
+    });
+
+    it('Silent video: says it is silent', async () => {
+      stubPlayer();
+      (await open('/i/clip', 'clip')).flush(
+        clip({
+          file: { ...VIDEO_FILE, mime: 'video/webm', hasAudio: false },
+        }),
+      );
+      await settled();
+      expect(text('.file')).toBe(
+        'WebM video · 0:42 · Silent · 1080 × 1920 px · 12.3 MB',
+      );
+    });
+
+    it('leaves an image piece without a player', async () => {
+      stubPlayer();
+      (await open('/i/hey-pookie', 'hey-pookie')).flush(artwork());
+      await settled();
+      expect(player()).toBeNull();
+      expect(page().querySelector('[aria-label="Full view"]')).not.toBeNull();
+      expect(text('.file')).toBe('PNG · 1620 × 2117 px · 3.7 MB');
+    });
   });
 });

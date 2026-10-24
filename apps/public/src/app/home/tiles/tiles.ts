@@ -2,13 +2,14 @@ import { Component, ElementRef, input, viewChildren } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Paw } from '../../markings/paw';
 import type { Tile } from './tile';
+import { VideoPreview } from './video-preview';
 
 /** About the first row on a wide screen; the rest load as they near the screen. */
 const EAGER_TILES = 6;
 
 @Component({
   selector: 'app-tiles',
-  imports: [RouterLink, Paw],
+  imports: [RouterLink, Paw, VideoPreview],
   templateUrl: './tiles.html',
   styleUrl: './tiles.css',
 })

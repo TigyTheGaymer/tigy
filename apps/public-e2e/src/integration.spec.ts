@@ -110,7 +110,7 @@ test.describe('edits', () => {
       '/i/later',
     );
     await expect(page.locator('.overview')).toHaveText(
-      '6 pieces · Jan 2025 – Jun 2026',
+      '7 pieces · Jan 2025 – Jun 2026',
     );
     await page.goto('/i/later');
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Later');

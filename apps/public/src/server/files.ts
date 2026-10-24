@@ -10,10 +10,16 @@ import type { Readable } from 'node:stream';
 import { CDN_CACHE_CONTROL, FILE_CACHE_CONTROL } from './cache-control';
 import type { SummaryCache } from './summary-cache';
 
+/** Both ends included, as in a `Range` header. */
+export interface ByteRange {
+  start: number;
+  end: number;
+}
+
 export interface StoredFile {
   contentType: string;
   size: number;
-  read(): Readable;
+  read(range?: ByteRange): Readable;
 }
 
 /** `open` resolves to null when the file does not exist. */
@@ -22,6 +28,13 @@ export interface FileStore {
 }
 
 const ORIGINAL = /^original\.([a-z0-9]{1,5})$/;
+
+const WEB_FILES: Record<string, (id: string) => string> = {
+  'thumb.webp': imagePaths.thumb,
+  'full.webp': imagePaths.full,
+  'full.mp4': imagePaths.video,
+  'preview.mp4': imagePaths.preview,
+};
 
 /** "Hey Pookie!" gives "hey-pookie.png"; without a usable title, "tigy-{id}.png". */
 export function downloadName(
@@ -48,19 +61,17 @@ export function filesRouter(store: FileStore, summaries: SummaryCache): Router {
       const id = String(req.params['id']);
       const file = String(req.params['file']);
       const original = ORIGINAL.exec(file);
-      if (
-        !ID_PATTERN.test(id) ||
-        !(file === 'thumb.webp' || file === 'full.webp' || original)
-      ) {
+      const path = !ID_PATTERN.test(id)
+        ? undefined
+        : original
+          ? imagePaths.original(id, original[1])
+          : Object.hasOwn(WEB_FILES, file)
+            ? WEB_FILES[file](id)
+            : undefined;
+      if (!path) {
         notFound(res);
         return;
       }
-      const path =
-        file === 'thumb.webp'
-          ? imagePaths.thumb(id)
-          : file === 'full.webp'
-            ? imagePaths.full(id)
-            : imagePaths.original(id, original![1]);
       const stored = await store.open(path);
       if (!stored) {
         notFound(res);
@@ -71,7 +82,7 @@ export function filesRouter(store: FileStore, summaries: SummaryCache): Router {
       );
       if (row?.nsfw) res.set('X-Robots-Tag', 'noindex');
       if (original) res.attachment(downloadName(id, row?.title, original[1]));
-      send(res, stored);
+      send(req, res, stored);
     }),
   );
 
@@ -87,18 +98,53 @@ export function filesRouter(store: FileStore, summaries: SummaryCache): Router {
         notFound(res);
         return;
       }
-      send(res, stored);
+      send(req, res, stored);
     }),
   );
 
   return router;
 }
 
-function send(res: Response, file: StoredFile): void {
+/**
+ * The one range of `bytes=a-b`, `bytes=a-` or `bytes=-n`, clamped to the file;
+ * `unsatisfiable` when it starts past the end. Anything else, multiple ranges
+ * included, reads as no range: HTTP allows sending the whole file instead.
+ */
+export function parseRange(
+  header: string | undefined,
+  size: number,
+): ByteRange | 'unsatisfiable' | undefined {
+  const match = /^bytes=(\d*)-(\d*)$/.exec(header?.trim() ?? '');
+  if (!match || (!match[1] && !match[2])) return undefined;
+  if (!match[1]) {
+    const suffix = Number(match[2]);
+    if (suffix === 0 || size === 0) return 'unsatisfiable';
+    return { start: Math.max(0, size - suffix), end: size - 1 };
+  }
+  const start = Number(match[1]);
+  const end = match[2] ? Number(match[2]) : Infinity;
+  if (end < start) return undefined;
+  if (start >= size) return 'unsatisfiable';
+  return { start, end: Math.min(end, size - 1) };
+}
+
+/** Safari plays a video only from 206 responses, and seeking shouldn't download the whole file. */
+function send(req: Request, res: Response, file: StoredFile): void {
   res.set('Cache-Control', FILE_CACHE_CONTROL);
+  res.set('Accept-Ranges', 'bytes');
   res.type(file.contentType);
-  res.set('Content-Length', String(file.size));
-  const stream = file.read();
+  const range = parseRange(req.headers.range, file.size);
+  if (range === 'unsatisfiable') {
+    res.status(416).set('Content-Range', `bytes */${file.size}`).end();
+    return;
+  }
+  if (range) {
+    res.status(206);
+    res.set('Content-Range', `bytes ${range.start}-${range.end}/${file.size}`);
+  }
+  const length = range ? range.end - range.start + 1 : file.size;
+  res.set('Content-Length', String(length));
+  const stream = file.read(range);
   stream.on('error', () => res.destroy());
   stream.pipe(res);
 }

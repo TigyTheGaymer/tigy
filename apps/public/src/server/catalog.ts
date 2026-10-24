@@ -88,7 +88,7 @@ export function storageFiles(): FileStore {
         return {
           contentType: metadata.contentType ?? 'application/octet-stream',
           size: Number(metadata.size ?? 0),
-          read: () => file.createReadStream(),
+          read: (range) => file.createReadStream(range ?? {}),
         };
       } catch (error: unknown) {
         if ((error as { code?: unknown }).code === 404) return null;

@@ -5,7 +5,7 @@ import type { Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import { Readable } from 'node:stream';
 import { CDN_CACHE_CONTROL, FILE_CACHE_CONTROL } from './cache-control';
-import { downloadName, filesRouter, type FileStore } from './files';
+import { downloadName, filesRouter, parseRange, type FileStore } from './files';
 import { SummaryCache } from './summary-cache';
 
 const BUCKET: Record<string, { body: string; type: string }> = {
@@ -14,12 +14,20 @@ const BUCKET: Record<string, { body: string; type: string }> = {
   'images/hey/original.png': { body: 'original', type: 'image/png' },
   'images/lewd/full.webp': { body: 'lewd', type: 'image/webp' },
   'images/draft/original.jpg': { body: 'draft', type: 'image/jpeg' },
+  'images/clip/full.mp4': { body: '0123456789', type: 'video/mp4' },
+  'images/clip/preview.mp4': { body: 'preview', type: 'video/mp4' },
+  'images/clip/original.mov': { body: 'original', type: 'video/quicktime' },
+  'images/lewdclip/full.mp4': { body: 'lewd', type: 'video/mp4' },
+  'images/lewdclip/preview.mp4': { body: 'lewd', type: 'video/mp4' },
+  'images/lewdclip/original.mp4': { body: 'lewd', type: 'video/mp4' },
   'people/tigy/avatar.webp': { body: 'avatar', type: 'image/webp' },
 };
 
 const ROWS: GalleryRow[] = [
   aRow('hey', '2026-02-14', { title: 'Hey Pookie!' }),
   aRow('lewd', '2026-02-14', { nsfw: true }),
+  aRow('clip', '2026-02-14', { title: 'Hey Pookie!', isVideo: true }),
+  aRow('lewdclip', '2026-02-14', { nsfw: true, isVideo: true }),
 ];
 
 let server: Server;
@@ -36,7 +44,14 @@ beforeEach(async () => {
         ? {
             contentType: file.type,
             size: file.body.length,
-            read: () => Readable.from([Buffer.from(file.body)]),
+            read: (range) =>
+              Readable.from([
+                Buffer.from(
+                  range
+                    ? file.body.slice(range.start, range.end + 1)
+                    : file.body,
+                ),
+              ]),
           }
         : null;
     },
@@ -101,6 +116,112 @@ describe('GET /img/:id/:file', () => {
       expect((await fetch(base + path)).status, path).toBe(404);
     }
     expect(opened).toEqual([]);
+  });
+});
+
+describe('GET /img/:id/:file of a video', () => {
+  const get = (path: string, range?: string) =>
+    fetch(base + path, range ? { headers: { Range: range } } : undefined);
+
+  it('serves the web copy and the preview as MP4s', async () => {
+    for (const [file, body] of [
+      ['full.mp4', '0123456789'],
+      ['preview.mp4', 'preview'],
+    ]) {
+      const response = await get(`/img/clip/${file}`);
+      expect(response.status).toBe(200);
+      expect(await response.text()).toBe(body);
+      expect(response.headers.get('content-type')).toBe('video/mp4');
+      expect(response.headers.get('cache-control')).toBe(FILE_CACHE_CONTROL);
+    }
+    expect(opened).toEqual(['images/clip/full.mp4', 'images/clip/preview.mp4']);
+  });
+
+  it('Video download: names the original after the title', async () => {
+    const response = await get('/img/clip/original.mov');
+    expect(response.headers.get('content-disposition')).toBe(
+      'attachment; filename=hey-pookie.mov',
+    );
+  });
+
+  it('Range request: answers 206 with exactly those bytes and the full size', async () => {
+    const response = await get('/img/clip/full.mp4', 'bytes=2-5');
+    expect(response.status).toBe(206);
+    expect(await response.text()).toBe('2345');
+    expect(response.headers.get('content-range')).toBe('bytes 2-5/10');
+    expect(response.headers.get('content-length')).toBe('4');
+    expect(response.headers.get('cache-control')).toBe(FILE_CACHE_CONTROL);
+  });
+
+  it('answers an open-ended and a suffix range', async () => {
+    const open = await get('/img/clip/full.mp4', 'bytes=7-');
+    expect(open.status).toBe(206);
+    expect(await open.text()).toBe('789');
+    expect(open.headers.get('content-range')).toBe('bytes 7-9/10');
+
+    const suffix = await get('/img/clip/full.mp4', 'bytes=-3');
+    expect(suffix.status).toBe(206);
+    expect(await suffix.text()).toBe('789');
+    expect(suffix.headers.get('content-range')).toBe('bytes 7-9/10');
+  });
+
+  it('clamps a range that runs past the end', async () => {
+    const response = await get('/img/clip/full.mp4', 'bytes=8-100');
+    expect(await response.text()).toBe('89');
+    expect(response.headers.get('content-range')).toBe('bytes 8-9/10');
+  });
+
+  it('Range beyond the end: answers 416 with the full size', async () => {
+    const response = await get('/img/clip/full.mp4', 'bytes=10-20');
+    expect(response.status).toBe(416);
+    expect(response.headers.get('content-range')).toBe('bytes */10');
+    expect(await response.text()).toBe('');
+  });
+
+  it('sends the whole file for several ranges or a malformed header', async () => {
+    for (const range of [
+      'bytes=0-1,4-5',
+      'bytes=5-2',
+      'items=0-1',
+      'bytes=-',
+    ]) {
+      const response = await get('/img/clip/full.mp4', range);
+      expect(response.status, range).toBe(200);
+      expect(await response.text(), range).toBe('0123456789');
+    }
+  });
+
+  it('offers ranges on every file, images and avatars included', async () => {
+    for (const path of [
+      '/img/hey/thumb.webp',
+      '/img/hey/original.png',
+      '/img/clip/preview.mp4',
+      '/avatars/tigy.webp',
+    ]) {
+      expect((await get(path)).headers.get('accept-ranges'), path).toBe(
+        'bytes',
+      );
+    }
+    const image = await get('/img/hey/full.webp', 'bytes=0-1');
+    expect(image.status).toBe(206);
+    expect(await image.text()).toBe('fu');
+  });
+
+  it('NSFW video files: marks the web copy, preview and original noindex', async () => {
+    for (const file of ['full.mp4', 'preview.mp4', 'original.mp4']) {
+      const response = await get(`/img/lewdclip/${file}`, 'bytes=0-1');
+      expect(response.headers.get('x-robots-tag'), file).toBe('noindex');
+    }
+  });
+});
+
+describe('parseRange', () => {
+  it('reads one range against the size', () => {
+    expect(parseRange('bytes=0-0', 10)).toEqual({ start: 0, end: 0 });
+    expect(parseRange('bytes=-20', 10)).toEqual({ start: 0, end: 9 });
+    expect(parseRange('bytes=-0', 10)).toBe('unsatisfiable');
+    expect(parseRange('bytes=0-', 0)).toBe('unsatisfiable');
+    expect(parseRange(undefined, 10)).toBeUndefined();
   });
 });
 

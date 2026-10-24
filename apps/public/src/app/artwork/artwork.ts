@@ -1,12 +1,15 @@
 import {
+  afterRenderEffect,
   Component,
   computed,
   DestroyRef,
   DOCUMENT,
   effect,
+  ElementRef,
   inject,
   input,
   signal,
+  untracked,
   viewChild,
 } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
@@ -19,6 +22,8 @@ import {
   lucideInfo,
   lucideShare2,
 } from '@ng-icons/lucide';
+import { stopVideo } from '@tigy/gallery';
+import { isVideoFile } from '@tigy/models';
 import { CatalogService, isNotFound } from '../catalog/catalog.service';
 import { StageBar } from '../chrome/stage-bar';
 import { HeadService } from '../head/head.service';
@@ -29,9 +34,15 @@ import { AgeCheckService } from '../nsfw/age-check.service';
 import { ConfirmedPiecesService } from '../nsfw/confirmed-pieces.service';
 import { NsfwSwitchService } from '../nsfw/nsfw-switch.service';
 import { pieceTitle } from '../shared/format';
+import { MotionPreferenceService } from '../shared/motion-preference.service';
 import { PieceTitlePipe } from '../shared/piece-title.pipe';
 import { latest } from '../shared/resources';
-import { artworkPath, fullImageUrl, originalUrl } from '../shared/urls';
+import {
+  artworkPath,
+  fullImageUrl,
+  originalUrl,
+  videoUrl,
+} from '../shared/urls';
 import { CreditsPanel } from './credits-panel/credits-panel';
 import { CreditsPanelService } from './credits-panel/credits-panel.service';
 import { FullView } from './full-view/full-view';
@@ -39,6 +50,8 @@ import { FullView } from './full-view/full-view';
 /** artwork.css's breakpoint: at this width and below, the credits sit under the stage. */
 const STACKED_WIDTH = 1100;
 const SWIPE_DISTANCE = 60;
+// About the height of the native controls bar at the bottom of a player.
+const PLAYER_CONTROLS_HEIGHT = 64;
 
 @Component({
   selector: 'app-artwork',
@@ -114,6 +127,11 @@ export class ArtworkPage {
     pieceTitle(this.data()?.artwork.title),
   );
   protected readonly fullImage = computed(() => fullImageUrl(this.id()));
+  protected readonly isVideo = computed(() => {
+    const artwork = this.data()?.artwork;
+    return !!artwork && isVideoFile(artwork.file);
+  });
+  protected readonly video = computed(() => videoUrl(this.id()));
   protected readonly originalHref = computed(() => {
     const artwork = this.data()?.artwork;
     return artwork ? originalUrl(artwork) : '';
@@ -125,9 +143,11 @@ export class ArtworkPage {
   private swipeStart: { x: number; y: number } | undefined;
 
   private readonly stageBar = viewChild(StageBar);
+  private readonly player = viewChild<ElementRef<HTMLVideoElement>>('player');
 
   constructor() {
     inject(DestroyRef).onDestroy(() => clearTimeout(this.toastTimer));
+    this.playVideos();
     const response = injectServerResponse();
     effect(() => {
       if (this.hasFailed()) response.unavailable();
@@ -196,17 +216,21 @@ export class ArtworkPage {
     if (event.altKey || event.ctrlKey || event.metaKey) return;
     const target = event.target as HTMLElement | null;
     if (target?.closest('input, textarea, select')) return;
+    // A focused player seeks with the arrow keys.
+    const isArrow = event.key === 'ArrowLeft' || event.key === 'ArrowRight';
+    if (isArrow && target?.closest('video')) return;
     if (event.key === 'ArrowLeft') this.go(this.data()?.previous?.id);
     else if (event.key === 'ArrowRight') this.go(this.data()?.next?.id);
     else if (event.key === 'Escape') this.stageBar()?.goBack();
   }
 
   protected onTouchStart(event: TouchEvent): void {
-    if (event.touches.length !== 1) return;
-    this.swipeStart = {
-      x: event.touches[0].clientX,
-      y: event.touches[0].clientY,
-    };
+    const touch = event.touches[0];
+    if (event.touches.length !== 1 || isOnPlayerControls(event.target, touch)) {
+      this.swipeStart = undefined;
+      return;
+    }
+    this.swipeStart = { x: touch.clientX, y: touch.clientY };
   }
 
   protected onTouchEnd(event: TouchEvent): void {
@@ -219,6 +243,29 @@ export class ArtworkPage {
       return;
     }
     this.go(dx > 0 ? this.data()?.previous?.id : this.data()?.next?.id);
+  }
+
+  /**
+   * Starts each piece's player once, after hydration, unless reduced motion is asked for. A player
+   * that leaves the page is stopped and emptied: a detached video keeps playing its sound.
+   */
+  private playVideos(): void {
+    const motion = inject(MotionPreferenceService);
+    let current: HTMLVideoElement | undefined;
+    let currentId: string | undefined;
+    afterRenderEffect(() => {
+      const video = this.player()?.nativeElement;
+      const id = this.id();
+      if (video === current && id === currentId) return;
+      if (video !== current) stopVideo(current);
+      current = video;
+      currentId = id;
+      if (video && !untracked(motion.isMotionReduced)) {
+        // Autoplay policies may refuse; the player then waits for a press.
+        video.play()?.catch(() => undefined);
+      }
+    });
+    inject(DestroyRef).onDestroy(() => stopVideo(current));
   }
 
   /** Moving between pieces replaces the history entry, so going back returns to the gallery. */
@@ -242,4 +289,14 @@ export class ArtworkPage {
       return false;
     }
   }
+}
+
+/** Dragging along a player's position bar is seeking, not a swipe. */
+function isOnPlayerControls(target: EventTarget | null, touch: Touch): boolean {
+  const video = (target as Element | null)?.closest?.('video');
+  if (!video) return false;
+  return (
+    touch.clientY >
+    video.getBoundingClientRect().bottom - PLAYER_CONTROLS_HEIGHT
+  );
 }

@@ -68,6 +68,7 @@ test.describe('the sitemap', () => {
         '/',
         '/i/chibi-tigy',
         '/i/happy-tigy',
+        '/i/happy-tigy-loop',
         '/i/hey-pookie',
         '/i/ref-sheet',
         '/i/tigy-portrait',

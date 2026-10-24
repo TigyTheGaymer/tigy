@@ -18,15 +18,17 @@
           >
             <ng-icon name="lucideShare2" class="icon" />
           </button>
-          <button
-            type="button"
-            class="round"
-            aria-label="Full view"
-            title="Full view"
-            (click)="isFullViewOpen.set(true)"
-          >
-            <ng-icon name="lucideExpand" class="icon" />
-          </button>
+          @if (!isVideo()) {
+            <button
+              type="button"
+              class="round"
+              aria-label="Full view"
+              title="Full view"
+              (click)="isFullViewOpen.set(true)"
+            >
+              <ng-icon name="lucideExpand" class="icon" />
+            </button>
+          }
           <button
             type="button"
             class="round info-toggle"
@@ -60,19 +62,42 @@
               ><ng-icon name="lucideArrowLeft" class="icon"
             /></a>
           }
-          <button
-            type="button"
-            class="piece"
-            [attr.aria-label]="'Full view of ' + title()"
-            (click)="isFullViewOpen.set(true)"
-          >
-            <img
-              [src]="fullImage()"
+          @if (isVideo()) {
+            <!-- No autoplay here: the server can't know about reduced motion. The muted
+                 binding covers a player made on the client, where the attribute isn't enough. -->
+            <video
+              #player
+              class="player"
+              controls
+              muted
+              [muted]="true"
+              [volume]="0.5"
+              loop
+              playsinline
+              preload="metadata"
+              [src]="video()"
+              [poster]="fullImage()"
               [width]="page.artwork.file.w"
               [height]="page.artwork.file.h"
-              [alt]="title()"
-            />
-          </button>
+              [style.--ratio]="page.artwork.file.w / page.artwork.file.h"
+              [style.--natural-w]="page.artwork.file.w + 'px'"
+              [attr.aria-label]="title()"
+            ></video>
+          } @else {
+            <button
+              type="button"
+              class="piece"
+              [attr.aria-label]="'Full view of ' + title()"
+              (click)="isFullViewOpen.set(true)"
+            >
+              <img
+                [src]="fullImage()"
+                [width]="page.artwork.file.w"
+                [height]="page.artwork.file.h"
+                [alt]="title()"
+              />
+            </button>
+          }
           @if (page.next; as next) {
             <a
               class="nav next"
@@ -127,7 +152,7 @@
     }
   </div>
 
-  @if (isFullViewOpen() && data()) {
+  @if (isFullViewOpen() && data() && !isVideo()) {
     <app-full-view
       [fullSrc]="fullImage()"
       [originalSrc]="originalHref()"

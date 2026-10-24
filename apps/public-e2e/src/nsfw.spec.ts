@@ -23,34 +23,34 @@ test('Switch off: no NSFW piece, title or link is in the page or its source, and
   expect(html).not.toContain('NSFW for testing');
   await expect(toggle(page)).not.toBeChecked();
   await expect(page.locator('.overview')).toHaveText(
-    '5 pieces · Jan 2025 – Apr 2026',
+    '6 pieces · Jan 2025 – Apr 2026',
   );
-  await expect(tiles(page)).toHaveCount(5);
+  await expect(tiles(page)).toHaveCount(6);
 });
 
 test('Turning the switch on for the first time: the age check passes, the gallery reloads with NSFW pieces in date order, and both hold', async ({
   page,
 }) => {
   await page.goto('/');
-  await expect(tiles(page)).toHaveCount(5);
+  await expect(tiles(page)).toHaveCount(6);
   await toggle(page).click();
   await expect(ageCheck(page)).toBeVisible();
   await expect(toggle(page)).not.toBeChecked();
   await enterBirthday(page, ADULT);
   await expect(ageCheck(page)).toBeHidden();
   await expect(toggle(page)).toBeChecked();
-  await expect(tiles(page)).toHaveCount(6);
+  await expect(tiles(page)).toHaveCount(7);
   expect(await page.evaluate(() => JSON.stringify(localStorage))).not.toContain(
     '1990',
   );
   await expect(tiles(page).nth(2)).toHaveAttribute('href', `/i/${NSFW}`);
   await expect(page.locator('.overview')).toHaveText(
-    '6 pieces · Jan 2025 – Apr 2026',
+    '7 pieces · Jan 2025 – Apr 2026',
   );
 
   await page.reload();
   await expect(toggle(page)).toBeChecked();
-  await expect(tiles(page)).toHaveCount(6);
+  await expect(tiles(page)).toHaveCount(7);
 
   // Off and on again: no second question.
   await toggle(page).uncheck();
@@ -139,7 +139,7 @@ test.describe('the age check', () => {
     await page.getByRole('button', { name: 'Close' }).click();
     await expect(ageCheck(page)).toBeHidden();
     await expect(toggle(page)).not.toBeChecked();
-    await expect(tiles(page)).toHaveCount(5);
+    await expect(tiles(page)).toHaveCount(6);
     expect(
       await page.evaluate(() => [
         localStorage.getItem('tigy.nsfw.age'),
@@ -168,7 +168,7 @@ test.describe('the age check', () => {
   }) => {
     await page.addInitScript(() => localStorage.setItem('tigy.nsfw', '1'));
     await page.goto('/');
-    await expect(tiles(page)).toHaveCount(5);
+    await expect(tiles(page)).toHaveCount(6);
     await expect(toggle(page)).not.toBeChecked();
   });
 

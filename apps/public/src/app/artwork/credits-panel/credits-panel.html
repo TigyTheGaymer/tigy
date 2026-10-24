@@ -97,13 +97,15 @@
       <button type="button" class="pad" (click)="shareRequested.emit()">
         <ng-icon name="lucideShare2" class="icon" />Share
       </button>
-      <button
-        type="button"
-        class="pad light"
-        (click)="fullViewRequested.emit()"
-      >
-        <ng-icon name="lucideExpand" class="icon" />Full view
-      </button>
+      @if (!isVideo()) {
+        <button
+          type="button"
+          class="pad light"
+          (click)="fullViewRequested.emit()"
+        >
+          <ng-icon name="lucideExpand" class="icon" />Full view
+        </button>
+      }
     }
     @if (artwork().nsfw) {
       <button

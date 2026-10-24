@@ -12,6 +12,14 @@ export function fullImageUrl(id: string): string {
   return `/img/${encodeURIComponent(id)}/full.webp`;
 }
 
+export function videoUrl(id: string): string {
+  return `/img/${encodeURIComponent(id)}/full.mp4`;
+}
+
+export function previewUrl(id: string): string {
+  return `/img/${encodeURIComponent(id)}/preview.mp4`;
+}
+
 /** `file.original` is the Storage path, such as `images/k3x/original.png`. */
 export function originalUrl({
   id,

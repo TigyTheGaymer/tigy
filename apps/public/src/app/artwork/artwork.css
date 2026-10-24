@@ -51,6 +51,19 @@
   transform: scale(1.01);
 }
 
+/* A video has no size until its metadata loads, so the piece's shape and width size it, as an
+   image's would. */
+.player {
+  --max-w: calc(100% - 140px);
+  --max-h: calc(100svh - 150px);
+  display: block;
+  width: min(var(--natural-w), var(--max-w), var(--max-h) * var(--ratio));
+  aspect-ratio: var(--ratio);
+  margin: 0 auto;
+  border-radius: var(--r-md);
+  background: var(--stage);
+}
+
 .nav {
   position: absolute;
   top: 50%;
@@ -105,6 +118,10 @@
     max-height: calc(76svh - 120px);
   }
 
+  .player {
+    --max-h: calc(76svh - 120px);
+  }
+
   .info-wrap,
   :host-context([data-credits='closed']) .info-wrap {
     display: block;
@@ -123,6 +140,11 @@
 @media (max-width: 720px) {
   .piece img {
     max-width: 100%;
+    border-radius: 0;
+  }
+
+  .player {
+    --max-w: 100%;
     border-radius: 0;
   }
 
