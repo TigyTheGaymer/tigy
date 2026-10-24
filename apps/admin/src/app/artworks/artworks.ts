@@ -20,7 +20,7 @@ import { HlmEmptyImports } from '@spartan-ng/helm/empty';
 import { HlmInputImports } from '@spartan-ng/helm/input';
 import { HlmSkeletonImports } from '@spartan-ng/helm/skeleton';
 import { HlmTabsImports } from '@spartan-ng/helm/tabs';
-import { IMAGE_FORMATS } from '@tigy/uploads';
+import { FORMATS } from '@tigy/uploads';
 import { listUploads, type UploadListStatus } from '../uploads/upload-list';
 import { UploadService } from '../uploads/upload.service';
 import { UploadsService } from '../uploads/uploads.service';
@@ -93,7 +93,7 @@ export class ArtworksPage {
     ArtworkView,
     string,
   ][];
-  protected readonly accept = Object.values(IMAGE_FORMATS)
+  protected readonly accept = Object.values(FORMATS)
     .map((format) => format.mime)
     .join(',');
 

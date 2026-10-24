@@ -1,7 +1,7 @@
 import { computed, inject, Service, signal } from '@angular/core';
 import { toast } from '@spartan-ng/brain/sonner';
 import { uploadPaths } from '@tigy/models';
-import { IMAGE_FORMATS, type ImageFormat } from '@tigy/uploads';
+import { FORMATS, type FileFormat } from '@tigy/uploads';
 import { warnBeforeLeaving } from '../shared/leave-warning';
 import { checkFile, REFUSAL_MESSAGES } from './check-file';
 import { UPLOADS_API } from './uploads-api';
@@ -21,7 +21,7 @@ export interface LocalUpload {
 
 export interface FileToUpload {
   file: File;
-  format: ImageFormat;
+  format: FileFormat;
 }
 
 @Service()
@@ -98,7 +98,7 @@ export class UploadService {
       uploadPaths.source(id),
       file,
       {
-        contentType: IMAGE_FORMATS[format].mime,
+        contentType: FORMATS[format].mime,
         customMetadata: { fileName: file.name },
       },
       (progress) => this.set(id, { progress }),

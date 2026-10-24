@@ -8,8 +8,8 @@ import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmProgressImports } from '@spartan-ng/helm/progress';
 import { HlmSpinnerImports } from '@spartan-ng/helm/spinner';
 import { HlmTooltipImports } from '@spartan-ng/helm/tooltip';
-import { fileSize, formatName } from '@tigy/gallery';
-import { imagePaths } from '@tigy/models';
+import { fileDuration, fileSize, formatName } from '@tigy/gallery';
+import { imagePaths, isVideoFile } from '@tigy/models';
 import { storageUrl } from '../../firebase/storage-url';
 import {
   isClearable,
@@ -19,10 +19,18 @@ import {
 } from '../upload-list';
 
 export const FAILURE_MESSAGES: Record<FailureReason, string> = {
-  unsupported: 'Only JPEG, PNG, GIF and WebP are supported.',
+  unsupported: 'Only JPEG, PNG, GIF, WebP, MP4, MOV and WebM are supported.',
   damaged: 'The file is damaged. Export it again and upload the new file.',
   'too-large':
     'The picture is too large to process (over 1 billion pixels, counting every frame). Make it smaller and upload it again.',
+  'file-too-large':
+    'The file is too large: the limit for images is 50 MB and for videos 200 MB.',
+  'video-too-long':
+    'Videos may be at most 3 minutes long. Shorten it and upload it again.',
+  'video-too-large':
+    'Videos may be at most 3840 × 2160 pixels. Make it smaller and upload it again.',
+  unreadable:
+    'The file could not be read. Export it again, as H.264 or VP9, and upload the new file.',
   internal: 'Processing failed. Upload the file again.',
   'too-long': 'Processing took too long. Upload the file again.',
   'not-sent': "The upload didn't finish. Upload the file again.",
@@ -75,8 +83,7 @@ export class UploadRow {
   protected readonly details = computed(() => {
     const file = this.row().file;
     if (!file) return null;
-    const animated = file.animated ? ', animated' : '';
-    return `${formatName(file.mime)}${animated}, ${file.w} × ${file.h}, ${fileSize(file.bytes)}`;
+    return fileDetails(file);
   });
   protected readonly isClearable = computed(() => isClearable(this.row()));
   protected readonly thumbnail = computed(() =>
@@ -84,4 +91,18 @@ export class UploadRow {
       ? storageUrl(imagePaths.thumb(this.row().id))
       : null,
   );
+}
+
+/** "PNG, animated, 500 × 500, 820 KB", "MP4 video, 1080 × 1920, 0:42, 12.3 MB". */
+export function fileDetails(file: NonNullable<UploadListItem['file']>): string {
+  const kind = isVideoFile(file)
+    ? formatName(file.mime)
+    : formatName(file.mime) + (file.animated ? ', animated' : '');
+  const duration = fileDuration(file);
+  return [
+    kind,
+    `${file.w} × ${file.h}`,
+    ...(duration ? [duration] : []),
+    fileSize(file.bytes),
+  ].join(', ');
 }

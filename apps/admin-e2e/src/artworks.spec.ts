@@ -42,7 +42,7 @@ test('Publishing a batch: all five are published and the counts change by five @
   await bar.getByRole('button', { name: 'Publish', exact: true }).click();
 
   await expect(counts(page)).toContainText('0 unpublished');
-  await expect(counts(page)).toContainText('10 published SFW');
+  await expect(counts(page)).toContainText('11 published SFW');
   await expect(page.getByText('No artworks match')).toBeVisible();
   await expect
     .poll(() => published(batchPieces(5).map((p) => p.id)))

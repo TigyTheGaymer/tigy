@@ -41,11 +41,28 @@
 @if (artwork(); as piece) {
   <div class="grid gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
     <section class="grid content-start gap-3" aria-label="Picture">
-      <img
-        [src]="fullImage()"
-        [alt]="title()"
-        class="bg-muted max-h-[35dvh] w-full rounded-lg object-contain md:max-h-[70dvh]"
-      />
+      @if (isVideo()) {
+        <!-- The muted binding: on a video made by script, the attribute sets only defaultMuted. -->
+        <video
+          #player
+          controls
+          [muted]="true"
+          [volume]="0.5"
+          loop
+          playsinline
+          preload="metadata"
+          [src]="video()"
+          [poster]="fullImage()"
+          [attr.aria-label]="title()"
+          class="bg-muted max-h-[35dvh] w-full rounded-lg object-contain md:max-h-[70dvh]"
+        ></video>
+      } @else {
+        <img
+          [src]="fullImage()"
+          [alt]="title()"
+          class="bg-muted max-h-[35dvh] w-full rounded-lg object-contain md:max-h-[70dvh]"
+        />
+      }
       <div class="flex flex-wrap gap-2">
         <button
           hlmBtn

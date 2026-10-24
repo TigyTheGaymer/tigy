@@ -70,6 +70,69 @@ describe('UploadsPage', () => {
     ]);
   });
 
+  it('A video becomes ready: its row shows the still, dimensions, duration and size', async () => {
+    const { api, page, rows, update } = await open();
+    api.emit([
+      record('v1', {
+        fileName: 'loop.mp4',
+        status: 'ready',
+        file: {
+          w: 1920,
+          h: 1080,
+          bytes: 48_000_000,
+          mime: 'video/mp4',
+          animated: true,
+          durationMs: 60_000,
+        },
+      }),
+    ]);
+    await update();
+    expect(rows()).toEqual([
+      expect.stringMatching(
+        /loop\.mp4 Ready MP4 video, 1920 × 1080, 1:00, 48\.0 MB/,
+      ),
+    ]);
+    expect(page.querySelector('li img')?.getAttribute('src')).toContain(
+      '/o/images%2Fv1%2Fthumb.webp?alt=media',
+    );
+  });
+
+  it('says why a video was refused', async () => {
+    const { api, rows, update } = await open();
+    api.emit(
+      (
+        [
+          ['long', 'video-too-long'],
+          ['big', 'video-too-large'],
+          ['odd', 'unreadable'],
+          ['png', 'file-too-large'],
+        ] as const
+      ).map(([id, error], i) =>
+        record(id, { fileName: `${id}.mov`, status: 'failed', error }, 4 - i),
+      ),
+    );
+    await update();
+    expect(rows()).toEqual([
+      expect.stringMatching(
+        /long\.mov Failed Videos may be at most 3 minutes long/,
+      ),
+      expect.stringMatching(
+        /big\.mov Failed Videos may be at most 3840 × 2160 pixels/,
+      ),
+      expect.stringMatching(/odd\.mov Failed The file could not be read/),
+      expect.stringMatching(/png\.mov Failed .*the limit for images is 50 MB/),
+    ]);
+  });
+
+  it('uploads a video with its content type', async () => {
+    const { api } = await open();
+    TestBed.inject(UploadService).start([
+      { file: new File([new Uint8Array(10)], 'clip.mov'), format: 'mov' },
+    ]);
+    await settle();
+    expect(api.uploads[0].metadata.contentType).toBe('video/quicktime');
+  });
+
   it('shows a record that ran out of time as failed', async () => {
     const { api, rows, update } = await open();
     api.emit([

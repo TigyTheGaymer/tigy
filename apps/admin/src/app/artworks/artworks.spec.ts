@@ -205,6 +205,29 @@ describe('ArtworksPage', () => {
     expect(tiles()[1]).not.toContain('No artist');
   });
 
+  it("shows a video's duration on its tile, and none on an image's", async () => {
+    const { tiles, page } = await openArtworks('/artworks', [
+      artwork('vid', {
+        ...credited,
+        file: {
+          original: 'images/vid/original.mp4',
+          w: 1920,
+          h: 1080,
+          bytes: 1000,
+          mime: 'video/mp4',
+          animated: true,
+          transparent: false,
+          durationMs: 60_000,
+          hasAudio: true,
+        },
+      }),
+      artwork('pic', { ...credited, sortDate: '2020-01-01' }),
+    ]);
+    expect(tiles()[0]).toContain('1:00');
+    expect(page().querySelector('[aria-label="Video, 1:00"]')).not.toBeNull();
+    expect(tiles()[1]).not.toMatch(/\d:\d\d/);
+  });
+
   it('links each tile to its editor with the view and search', async () => {
     const { page } = await openArtworks('/artworks?view=unpublished&q=pool', [
       artwork('k3x', { title: 'Pool' }),
@@ -440,11 +463,13 @@ describe('ArtworksPage', () => {
   });
 
   describe('uploading', () => {
-    it('offers an Upload button that picks several of the supported pictures', async () => {
+    it('offers an Upload button that picks several of the supported pictures and videos', async () => {
       const { page } = await openArtworks();
       const field = page().querySelector<HTMLInputElement>('input[type=file]');
       expect(field?.multiple).toBe(true);
-      expect(field?.accept).toBe('image/jpeg,image/png,image/gif,image/webp');
+      expect(field?.accept).toBe(
+        'image/jpeg,image/png,image/gif,image/webp,video/mp4,video/quicktime,video/webm',
+      );
     });
 
     function drag(type: string, files: File[] = [], types = ['Files']) {
@@ -482,7 +507,8 @@ describe('ArtworksPage', () => {
       await vi.waitFor(() => expect(error).toHaveBeenCalled());
       expect(uploads.uploads).toEqual([]);
       expect(error).toHaveBeenCalledWith("photo.heic wasn't uploaded", {
-        description: 'Only JPEG, PNG, GIF and WebP are supported.',
+        description:
+          'Only JPEG, PNG, GIF, WebP, MP4, MOV and WebM are supported.',
       });
     });
 

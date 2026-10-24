@@ -2,6 +2,7 @@ import { Component, computed, input, output } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { HlmBadgeImports } from '@spartan-ng/helm/badge';
 import { HlmCheckboxImports } from '@spartan-ng/helm/checkbox';
+import { fileDuration } from '@tigy/gallery';
 import { imagePaths } from '@tigy/models';
 import { storageUrl } from '../../firebase/storage-url';
 import { dateOf, GAP_LABELS, titleOf } from '../artwork-label';
@@ -34,6 +35,9 @@ export class ArtworkTile {
   protected readonly date = computed(() => dateOf(this.artwork()));
   protected readonly thumbnail = computed(() =>
     storageUrl(imagePaths.thumb(this.artwork().id)),
+  );
+  protected readonly duration = computed(() =>
+    fileDuration(this.artwork().file),
   );
   /** Every gap on Needs work; elsewhere only a missing artist. */
   protected readonly warnings = computed(() => {

@@ -1,6 +1,8 @@
 import {
+  afterRenderEffect,
   Component,
   computed,
+  DestroyRef,
   ElementRef,
   inject,
   input,
@@ -8,6 +10,7 @@ import {
   resource,
   signal,
   untracked,
+  viewChild,
 } from '@angular/core';
 import { form, FormField, submit, validate } from '@angular/forms/signals';
 import { Router, RouterLink } from '@angular/router';
@@ -28,8 +31,8 @@ import { HlmKbdImports } from '@spartan-ng/helm/kbd';
 import { HlmSwitchImports } from '@spartan-ng/helm/switch';
 import { HlmTextareaImports } from '@spartan-ng/helm/textarea';
 import { HlmTooltipImports } from '@spartan-ng/helm/tooltip';
-import { fileSize, formatName } from '@tigy/gallery';
-import { imagePaths } from '@tigy/models';
+import { fileDuration, fileSize, formatName, stopVideo } from '@tigy/gallery';
+import { imagePaths, isVideoFile } from '@tigy/models';
 import { environment } from '../../firebase/environment';
 import { storageUrl } from '../../firebase/storage-url';
 import { PageHeader } from '../../chrome/page-header';
@@ -240,13 +243,28 @@ export class ArtworkEditorPage {
   protected readonly publicPage = computed(
     () => `${environment.publicSite}/i/${encodeURIComponent(this.id())}`,
   );
+  protected readonly isVideo = computed(() => {
+    const file = this.artwork()?.file;
+    return !!file && isVideoFile(file);
+  });
+  protected readonly video = computed(() =>
+    storageUrl(imagePaths.video(this.id())),
+  );
   protected readonly fileDetails = computed(() => {
     const file = this.artwork()?.file;
     if (!file) return [];
+    const duration = fileDuration(file);
+    const video = isVideoFile(file)
+      ? [
+          ...(duration ? [['Duration', duration]] : []),
+          ['Sound', file.hasAudio ? 'Yes' : 'No'],
+        ]
+      : [];
     return [
       ['Format', formatName(file.mime)],
       ['Size', fileSize(file.bytes)],
       ['Dimensions', `${file.w} × ${file.h}`],
+      ...video,
       ['Animated', file.animated ? 'Yes' : 'No'],
       ['Transparent', file.transparent ? 'Yes' : 'No'],
     ];
@@ -259,8 +277,31 @@ export class ArtworkEditorPage {
   protected readonly editingPerson = signal<string | null>(null);
   protected readonly isFileInfoShown = signal(false);
 
+  private readonly player = viewChild<ElementRef<HTMLVideoElement>>('player');
+
   constructor() {
     warnBeforeLeaving(() => this.isDirty());
+    this.stopVideosLeftBehind();
+  }
+
+  /** A video left behind keeps playing its sound, even once it is out of the page. */
+  private stopVideosLeftBehind(): void {
+    let current: HTMLVideoElement | undefined;
+    let currentId: string | undefined;
+    afterRenderEffect(() => {
+      const video = this.player()?.nativeElement;
+      const id = this.id();
+      if (video === current && id === currentId) return;
+      if (video === current) {
+        // The same player shows the next artwork: stop the last one's sound now.
+        video?.pause();
+      } else {
+        stopVideo(current);
+      }
+      current = video;
+      currentId = id;
+    });
+    inject(DestroyRef).onDestroy(() => stopVideo(current));
   }
 
   hasUnsavedEdits(): boolean {

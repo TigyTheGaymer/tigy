@@ -200,6 +200,109 @@ describe('ArtworkEditorPage', () => {
     });
   });
 
+  describe('a video', () => {
+    const VIDEO_FILE = {
+      original: 'images/clip/original.mp4',
+      w: 1080,
+      h: 1920,
+      bytes: 12_300_000,
+      mime: 'video/mp4',
+      animated: true,
+      transparent: false,
+      durationMs: 42_000,
+      hasAudio: true,
+    };
+    const clips = () =>
+      unpublished().map((piece) =>
+        piece.id === 'second'
+          ? {
+              ...piece,
+              file: { ...VIDEO_FILE, original: 'images/second/original.mp4' },
+            }
+          : piece,
+      );
+
+    let pause: ReturnType<typeof vi.fn<() => void>>;
+    beforeEach(() => {
+      pause = vi.fn<() => void>();
+      vi.spyOn(HTMLMediaElement.prototype, 'pause').mockImplementation(pause);
+      vi.spyOn(HTMLMediaElement.prototype, 'load').mockImplementation(
+        () => undefined,
+      );
+    });
+
+    it('Opening a video: shows a muted player with controls, and its duration and sound', async () => {
+      const { page } = await open('/artworks/clip', {
+        images: [artwork('clip', { title: 'Loop', file: VIDEO_FILE })],
+      });
+      const video = page().querySelector('video')!;
+      expect(video.getAttribute('src')).toContain('images%2Fclip%2Ffull.mp4');
+      expect(video.getAttribute('poster')).toContain(
+        'images%2Fclip%2Ffull.webp',
+      );
+      expect(video.muted).toBe(true);
+      expect(video.volume).toBe(0.5);
+      expect(video.controls).toBe(true);
+      expect(video.loop).toBe(true);
+      expect(video.hasAttribute('autoplay')).toBe(false);
+      expect(
+        page().querySelector('section[aria-label="Picture"] img'),
+      ).toBeNull();
+      const details = text(page().querySelector('dl'));
+      expect(details).toContain('Format MP4 video');
+      expect(details).toContain('Duration 0:42');
+      expect(details).toContain('Sound Yes');
+      expect(details).toContain('Dimensions 1080 × 1920');
+    });
+
+    it('says a silent video has no sound', async () => {
+      const { page } = await open('/artworks/clip', {
+        images: [
+          artwork('clip', {
+            file: { ...VIDEO_FILE, mime: 'video/webm', hasAudio: false },
+          }),
+        ],
+      });
+      expect(text(page().querySelector('dl'))).toContain('Sound No');
+    });
+
+    it('shows no duration or sound for an image', async () => {
+      const { page } = await open('/artworks/k3x', {
+        images: [artwork('k3x')],
+      });
+      expect(page().querySelector('video')).toBeNull();
+      expect(text(page().querySelector('dl'))).not.toContain('Duration');
+      expect(text(page().querySelector('dl'))).not.toContain('Sound');
+    });
+
+    it('Moving on from a playing video: Save and next stops it, so its sound does not carry over', async () => {
+      const { page, toggle, button, click, update } = await open(
+        '/artworks/second?view=unpublished',
+        { images: clips() },
+      );
+      const video = page().querySelector('video')!;
+      video.muted = false;
+      await toggle('Published');
+      await click(button('Save and next'));
+      await update();
+      expect(url()).toBe('/artworks/third?view=unpublished');
+      expect(pause).toHaveBeenCalled();
+      expect(video.hasAttribute('src')).toBe(false);
+      expect(page().querySelector('video')).toBeNull();
+    });
+
+    it('stops the video when the editor is left', async () => {
+      const { page, harness, update } = await open('/artworks/clip', {
+        images: [artwork('clip', { file: VIDEO_FILE })],
+      });
+      const video = page().querySelector('video')!;
+      await harness.navigateByUrl('/artworks');
+      await update();
+      expect(pause).toHaveBeenCalled();
+      expect(video.hasAttribute('src')).toBe(false);
+    });
+  });
+
   describe('missing details', () => {
     const gaps = (page: HTMLElement) =>
       [
@@ -505,7 +608,8 @@ describe('ArtworkEditorPage', () => {
     });
 
     it('Backing out of publishing with missing details: stores nothing and stays', async () => {
-      const { api, confirm, page, toggle, leave } = await leaveAs('alternative');
+      const { api, confirm, page, toggle, leave } =
+        await leaveAs('alternative');
       await toggle('Published');
       await leave();
       expect(confirm.asked.map((question) => question.title)).toEqual([

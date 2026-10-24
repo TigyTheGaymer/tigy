@@ -2,7 +2,7 @@
   <a
     [routerLink]="['/artworks', artwork().id]"
     [queryParams]="listParams()"
-    class="bg-muted focus-visible:ring-ring/50 ring-offset-background block aspect-square overflow-hidden rounded-lg outline-none focus-visible:ring-3"
+    class="bg-muted focus-visible:ring-ring/50 ring-offset-background relative block aspect-square overflow-hidden rounded-lg outline-none focus-visible:ring-3"
     [class.ring-2]="isSelected()"
     [class.ring-primary]="isSelected()"
     [class.ring-offset-2]="isSelected()"
@@ -13,6 +13,13 @@
       loading="lazy"
       class="size-full object-cover"
     />
+    @if (duration(); as duration) {
+      <span
+        class="bg-background/90 absolute right-2 bottom-2 rounded-md px-1.5 py-0.5 text-xs font-medium tabular-nums shadow"
+        [attr.aria-label]="'Video, ' + duration"
+        >{{ duration }}</span
+      >
+    }
   </a>
   <!-- A solid chip, so the box shows on any picture. -->
   <!-- Shift is read before the click toggles the box. -->

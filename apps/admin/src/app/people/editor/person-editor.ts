@@ -140,7 +140,7 @@ export class PersonEditor {
     const file = field.files?.[0];
     field.value = '';
     if (!file) return;
-    const check = await checkFile(file);
+    const check = await checkFile(file, { includeVideo: false });
     if ('refusal' in check) {
       toast.error(`${file.name} can't be an avatar`, {
         description: REFUSAL_MESSAGES[check.refusal],

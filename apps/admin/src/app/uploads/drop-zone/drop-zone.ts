@@ -25,14 +25,16 @@ import { lucideImageUp } from '@ng-icons/lucide';
         name="lucideImageUp"
         class="text-muted-foreground text-[length:--spacing(8)]"
       />
-      <span class="font-medium">Drop pictures here, or choose files</span>
+      <span class="font-medium">
+        Drop pictures or videos here, or choose files
+      </span>
       <span class="text-muted-foreground text-sm">
-        JPEG, PNG, GIF or WebP, up to 50 MB each
+        JPEG, PNG, GIF or WebP up to 50 MB; MP4, MOV or WebM up to 200 MB
       </span>
       <input
         type="file"
         multiple
-        accept="image/*"
+        accept="image/*,video/mp4,video/quicktime,video/webm"
         class="sr-only"
         (change)="onPick($event)"
       />

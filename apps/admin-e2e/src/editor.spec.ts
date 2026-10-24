@@ -62,7 +62,7 @@ test('Publishing a new upload, marking it NSFW, then deleting it from the editor
       }),
     );
   await page.getByRole('link', { name: 'Artworks' }).first().click();
-  await expect(page.getByLabel('Counts')).toContainText('6 published SFW');
+  await expect(page.getByLabel('Counts')).toContainText('7 published SFW');
 
   // Marking a published piece NSFW.
   await page.goto(`/artworks/${id}`);
