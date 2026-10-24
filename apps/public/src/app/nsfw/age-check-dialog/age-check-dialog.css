@@ -1,0 +1,47 @@
+.age-check {
+  width: calc(100% - 32px);
+  margin: auto;
+  border: 0;
+  opacity: 0;
+  transform: translateY(12px) scale(0.97);
+  transition:
+    opacity 220ms var(--ease-out),
+    transform 260ms var(--ease-squish),
+    display 260ms allow-discrete,
+    overlay 260ms allow-discrete;
+}
+
+.age-check[open] {
+  opacity: 1;
+  transform: none;
+}
+
+@starting-style {
+  .age-check[open] {
+    opacity: 0;
+    transform: translateY(12px) scale(0.97);
+  }
+}
+
+.age-check::backdrop {
+  background: color-mix(in srgb, var(--night) 72%, transparent);
+}
+
+.field {
+  display: grid;
+  justify-items: center;
+  margin: 0 auto 22px;
+}
+
+input {
+  min-width: 14rem;
+  min-height: var(--control);
+  padding: 8px 14px;
+  border: 2px solid var(--ink);
+  border-radius: var(--r-md);
+  background: var(--panel-2);
+  color: var(--ink);
+  font: inherit;
+  font-size: var(--text-body);
+  font-weight: 700;
+}

@@ -68,6 +68,7 @@ test.describe('icons and controls', () => {
   test('the theme button and the NSFW switch work from the keyboard alone', async ({
     page,
   }) => {
+    await page.addInitScript(() => localStorage.setItem('tigy.nsfw.age', '1'));
     await page.goto('/');
     await page.locator('.theme-btn').focus();
     await page.keyboard.press('Enter');

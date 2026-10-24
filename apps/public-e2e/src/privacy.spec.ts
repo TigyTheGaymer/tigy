@@ -32,7 +32,9 @@ test('Browsing the site: no cookie and no request to another site', async ({
   const origin = new URL(page.url()).origin;
   // The social links are shown, and must load nothing from their networks.
   await expect(page.locator('.socials a').first()).toBeVisible();
-  await page.getByRole('switch', { name: 'Show NSFW' }).check();
+  await page.getByRole('switch', { name: 'Show NSFW' }).click();
+  await page.getByLabel('Your birthday').fill('1990-05-01');
+  await page.getByRole('button', { name: 'Confirm' }).click();
   await expect(page.locator('.gallery .tile a')).toHaveCount(6);
   await page.goto('/i/hey-pookie');
   await expect(page.locator('.piece img')).toBeVisible();

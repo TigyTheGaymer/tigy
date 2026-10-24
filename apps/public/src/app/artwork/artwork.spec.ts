@@ -8,6 +8,7 @@ import { TestBed } from '@angular/core/testing';
 import { provideRouter, withComponentInputBinding } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { appRoutes } from '../app.routes';
+import { AgeCheckService } from '../nsfw/age-check.service';
 import { NsfwSwitchService } from '../nsfw/nsfw-switch.service';
 import { artwork, requested, settled } from '../testing';
 
@@ -159,8 +160,11 @@ describe('ArtworkPage', () => {
     expect(page().querySelector('.download')).toBeNull();
     expect(text('app-credits-panel')).toContain('Copy safe link');
 
-    // Confirming one piece: shows it without another request, switch still off.
+    // Confirming one piece: waits for the age check, then shows it without another request.
     page().querySelector<HTMLButtonElement>('.confirm button')!.click();
+    await settled();
+    expect(page().querySelector('.piece img')).toBeNull();
+    TestBed.inject(AgeCheckService).pass();
     await settled();
     expect(page().querySelector('.piece img')?.getAttribute('src')).toBe(
       '/img/lewd/full.webp',
@@ -169,6 +173,16 @@ describe('ArtworkPage', () => {
     expect(JSON.parse(sessionStorage.getItem('tigy.nsfw.confirmed')!)).toEqual([
       'lewd',
     ]);
+  });
+
+  it('After the age check passed: showing one piece asks nothing', async () => {
+    localStorage.setItem('tigy.nsfw.age', '1');
+    (await open('/i/lewd', 'lewd')).flush(artwork({ id: 'lewd', nsfw: true }));
+    await settled();
+    page().querySelector<HTMLButtonElement>('.confirm button')!.click();
+    await settled();
+    expect(page().querySelector('.piece img')).not.toBeNull();
+    expect(TestBed.inject(AgeCheckService).isPending()).toBe(false);
   });
 
   it('Safe link of an NSFW piece: copies it and confirms', async () => {
@@ -193,6 +207,10 @@ describe('ArtworkPage', () => {
     await settled();
 
     page().querySelectorAll<HTMLButtonElement>('.confirm button')[1].click();
+    await settled();
+    expect(TestBed.inject(NsfwSwitchService).isOn()).toBe(false);
+    expect(page().querySelector('.piece img')).toBeNull();
+    TestBed.inject(AgeCheckService).pass();
     await settled();
     expect(TestBed.inject(NsfwSwitchService).isOn()).toBe(true);
     // The details stay while the neighbours load.

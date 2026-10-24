@@ -25,6 +25,7 @@ import { HeadService } from '../head/head.service';
 import { injectServerResponse } from '../head/server-response';
 import { Paw } from '../markings/paw';
 import { NotFoundPage } from '../not-found/not-found';
+import { AgeCheckService } from '../nsfw/age-check.service';
 import { ConfirmedPiecesService } from '../nsfw/confirmed-pieces.service';
 import { NsfwSwitchService } from '../nsfw/nsfw-switch.service';
 import { pieceTitle } from '../shared/format';
@@ -77,6 +78,7 @@ export class ArtworkPage {
   private readonly document = inject(DOCUMENT);
   private readonly nsfwSwitch = inject(NsfwSwitchService);
   private readonly confirmedPieces = inject(ConfirmedPiecesService);
+  private readonly ageCheck = inject(AgeCheckService);
   protected readonly creditsPanel = inject(CreditsPanelService);
 
   private readonly resource = this.catalog.artwork(() =>
@@ -144,7 +146,8 @@ export class ArtworkPage {
 
   protected showPiece(): void {
     const artwork = this.data()?.artwork;
-    if (artwork) this.confirmedPieces.add(artwork.id);
+    if (artwork)
+      this.ageCheck.confirm(() => this.confirmedPieces.add(artwork.id));
   }
 
   protected showAll(): void {

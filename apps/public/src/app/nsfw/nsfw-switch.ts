@@ -13,7 +13,7 @@ import { NsfwSwitchService } from './nsfw-switch.service';
         type="checkbox"
         role="switch"
         [checked]="nsfwSwitch.isOn()"
-        (change)="nsfwSwitch.set(toggle.checked)"
+        (change)="toggleSwitch(toggle)"
       />
       <span class="track" aria-hidden="true"
         ><span class="thumb"><app-paw /></span
@@ -23,4 +23,10 @@ import { NsfwSwitchService } from './nsfw-switch.service';
 })
 export class NsfwSwitch {
   protected readonly nsfwSwitch = inject(NsfwSwitchService);
+
+  protected toggleSwitch(toggle: HTMLInputElement): void {
+    this.nsfwSwitch.set(toggle.checked);
+    // While the check waits, isOn() stays false, so the binding won't uncheck the box.
+    toggle.checked = this.nsfwSwitch.isOn();
+  }
 }

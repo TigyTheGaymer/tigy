@@ -1,0 +1,48 @@
+@if (ageCheck.isPending()) {
+  <dialog
+    #dialog
+    class="stage-panel age-check"
+    aria-labelledby="age-check-heading"
+    (close)="onClosed()"
+  >
+    @if (isRefused()) {
+      <h2 id="age-check-heading">Not just yet</h2>
+      <p id="age-check-refusal">
+        NSFW art isn’t available to visitors under 18.
+      </p>
+      <div class="choices">
+        <button
+          #closeButton
+          type="button"
+          class="pad dark"
+          aria-describedby="age-check-refusal"
+          (click)="dialog.close()"
+        >
+          Close
+        </button>
+      </div>
+    } @else {
+      <h2 id="age-check-heading">How old are you?</h2>
+      <p>Enter your birthday</p>
+      <form (submit)="submit($event, birthday)">
+        <label class="field">
+          <span class="visually-hidden">Your birthday</span>
+          <input
+            #birthday
+            type="date"
+            required
+            autofocus
+            min="1900-01-01"
+            [max]="today()"
+          />
+        </label>
+        <div class="choices">
+          <button type="button" class="pad" (click)="dialog.close()">
+            Cancel
+          </button>
+          <button type="submit" class="pad dark"><app-paw />Confirm</button>
+        </div>
+      </form>
+    }
+  </dialog>
+}
