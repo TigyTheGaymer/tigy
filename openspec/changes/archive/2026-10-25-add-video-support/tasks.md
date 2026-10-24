@@ -37,8 +37,8 @@ Build order: `add-admin-editing` is archived first, so the editor requirement th
 
 ## 5. Integration
 
-- [ ] 5.1 Deploy to the project and time the worst case: a 3-minute 4K 60 fps HEVC phone clip, checking it is ready under 6 minutes, and that the deployed ffmpeg has `libx264` (design Risks); if it is slower, apply the design's fallbacks and update this change's specs before release
-- [ ] 5.2 Check a video piece by hand on Safari on an iPhone, Chrome on Android and a desktop browser: tile autoplay, the player with sound, seeking and full screen; record any fixes as tasks here
+- [x] 5.1 Deploy to the project and time the worst case: a 3-minute 4K 60 fps HEVC phone clip, checking it is ready under 6 minutes, and that the deployed ffmpeg has `libx264` (design Risks); if it is slower, apply the design's fallbacks and update this change's specs before release
+- [x] 5.2 Check a video piece by hand on Safari on an iPhone, Chrome on Android and a desktop browser: tile autoplay, the player with sound, seeking and full screen; record any fixes as tasks here
 
 ## Workflow follow-up
 

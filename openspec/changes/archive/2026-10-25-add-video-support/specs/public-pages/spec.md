@@ -78,3 +78,22 @@ Thumbnails, full images, a video's web copy and preview, and originals SHALL be 
 #### Scenario: Range beyond the end
 - **WHEN** a browser asks for a byte range that starts after the end of a file
 - **THEN** the site answers with status 416 and the file's full size
+
+### Requirement: Link previews and the safe link
+An artwork page SHALL carry its real title, description and full image in link-preview metadata. For a GIF, the preview image SHALL be the original GIF, so chat apps animate it. For a video, the full image SHALL be the poster, and the metadata SHALL also carry the playable MP4 with its type, width and height. With `?safe` in the address, and on the home, privacy and not-found pages, it SHALL carry only the site card: the name "Tigy", the description "Tigy" and Tigy's avatar as a small card. An NSFW artwork page SHALL offer both its link and its safe link.
+
+#### Scenario: Link to a GIF
+- **WHEN** a chat app fetches `/i/{id}` for a GIF piece
+- **THEN** the preview image is the original GIF
+
+#### Scenario: Link to a video
+- **WHEN** a chat app fetches `/i/{id}` for a video piece
+- **THEN** the preview metadata carries the poster as its image and the piece's MP4 as its video
+
+#### Scenario: Safe link to an NSFW piece
+- **WHEN** a chat app fetches `/i/{id}?safe` for an NSFW piece
+- **THEN** the preview metadata carries only the site card, with no title, description or image of the piece
+
+#### Scenario: Link to the privacy page
+- **WHEN** a chat app fetches `/privacy`
+- **THEN** the preview metadata carries only the site card
