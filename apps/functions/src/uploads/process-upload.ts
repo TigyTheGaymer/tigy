@@ -5,29 +5,44 @@ import {
   TIGY_ID,
   UPLOADS_COLLECTION,
   type Image,
+  type ImageFile,
   type Upload,
   type UploadError,
 } from '@tigy/models';
 import {
-  detectImageFormat,
+  detectFormat,
   FORMAT_SIGNATURE_BYTES,
-  IMAGE_FORMATS,
+  FORMATS,
+  isVideoFormat,
+  maxBytesFor,
   type ImageFormat,
+  type VideoFormat,
 } from '@tigy/uploads';
 import { getFirestore, Timestamp } from 'firebase-admin/firestore';
 import { getStorage } from 'firebase-admin/storage';
 import * as logger from 'firebase-functions/logger';
 import { onObjectFinalized } from 'firebase-functions/storage';
 import { randomUUID } from 'node:crypto';
+import { mkdtemp, readdir, rm } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { loadSharp } from './load-sharp';
 import {
   DamagedImageError,
   stripMetadata,
 } from './strip-metadata/strip-metadata';
+import { UploadFailure } from './upload-failure';
+import { processVideo } from './video/process-video';
 import { makeWebVersions } from './web-versions';
 
 /** Width × height × frames. 500 million (a 320-frame 1440×1080 GIF) peaked at 1.4 GB, well inside 4 GiB. */
 export const MAX_PIXELS = 1_000_000_000;
+
+/** Each upload works in a directory named so, removed when it ends. */
+export const WORK_DIR_PREFIX = 'tigy-upload-';
+
+/** Leaves time within the function's 540 s to save the files, or to clean up after a step that ran out. */
+const PROCESSING_BUDGET_MS = 480_000;
 
 export interface UploadedObject {
   name: string;
@@ -35,11 +50,18 @@ export interface UploadedObject {
   metadata?: Record<string, string>;
 }
 
-/** A failure with a reason the owner can act on; anything else is `internal`. */
-class UploadFailure extends Error {
-  constructor(readonly code: UploadError) {
-    super(code);
-  }
+interface FileToSave {
+  path: string;
+  /** The bytes, or a local file's path. */
+  data: Buffer | string;
+  contentType: string;
+}
+
+interface ProcessedUpload {
+  files: FileToSave[];
+  file: ImageFile;
+  /** What the strippers removed, for the log. */
+  removed?: unknown;
 }
 
 const SOURCE_PATH = /^uploads\/([^/]+)\/source$/;
@@ -47,9 +69,9 @@ const SOURCE_PATH = /^uploads\/([^/]+)\/source$/;
 const ALREADY_EXISTS = 6;
 
 /**
- * Turns `uploads/{id}/source` into the artwork `images/{id}` with its three
- * files. Returns at once for every other object, including its own
- * writes under `images/`.
+ * Turns `uploads/{id}/source` into the artwork `images/{id}` with its files.
+ * Returns at once for every other object, including its own writes under
+ * `images/`.
  */
 export async function processUploadedObject(
   object: UploadedObject,
@@ -83,9 +105,9 @@ export async function processUploadedObject(
 
   const written: string[] = [];
   let isImageCreated = false;
-  const save = async (path: string, data: Buffer, contentType: string) => {
+  const save = async ({ path, data, contentType }: FileToSave) => {
     written.push(path);
-    await bucket.file(path).save(data, {
+    const options = {
       resumable: false,
       metadata: {
         contentType,
@@ -93,23 +115,38 @@ export async function processUploadedObject(
         // getDownloadURL() fails. `get` on images/ is public anyway.
         metadata: { firebaseStorageDownloadTokens: randomUUID() },
       },
-    });
+    };
+    if (typeof data === 'string') {
+      await bucket.upload(data, { ...options, destination: path });
+    } else {
+      await bucket.file(path).save(data, options);
+    }
   };
 
+  const deadline = Date.now() + PROCESSING_BUDGET_MS;
+  await removeWorkDirsLeftBehind();
+  const workDir = await mkdtemp(
+    join(tmpdir(), `${WORK_DIR_PREFIX}${uploadId}-`),
+  );
   try {
-    const [bytes] = await source.download();
-    const format = detectImageFormat(bytes.subarray(0, FORMAT_SIGNATURE_BYTES));
+    // A range of an empty object fails, and an empty file has no format anyway.
+    const [head] =
+      record.bytes > 0
+        ? await source.download({ start: 0, end: FORMAT_SIGNATURE_BYTES - 1 })
+        : [Buffer.alloc(0)];
+    const format = detectFormat(head);
     if (!format) throw new UploadFailure('unsupported');
-    await checkPixels(bytes);
+    // Storage judged the size by the declared type, not the content.
+    if (record.bytes > maxBytesFor(format)) {
+      throw new UploadFailure('file-too-large');
+    }
 
-    const { data: original, removed } = stripMetadata(bytes, format);
-    const { ext, mime } = IMAGE_FORMATS[format];
-    const originalPath = imagePaths.original(uploadId, ext);
-    await save(originalPath, original, mime);
-
-    const { full, thumb, file } = await webVersions(original, format);
-    await save(imagePaths.full(uploadId), full, 'image/webp');
-    await save(imagePaths.thumb(uploadId), thumb, 'image/webp');
+    const processed = isVideoFormat(format)
+      ? await videoFiles(uploadId, format, workDir, deadline, (path) =>
+          source.download({ destination: path }),
+        )
+      : await imageFiles(uploadId, format, (await source.download())[0]);
+    for (const file of processed.files) await save(file);
 
     const image: Image = {
       published: false,
@@ -118,21 +155,32 @@ export async function processUploadedObject(
       characterIds: [TIGY_ID],
       tags: [],
       sortDate: sortDateFor(undefined, now.toDate()),
-      file: { original: originalPath, ...file },
+      file: processed.file,
       createdAt: now,
       updatedAt: now,
     };
     await db.collection(IMAGES_COLLECTION).doc(uploadId).create(image);
     isImageCreated = true;
 
-    const { w, h, bytes: fileBytes, mime: fileMime, animated } = file;
+    const { w, h, bytes, mime, animated, durationMs } = processed.file;
     await recordRef.update({
       status: 'ready',
-      file: { w, h, bytes: fileBytes, mime: fileMime, animated },
+      file: {
+        w,
+        h,
+        bytes,
+        mime,
+        animated,
+        ...(durationMs === undefined ? {} : { durationMs }),
+      },
       updatedAt: Timestamp.now(),
     } satisfies Partial<Upload>);
     await source.delete({ ignoreNotFound: true });
-    logger.info('Processed an upload', { uploadId, format, removed });
+    logger.info('Processed an upload', {
+      uploadId,
+      format,
+      removed: processed.removed,
+    });
   } catch (error) {
     // The files now belong to the artwork. The record stays processing and
     // shows as "took too long"; clearing it keeps the artwork's files.
@@ -153,7 +201,97 @@ export async function processUploadedObject(
       error: code,
       updatedAt: Timestamp.now(),
     } satisfies Partial<Upload>);
+  } finally {
+    await rm(workDir, { recursive: true, force: true });
   }
+}
+
+async function imageFiles(
+  uploadId: string,
+  format: ImageFormat,
+  bytes: Buffer,
+): Promise<ProcessedUpload> {
+  await checkPixels(bytes);
+  const { data: original, removed } = stripMetadata(bytes, format);
+  const { ext, mime } = FORMATS[format];
+  const originalPath = imagePaths.original(uploadId, ext);
+  const { full, thumb, file } = await asDamaged(
+    makeWebVersions(original, format),
+  );
+  return {
+    files: [
+      { path: originalPath, data: original, contentType: mime },
+      {
+        path: imagePaths.full(uploadId),
+        data: full,
+        contentType: 'image/webp',
+      },
+      {
+        path: imagePaths.thumb(uploadId),
+        data: thumb,
+        contentType: 'image/webp',
+      },
+    ],
+    file: { original: originalPath, ...file },
+    removed,
+  };
+}
+
+/** Videos stay on disk: ffmpeg works on files, and a 200 MB source would be held in memory several times over. */
+async function videoFiles(
+  uploadId: string,
+  format: VideoFormat,
+  workDir: string,
+  deadline: number,
+  downloadTo: (path: string) => Promise<unknown>,
+): Promise<ProcessedUpload> {
+  const sourcePath = join(workDir, 'source');
+  await downloadTo(sourcePath);
+  const video = await processVideo(sourcePath, format, workDir, deadline);
+  const { ext, mime } = FORMATS[format];
+  const originalPath = imagePaths.original(uploadId, ext);
+  return {
+    files: [
+      { path: originalPath, data: video.original, contentType: mime },
+      {
+        path: imagePaths.video(uploadId),
+        data: video.video,
+        contentType: 'video/mp4',
+      },
+      {
+        path: imagePaths.preview(uploadId),
+        data: video.preview,
+        contentType: 'video/mp4',
+      },
+      {
+        path: imagePaths.full(uploadId),
+        data: video.full,
+        contentType: 'image/webp',
+      },
+      {
+        path: imagePaths.thumb(uploadId),
+        data: video.thumb,
+        contentType: 'image/webp',
+      },
+    ],
+    file: { original: originalPath, ...video.file },
+  };
+}
+
+/**
+ * A run killed at the function's timeout never reaches its `finally`, and /tmp
+ * counts against the instance's memory. An instance processes one upload at a
+ * time, so any directory found here is left over.
+ */
+async function removeWorkDirsLeftBehind(): Promise<void> {
+  const names = await readdir(tmpdir());
+  await Promise.all(
+    names
+      .filter((name) => name.startsWith(WORK_DIR_PREFIX))
+      .map((name) =>
+        rm(join(tmpdir(), name), { recursive: true, force: true }),
+      ),
+  );
 }
 
 /** Reads only the header, so an oversized picture fails before anything is decoded. */
@@ -166,10 +304,6 @@ async function checkPixels(bytes: Buffer): Promise<void> {
   if (meta.width * height * (meta.pages ?? 1) > MAX_PIXELS) {
     throw new UploadFailure('too-large');
   }
-}
-
-function webVersions(original: Buffer, format: ImageFormat) {
-  return asDamaged(makeWebVersions(original, format));
 }
 
 /** sharp's errors mean it could not decode the file. */
@@ -191,7 +325,8 @@ function errorCode(error: unknown): UploadError {
 export const processUpload = onObjectFinalized(
   {
     memory: '4GiB',
-    cpu: 2,
+    // x264 uses every core. 4 vCPUs need at least 2 GiB on Cloud Run.
+    cpu: 4,
     timeoutSeconds: 540,
     concurrency: 1,
     maxInstances: 2,

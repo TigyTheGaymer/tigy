@@ -99,6 +99,7 @@ describe.each(OTHERS)('%s', (who) => {
 
   it('A stranger tries to upload: cannot upload a file', async () => {
     await assertFails(upload(as[who], 'uploads/u2/source', 'image/png'));
+    await assertFails(upload(as[who], 'uploads/u3/source', 'video/mp4'));
   });
 
   it('cannot upload, replace or delete an avatar', async () => {
@@ -144,7 +145,43 @@ describe('owner', () => {
     );
   });
 
+  it.each(['video/mp4', 'video/quicktime', 'video/webm'])(
+    'Large video: uploads a 120 MB %s file',
+    async (contentType) => {
+      await assertSucceeds(
+        upload(
+          as.owner,
+          `uploads/new-${contentType.slice(6)}/source`,
+          contentType,
+          new Uint8Array(120 * 1024 * 1024),
+        ),
+      );
+    },
+  );
+
+  it('Video too large: cannot upload a video over 200 MB, or a 60 MB PNG', async () => {
+    await assertFails(
+      upload(
+        as.owner,
+        'uploads/big-video/source',
+        'video/mp4',
+        new Uint8Array(250 * 1024 * 1024),
+      ),
+    );
+    await assertFails(
+      upload(
+        as.owner,
+        'uploads/big-png/source',
+        'image/png',
+        new Uint8Array(60 * 1024 * 1024),
+      ),
+    );
+  });
+
   it('cannot upload another type, or anywhere else under uploads/', async () => {
+    await assertFails(
+      upload(as.owner, 'uploads/u2/source', 'video/x-matroska'),
+    );
     await assertFails(upload(as.owner, 'uploads/u2/source', 'image/heic'));
     await assertFails(upload(as.owner, 'uploads/u2/source', 'text/plain'));
     await assertFails(upload(as.owner, 'uploads/u2/other', 'image/png'));

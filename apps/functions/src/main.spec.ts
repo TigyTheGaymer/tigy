@@ -22,7 +22,7 @@ it.each(Object.entries(functions).filter(([name]) => name !== 'processUpload'))(
 it('processes one upload per instance on at most 2 instances, with retries', () => {
   expect(functions.processUpload.__endpoint).toMatchObject({
     availableMemoryMb: 4096,
-    cpu: 2,
+    cpu: 4,
     timeoutSeconds: 540,
     concurrency: 1,
     maxInstances: 2,

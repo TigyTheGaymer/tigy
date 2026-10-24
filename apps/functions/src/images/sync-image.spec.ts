@@ -166,3 +166,40 @@ it('deleting an artwork without an upload record resolves', async () => {
   await expect(onImageWritten.run(deleted(image()))).resolves.not.toThrow();
   expect(await rows()).toEqual([]);
 });
+
+it('Deleting a video artwork: removes its web copy and preview with the rest of its folder', async () => {
+  const videoFiles = [
+    'thumb.webp',
+    'full.webp',
+    'full.mp4',
+    'preview.mp4',
+    'original.mov',
+  ];
+  for (const file of videoFiles) {
+    await bucket.file(`images/v1/${file}`).save('x');
+  }
+  const video = image({
+    file: {
+      original: 'images/v1/original.mov',
+      w: 1080,
+      h: 1920,
+      bytes: 1000,
+      mime: 'video/quicktime',
+      animated: true,
+      transparent: false,
+      durationMs: 42_000,
+      hasAudio: true,
+    },
+  });
+  await write('v1', video);
+  expect((await rows())?.[0]).toMatchObject({ id: 'v1', isVideo: true });
+
+  await db.doc('images/v1').delete();
+  await onImageWritten.run({
+    params: { imageId: 'v1' },
+    data: { before: { data: () => video }, after: { data: () => undefined } },
+  } as unknown as Parameters<typeof onImageWritten.run>[0]);
+
+  expect(await rows()).toEqual([]);
+  expect((await bucket.getFiles({ prefix: 'images/v1/' }))[0]).toEqual([]);
+});

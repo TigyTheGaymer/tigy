@@ -15,12 +15,17 @@ service firebase.storage {
     }
 
     // The admin sets the content type from the file's first bytes; processing
-    // checks the bytes again. 50 MB is MAX_UPLOAD_BYTES in @tigy/uploads.
+    // checks the bytes and the size again. 50 MB and 200 MB are
+    // MAX_IMAGE_BYTES and MAX_VIDEO_BYTES in @tigy/uploads.
     match /uploads/{uploadId}/source {
       allow create: if isOwner()
         && resource == null
-        && request.resource.size <= 50 * 1024 * 1024
-        && request.resource.contentType.matches('image/(jpeg|png|gif|webp)');
+        && (
+          (request.resource.contentType.matches('image/(jpeg|png|gif|webp)')
+            && request.resource.size <= 50 * 1024 * 1024)
+          || (request.resource.contentType.matches('video/(mp4|quicktime|webm)')
+            && request.resource.size <= 200 * 1024 * 1024)
+        );
     }
 
     // One avatar per person, fetchable but not listable, like the images.

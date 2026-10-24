@@ -79,3 +79,19 @@ it.each(NOT_OWNER)('refuses %s and changes nothing', async (_, claims) => {
     stale: 3,
   });
 });
+
+it('marks a video row when it rebuilds the gallery', async () => {
+  await db.doc('images/vid').set({
+    sortDate: '2027-01-01',
+    published: true,
+    nsfw: false,
+    artistIds: [],
+    characterIds: ['tigy'],
+    tags: [],
+    file: { ...file, mime: 'video/mp4', durationMs: 4000, hasAudio: false },
+  });
+  await rebuildSummariesCallable.run(requestFrom(OWNER, {}));
+  const rows = await readItems<GalleryRow>('meta/gallery');
+  expect(rows?.find((row) => row.id === 'vid')?.isVideo).toBe(true);
+  expect(rows?.find((row) => row.id === 'pub')).not.toHaveProperty('isVideo');
+});

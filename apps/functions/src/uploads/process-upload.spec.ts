@@ -4,7 +4,23 @@ import { crc32 } from 'node:zlib';
 import sharp from 'sharp';
 import { bucket, clearEmulators, db } from '../testing/emulators';
 import { animatedGif, picture } from '../testing/images';
-import { processUploadedObject } from './process-upload';
+import {
+  existsSync,
+  mkdtempSync,
+  readdirSync,
+  readFileSync,
+  writeFileSync,
+} from 'node:fs';
+import { join } from 'node:path';
+import { tmpdir } from 'node:os';
+import {
+  eightKFrame,
+  longClip,
+  phoneMp4,
+  silentWebm,
+  truncatedMp4,
+} from '../testing/videos';
+import { processUploadedObject, WORK_DIR_PREFIX } from './process-upload';
 
 vi.mock('firebase-functions/logger', async (original) => ({
   ...(await original<typeof import('firebase-functions/logger')>()),
@@ -14,12 +30,17 @@ vi.mock('firebase-functions/logger', async (original) => ({
 }));
 
 /** Puts a file where the admin uploads it and runs processing for it, as the trigger would. */
-async function upload(id: string, data: Buffer, fileName = 'piece.png') {
+async function upload(
+  id: string,
+  data: Buffer,
+  fileName = 'piece.png',
+  contentType = 'image/png',
+) {
   const name = `uploads/${id}/source`;
   const metadata = { fileName };
   await bucket.file(name).save(data, {
     resumable: false,
-    metadata: { contentType: 'image/png', metadata },
+    metadata: { contentType, metadata },
   });
   await processUploadedObject({ name, size: data.length, metadata });
 }
@@ -236,3 +257,138 @@ function withSize(png: Buffer, width: number, height: number): Buffer {
   out.writeUInt32BE(crc32(out.subarray(12, 29)) >>> 0, 29);
   return out;
 }
+
+const workDirsOf = (id: string) =>
+  readdirSync(tmpdir()).filter((name) =>
+    name.startsWith(`${WORK_DIR_PREFIX}${id}-`),
+  );
+
+describe('a video upload', () => {
+  it('A video is processed: becomes an artwork with its five files and a ready record carrying the duration', async () => {
+    const mp4 = readFileSync(await phoneMp4());
+    await upload('v1', mp4, 'clip.mp4', 'video/mp4');
+
+    const file = (await image('v1'))?.file;
+    expect(file).toEqual({
+      original: 'images/v1/original.mp4',
+      w: 320,
+      h: 180,
+      bytes: expect.any(Number),
+      mime: 'video/mp4',
+      animated: true,
+      transparent: false,
+      durationMs: expect.any(Number),
+      hasAudio: true,
+    });
+    expect(await files('images/v1/')).toEqual([
+      'images/v1/full.mp4',
+      'images/v1/full.webp',
+      'images/v1/original.mp4',
+      'images/v1/preview.mp4',
+      'images/v1/thumb.webp',
+    ]);
+    expect(await record('v1')).toMatchObject({
+      status: 'ready',
+      file: {
+        w: 320,
+        h: 180,
+        mime: 'video/mp4',
+        animated: true,
+        durationMs: file?.durationMs,
+      },
+    });
+    expect(await files('uploads/')).toEqual([]);
+    expect(workDirsOf('v1')).toEqual([]);
+  });
+
+  it('gives the video files their content type and a download token', async () => {
+    await upload('v1', readFileSync(await phoneMp4()), 'clip.mp4', 'video/mp4');
+    for (const name of ['original.mp4', 'full.mp4', 'preview.mp4']) {
+      const [meta] = await bucket.file(`images/v1/${name}`).getMetadata();
+      expect(meta.contentType).toBe('video/mp4');
+      expect(meta.metadata?.['firebaseStorageDownloadTokens']).toMatch(
+        /^[0-9a-f-]{36}$/,
+      );
+    }
+  });
+
+  it('Video with the wrong extension: processes a WebM named .mp4 as a WebM', async () => {
+    await upload(
+      'w1',
+      readFileSync(await silentWebm()),
+      'loop.mp4',
+      'video/mp4',
+    );
+    expect((await image('w1'))?.file).toMatchObject({
+      original: 'images/w1/original.webm',
+      mime: 'video/webm',
+      hasAudio: false,
+    });
+    const [meta] = await bucket.file('images/w1/original.webm').getMetadata();
+    expect(meta.contentType).toBe('video/webm');
+  }, 60_000);
+
+  it('records no duration for an image', async () => {
+    await upload('p1', await picture(64, 64).png().toBuffer());
+    expect((await record('p1'))?.file).not.toHaveProperty('durationMs');
+    expect((await image('p1'))?.file).not.toHaveProperty('hasAudio');
+  });
+});
+
+describe('a refused video', () => {
+  async function expectRefused(id: string, video: string, code: string) {
+    await upload(id, readFileSync(video), 'clip.mp4', 'video/mp4');
+    expect(await record(id)).toMatchObject({ status: 'failed', error: code });
+    expect(await image(id)).toBeUndefined();
+    expect(await files(`images/${id}/`)).toEqual([]);
+    expect(await files(`uploads/${id}/`)).toEqual([]);
+    expect(workDirsOf(id)).toEqual([]);
+  }
+
+  it('Video too long: fails four minutes', async () => {
+    await expectRefused('l1', await longClip(), 'video-too-long');
+  });
+
+  it('Video too large: fails 8K', async () => {
+    await expectRefused('k1', await eightKFrame(), 'video-too-large');
+  });
+
+  it('Damaged file: fails a truncated MP4 as unreadable', async () => {
+    await expectRefused('t1', await truncatedMp4(), 'unreadable');
+  });
+
+  it('Image sent as a video: fails a PNG over 50 MB as too large a file', async () => {
+    const png = await picture(64, 64).png().toBuffer();
+    const big = Buffer.concat([
+      png,
+      Buffer.alloc(50 * 1024 * 1024 + 1 - png.length),
+    ]);
+    await upload('b1', big, 'big.png', 'video/mp4');
+    expect(await record('b1')).toMatchObject({
+      status: 'failed',
+      error: 'file-too-large',
+    });
+    expect(await image('b1')).toBeUndefined();
+    expect(await files('images/b1/')).toEqual([]);
+    expect(await files('uploads/b1/')).toEqual([]);
+  });
+});
+
+describe('an upload after trouble', () => {
+  it('fails an empty file as unsupported', async () => {
+    await upload('e1', Buffer.alloc(0), 'empty.png');
+    expect(await record('e1')).toMatchObject({
+      status: 'failed',
+      error: 'unsupported',
+    });
+    expect(await files('uploads/e1/')).toEqual([]);
+  });
+
+  it('removes the work directory of a run that was killed before its clean-up', async () => {
+    const leftOver = mkdtempSync(join(tmpdir(), `${WORK_DIR_PREFIX}killed-`));
+    writeFileSync(join(leftOver, 'source'), Buffer.alloc(1024));
+    await upload('n1', await picture(64, 64).png().toBuffer());
+    expect(existsSync(leftOver)).toBe(false);
+    expect(await record('n1')).toMatchObject({ status: 'ready' });
+  });
+});

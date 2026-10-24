@@ -145,6 +145,31 @@ const PIECES: Record<string, Piece> = {
   },
 };
 
+// Made by the upload processing from a 4-second loop of tigy-hearts.png with a tone.
+const SAMPLE_VIDEO = resolve(__dirname, 'sample-video');
+const SAMPLE_VIDEO_FILE = {
+  w: 640,
+  h: 640,
+  mime: 'video/mp4',
+  animated: true,
+  transparent: false,
+  durationMs: 4000,
+  hasAudio: true,
+};
+
+const VIDEOS: Record<string, Omit<Piece, 'asset'>> = {
+  'happy-tigy-loop': {
+    added: '2025-06-10',
+    fields: {
+      title: 'Happy Tigy loop',
+      date: '2025-06',
+      artistIds: ARTIST,
+      characterIds: [TIGY_ID],
+      tags: ['animated', 'sticker'],
+    },
+  },
+};
+
 const MIME: Record<string, string> = {
   '.png': 'image/png',
   '.gif': 'image/gif',
@@ -233,6 +258,39 @@ async function main(): Promise<void> {
           mime,
           animated: (meta.pages ?? 1) > 1,
           transparent: meta.hasAlpha === true,
+        },
+        createdAt: Timestamp.fromDate(added),
+        updatedAt: Timestamp.fromDate(added),
+      };
+      await db.collection(IMAGES_COLLECTION).doc(id).set(image);
+      images.push({ ...image, id });
+    }
+
+    for (const [id, piece] of Object.entries(VIDEOS)) {
+      const sample = (name: string) => readFile(resolve(SAMPLE_VIDEO, name));
+      const save = async (path: string, name: string, contentType: string) =>
+        bucket
+          .file(path)
+          .save(await sample(name), { contentType, resumable: false });
+      await save(imagePaths.original(id, 'mp4'), 'original.mp4', 'video/mp4');
+      await save(imagePaths.video(id), 'full.mp4', 'video/mp4');
+      await save(imagePaths.preview(id), 'preview.mp4', 'video/mp4');
+      await save(imagePaths.full(id), 'full.webp', 'image/webp');
+      await save(imagePaths.thumb(id), 'thumb.webp', 'image/webp');
+
+      const added = new Date(`${piece.added}T12:00:00Z`);
+      const image: Image = {
+        published: true,
+        nsfw: false,
+        artistIds: [],
+        characterIds: [],
+        tags: [],
+        ...piece.fields,
+        sortDate: sortDateFor(piece.fields.date, added),
+        file: {
+          original: imagePaths.original(id, 'mp4'),
+          bytes: (await sample('original.mp4')).length,
+          ...SAMPLE_VIDEO_FILE,
         },
         createdAt: Timestamp.fromDate(added),
         updatedAt: Timestamp.fromDate(added),

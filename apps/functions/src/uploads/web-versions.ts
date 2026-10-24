@@ -1,5 +1,5 @@
 import type { ImageFile } from '@tigy/models';
-import { IMAGE_FORMATS, type ImageFormat } from '@tigy/uploads';
+import { FORMATS, type ImageFormat } from '@tigy/uploads';
 import { loadSharp } from './load-sharp';
 
 export const FULL_SIZE = 2048;
@@ -53,7 +53,7 @@ export async function makeWebVersions(
       w: isSideways ? storedHeight : meta.width,
       h: isSideways ? meta.width : storedHeight,
       bytes: original.length,
-      mime: IMAGE_FORMATS[format].mime,
+      mime: FORMATS[format].mime,
       animated: (meta.pages ?? 1) > 1 || isApng(original, format),
       transparent: isTransparent,
     },
