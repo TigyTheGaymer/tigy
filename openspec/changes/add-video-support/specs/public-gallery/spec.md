@@ -72,7 +72,7 @@ A video's artwork page SHALL play its web copy in place of the image, with its s
 
 #### Scenario: Opening a video piece
 - **WHEN** a visitor opens the artwork page of a video with sound
-- **THEN** the video plays muted in a loop, and the visitor can unmute it to hear the sound
+- **THEN** the video plays muted in a loop, and the visitor can unmute it to hear the sound at half volume
 
 #### Scenario: Seeking
 - **WHEN** a visitor drags the player's position to the middle of a 2-minute video before it has fully loaded

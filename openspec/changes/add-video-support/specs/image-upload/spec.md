@@ -145,7 +145,7 @@ Processing a video SHALL make a web copy that plays in current browsers, upright
 
 #### Scenario: Portrait animation with sound
 - **WHEN** the owner uploads a 42-second MOV of 2160 by 3840 pixels with sound
-- **THEN** its web copy is 1080 by 1920 pixels, 42 seconds long with sound, and its preview is 405 by 720 pixels, 10 seconds long and silent
+- **THEN** its web copy is 1080 by 1920 pixels, 42 seconds long with sound, and its preview is 406 by 720 pixels (the nearest even width), 10 seconds long and silent
 
 #### Scenario: Short loop
 - **WHEN** the owner uploads a 4-second WebM of 800 by 800 pixels

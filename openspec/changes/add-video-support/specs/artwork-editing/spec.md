@@ -17,7 +17,7 @@ Opening an artwork from the list or from its upload row SHALL show the artwork e
 #### Scenario: Opening a video
 
 - **WHEN** the owner opens a 42-second MP4 with sound in the editor
-- **THEN** the editor shows a muted player with controls in place of the image, and its file details include the duration 0:42 and that it has sound
+- **THEN** the editor shows a muted player with controls, set to half volume, in place of the image, and its file details include the duration 0:42 and that it has sound
 
 #### Scenario: Moving on from a playing video
 
