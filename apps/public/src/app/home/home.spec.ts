@@ -12,7 +12,14 @@ import {
 } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { appRoutes } from '../app.routes';
-import { galleryPage, HOME, requested, rows, settled } from '../testing';
+import {
+  galleryPage,
+  HOME,
+  requested,
+  row,
+  rows,
+  settled,
+} from '../testing';
 
 /** Stands in for the browser's IntersectionObserver, which jsdom lacks. */
 let setNearEnd: (isNear: boolean) => void = () => undefined;
@@ -93,6 +100,22 @@ describe('HomePage', () => {
     expect(page().querySelector('.tile a')?.getAttribute('aria-label')).toBe(
       'Piece 1',
     );
+  });
+
+  it('Untitled piece: its tile shows no label but is still named "Untitled"', async () => {
+    await open('/');
+    (await requested(http, '/api/home')).flush(HOME);
+    (await requested(http, '/api/gallery')).flush(
+      galleryPage([row('p01', { title: 'Hey Pookie!' }), row('p02')], false),
+    );
+    await settled();
+
+    const [titled, untitled] = page().querySelectorAll('.tile a');
+    expect(titled.querySelector('.label')?.textContent?.trim()).toBe(
+      'Hey Pookie!',
+    );
+    expect(untitled.querySelector('.label')).toBeNull();
+    expect(untitled.getAttribute('aria-label')).toBe('Untitled');
   });
 
   it("shows just the name Tigy without Tigy's person", async () => {

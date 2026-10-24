@@ -42,9 +42,12 @@ describe('toTile', () => {
       width: 1620,
       height: 2117,
       shape: 1620 / 2117,
-      alt: 'Hey Pookie!',
+      title: 'Hey Pookie!',
+      name: 'Hey Pookie!',
       isNsfw: true,
     });
-    expect(toTile(row(10, 10)).alt).toBe('Untitled');
+    const untitled = toTile(row(10, 10));
+    expect(untitled.title).toBeUndefined();
+    expect(untitled.name).toBe('Untitled');
   });
 });

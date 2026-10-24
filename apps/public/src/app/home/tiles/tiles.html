@@ -3,7 +3,7 @@
     <li #item class="tile" [style.--shape]="tile.shape" [class.tilt]="odd">
       <a
         [routerLink]="['/i', tile.id]"
-        [attr.aria-label]="tile.alt + (tile.isNsfw ? ', NSFW' : '')"
+        [attr.aria-label]="tile.name + (tile.isNsfw ? ', NSFW' : '')"
       >
         <img
           [src]="tile.src"
@@ -16,7 +16,9 @@
         @if (tile.isNsfw) {
           <span class="badge" aria-hidden="true">NSFW</span>
         }
-        <span class="label" aria-hidden="true">{{ tile.alt }}</span>
+        @if (tile.title; as title) {
+          <span class="label" aria-hidden="true">{{ title }}</span>
+        }
         <span class="paws" aria-hidden="true"
           ><app-paw /><app-paw /><app-paw
         /></span>

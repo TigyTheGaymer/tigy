@@ -10,7 +10,9 @@ export interface Tile {
   height: number;
   /** The tile's width over its height, kept between 1:2 and 12:5 so no tile becomes a sliver. */
   shape: number;
-  alt: string;
+  /** The piece's own title, without the "Untitled" fallback. */
+  title?: string;
+  name: string;
   isNsfw: boolean;
 }
 
@@ -25,7 +27,8 @@ export function toTile(row: GalleryRow): Tile {
     width: row.w,
     height: row.h,
     shape: Math.min(WIDEST, Math.max(NARROWEST, shape)),
-    alt: pieceTitle(row.title),
+    title: row.title,
+    name: pieceTitle(row.title),
     isNsfw: row.nsfw,
   };
 }
