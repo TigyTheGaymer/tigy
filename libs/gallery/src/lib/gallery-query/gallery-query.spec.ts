@@ -44,11 +44,25 @@ describe('queryGallery', () => {
     ];
     const page = queryGallery(
       rows,
-      query({ characterIds: ['pookie'], artistIds: ['ann'], year: 2025 }),
+      query({ characterIds: ['pookie'], artistIds: ['ann'], years: [2025] }),
       { nsfw: false },
     );
     expect(ids(page.rows)).toEqual(['match']);
     expect(page.hasMore).toBe(false);
+  });
+
+  it('Several years: lists the pieces from any of them', () => {
+    const rows = [
+      aRow('y2026', '2026-01-01'),
+      aRow('y2025', '2025-01-01'),
+      aRow('y2024', '2024-01-01'),
+    ];
+    expect(
+      ids(
+        queryGallery(rows, query({ years: [2026, 2024] }), { nsfw: false })
+          .rows,
+      ),
+    ).toEqual(['y2026', 'y2024']);
   });
 
   it('requires every tag when several are given', () => {

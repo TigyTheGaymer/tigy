@@ -42,9 +42,16 @@ test("Following an artist's credit: opens the gallery filtered by that artist", 
   await page.goto('/i/hey-pookie');
   await page.getByRole('link', { name: 'Artist name (placeholder)' }).click();
   await expect(page).toHaveURL(/\/\?artist=placeholder-artist$/);
-  await expect(page.locator('.chip.is-active')).toHaveText([
-    'Artist: Artist name (placeholder)',
-  ]);
+  await expect(page.locator('.pickers .chip.is-active')).toHaveAttribute(
+    'aria-label',
+    'Artists, 1 selected',
+  );
+  await page.getByRole('button', { name: 'Artists' }).click();
+  await expect(
+    page.getByRole('link', {
+      name: /^Artist name \(placeholder\), \d+ pieces?, selected$/,
+    }),
+  ).toBeVisible();
 });
 
 test('following a tag opens the gallery filtered by it', async ({ page }) => {
@@ -100,9 +107,10 @@ test('Back to a filtered gallery: returns to the gallery with its filter, also a
   await expect(page).toHaveURL(/\/i\/chibi-tigy$/);
   await page.getByRole('link', { name: 'Back to the gallery' }).click();
   await expect(page).toHaveURL(/\/\?character=placeholder-character$/);
-  await expect(page.locator('.chip.is-active')).toHaveText([
-    'Character: Character name (placeholder)',
-  ]);
+  await expect(page.locator('.pickers .chip.is-active')).toHaveAttribute(
+    'aria-label',
+    'Characters, 1 selected',
+  );
 });
 
 test('Arriving from a shared link: the link back opens the home page', async ({

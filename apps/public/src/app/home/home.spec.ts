@@ -12,14 +12,7 @@ import {
 } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { appRoutes } from '../app.routes';
-import {
-  galleryPage,
-  HOME,
-  requested,
-  row,
-  rows,
-  settled,
-} from '../testing';
+import { galleryPage, HOME, requested, row, rows, settled } from '../testing';
 
 /** Stands in for the browser's IntersectionObserver, which jsdom lacks. */
 let setNearEnd: (isNear: boolean) => void = () => undefined;
@@ -69,6 +62,25 @@ describe('HomePage', () => {
 
   async function open(url: string): Promise<void> {
     void harness.navigateByUrl(url);
+  }
+
+  const pickers = () => [
+    ...page().querySelectorAll<HTMLButtonElement>('.pickers button.chip'),
+  ];
+  const pickerLabels = () =>
+    pickers().map((b) => b.textContent?.replace(/\s+/g, ' ').trim());
+
+  /** jsdom has no showModal() or matchMedia(). */
+  function stubDialogs(): void {
+    const { showModal } = HTMLDialogElement.prototype;
+    HTMLDialogElement.prototype.showModal = function () {
+      this.setAttribute('open', '');
+    };
+    onTestFinished(() => {
+      HTMLDialogElement.prototype.showModal = showModal;
+      vi.unstubAllGlobals();
+    });
+    vi.stubGlobal('matchMedia', () => ({ matches: false }));
   }
 
   it('Visitor opens the home page: shows the header and the first page of tiles', async () => {
@@ -182,26 +194,64 @@ describe('HomePage', () => {
     });
     await settled();
 
-    const filters = [
-      ...page().querySelectorAll<HTMLAnchorElement>('.chip.is-active'),
-    ];
-    expect(filters.map((a) => a.textContent?.trim())).toEqual([
-      'Character: Tigy',
-      'Tag: comic',
+    expect(pickerLabels()).toEqual([
+      'Characters · 1',
+      'Artists',
+      'Tags · 1',
+      'Year',
     ]);
-    expect(filters.map((a) => a.getAttribute('href'))).toEqual([
-      '/?tag=comic&sort=oldest',
-      '/?character=tigy&sort=oldest',
-    ]);
+    const [characters, artists] = pickers();
+    expect(characters.getAttribute('aria-label')).toBe(
+      'Characters, 1 selected',
+    );
+    expect(characters.classList).toContain('is-active');
+    expect(artists.classList).not.toContain('is-active');
+    expect(pickers().some((b) => b.hasAttribute('aria-disabled'))).toBe(false);
+    expect(page().textContent).not.toContain('coming later');
     const sort = page().querySelector('.chip.sort')!;
     expect(sort.textContent?.trim()).toBe('Oldest first');
     expect(sort.getAttribute('href')).toBe('/?character=tigy&tag=comic');
-    expect(
-      page().querySelectorAll('button.chip[aria-disabled="true"]'),
-    ).toHaveLength(4);
+    expect(page().querySelector('.chip.clear')?.getAttribute('href')).toBe(
+      '/?sort=oldest',
+    );
   });
 
-  it('Unknown person: names the filter "Unknown person", says nothing matches and offers to clear', async () => {
+  it('offers no "Clear all" without filters', async () => {
+    await open('/');
+    (await requested(http, '/api/home')).flush(HOME);
+    (await requested(http, '/api/gallery')).flush(galleryPage(rows(3), false));
+    await settled();
+    expect(pickerLabels()).toEqual(['Characters', 'Artists', 'Tags', 'Year']);
+    expect(page().querySelector('.chip.clear')).toBeNull();
+  });
+
+  it('Picking a tag: the picker offers the first page’s choices, each linking to the gallery with it added', async () => {
+    stubDialogs();
+    await open('/?character=tigy');
+    (await requested(http, '/api/home')).flush(HOME);
+    (await requested(http, '/api/gallery?character=tigy')).flush({
+      ...galleryPage(rows(3), false),
+      choices: {
+        characters: [{ id: 'tigy', name: 'Tigy', count: 3 }],
+        artists: [],
+        tags: [{ value: 'comic', count: 2 }],
+        years: [],
+      },
+    });
+    await settled();
+
+    // The choices already name Tigy.
+    expect(http.match('/api/people')).toEqual([]);
+    pickers()[2].click();
+    await settled();
+
+    const choice = page().querySelector<HTMLAnchorElement>('dialog .choice')!;
+    expect(choice.getAttribute('aria-label')).toBe('comic, 2 pieces');
+    expect(choice.getAttribute('href')).toBe('/?character=tigy&tag=comic');
+  });
+
+  it('Unknown person: lists the filter as "Unknown person" to unpick, says nothing matches and offers to clear', async () => {
+    stubDialogs();
     await open('/?artist=nobody');
     (await requested(http, '/api/home')).flush(HOME);
     (await requested(http, '/api/gallery?artist=nobody')).flush(
@@ -213,9 +263,14 @@ describe('HomePage', () => {
     });
     await settled();
 
-    const filter = page().querySelector<HTMLAnchorElement>('.chip.is-active')!;
-    expect(filter.textContent?.trim()).toBe('Artist: Unknown person');
-    expect(filter.getAttribute('href')).toBe('/');
+    expect(pickerLabels()[1]).toBe('Artists · 1');
+    pickers()[1].click();
+    await settled();
+    const choice = page().querySelector<HTMLAnchorElement>('dialog .choice')!;
+    expect(choice.getAttribute('aria-label')).toBe(
+      'Unknown person, 0 pieces, selected',
+    );
+    expect(choice.getAttribute('href')).toBe('/');
     expect(text('.empty')).toContain('Nothing matches these filters.');
     expect(page().querySelector('.empty a')?.getAttribute('href')).toBe('/');
   });
@@ -242,11 +297,12 @@ describe('HomePage', () => {
     await settled();
 
     expect(http.match('/api/people')).toEqual([]);
-    expect(
-      [...page().querySelectorAll('.chip.is-active')].map((a) =>
-        a.textContent?.trim(),
-      ),
-    ).toEqual(['Tag: comic', 'Year: 2025']);
+    expect(pickerLabels()).toEqual([
+      'Characters',
+      'Artists',
+      'Tags · 1',
+      'Year · 1',
+    ]);
   });
 
   it('remembers its address in this tab for the link back', async () => {

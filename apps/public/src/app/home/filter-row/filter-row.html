@@ -1,15 +1,18 @@
 <div class="bar">
   <nav class="filters container" aria-label="Filters and sort">
-    @for (filter of filters(); track filter.key) {
-      <a
-        class="chip is-active"
-        routerLink="/"
-        [queryParams]="filter.remove"
-        [attr.aria-label]="'Remove filter ' + filter.kind + ': ' + filter.name"
-        >{{ filter.kind }}: {{ filter.name
-        }}<ng-icon name="lucideX" class="icon"
-      /></a>
-    }
+    <span class="pickers" role="group" aria-label="Filter by">
+      @for (picker of pickers(); track picker.kind) {
+        <app-filter-picker
+          [name]="picker.name"
+          [icon]="picker.icon"
+          [active]="picker.active"
+          [choices]="choices()[picker.kind]"
+          [isSearchable]="picker.kind !== 'years'"
+          [hasPeople]="picker.isPeople"
+          [isLoading]="isLoading()"
+        />
+      }
+    </span>
     <a
       class="chip sort"
       routerLink="/"
@@ -19,23 +22,10 @@
       "
       ><ng-icon name="lucideArrowDownUp" class="icon" />{{ sortName() }}</a
     >
-    <span
-      class="pickers"
-      role="group"
-      aria-label="Filter pickers (coming later)"
-    >
-      @for (picker of pickers; track picker.name) {
-        <button
-          type="button"
-          class="chip"
-          aria-disabled="true"
-          title="Filters are coming later"
-        >
-          <ng-icon [name]="picker.icon" class="icon" />{{ picker.name
-          }}<ng-icon name="lucideChevronDown" class="icon chev" />
-        </button>
-      }
-    </span>
-    <span class="note">Filters coming later</span>
+    @if (hasFilters()) {
+      <a class="chip clear" routerLink="/" [queryParams]="clearedParams()"
+        ><ng-icon name="lucideX" class="icon" />Clear all</a
+      >
+    }
   </nav>
 </div>

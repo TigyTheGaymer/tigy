@@ -28,7 +28,7 @@ function everyCombination(): GalleryQuery[] {
     if (mask & 1) q.characterIds = ['tigy', 'Pookie_2'];
     if (mask & 2) q.artistIds = ['k3xQ9a-b'];
     if (mask & 4) q.tags = ['reference sheet', 'r&d / 50%'];
-    if (mask & 8) q.year = 2025;
+    if (mask & 8) q.years = [2025, 2019];
     if (mask & 16) q.sort = 'oldest';
     result.push(q);
   }
@@ -58,14 +58,14 @@ describe('gallery parameters', () => {
       characterIds: ['tigy'],
       artistIds: ['ann'],
       tags: ['chibi'],
-      year: 2025,
+      years: [2025],
       sort: 'oldest',
     });
     expect(galleryQueryToParams(q)).toEqual({
       character: ['tigy'],
       artist: ['ann'],
       tag: ['chibi'],
-      year: '2025',
+      year: ['2025'],
       sort: 'oldest',
     });
   });
@@ -104,16 +104,28 @@ describe('gallery parameters', () => {
       'character=tigy&character=a/b&year=abc&year=2024&sort=oldest',
     );
     expect(galleryQueryFromParams(params)).toEqual(
-      query({ characterIds: ['tigy'], year: 2024, sort: 'oldest' }),
+      query({ characterIds: ['tigy'], years: [2024], sort: 'oldest' }),
     );
   });
 
-  it('drops repeated people and tags', () => {
+  it('writes and reads years newest first, whatever order they were picked in', () => {
+    expect(galleryQueryToParams(query({ years: [2019, 2025] }))).toEqual({
+      year: ['2025', '2019'],
+    });
+    expect(galleryQueryFromParams({ year: ['2019', '2025'] }).years).toEqual([
+      2025, 2019,
+    ]);
+  });
+
+  it('drops repeated people, tags and years', () => {
     expect(
       galleryQueryFromParams({
         character: ['tigy', 'tigy'],
         tag: ['Chibi', 'chibi'],
+        year: ['2025', '2025'],
       }),
-    ).toEqual(query({ characterIds: ['tigy'], tags: ['chibi'] }));
+    ).toEqual(
+      query({ characterIds: ['tigy'], tags: ['chibi'], years: [2025] }),
+    );
   });
 });

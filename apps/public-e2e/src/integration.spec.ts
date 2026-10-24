@@ -78,9 +78,10 @@ test.describe('edits', () => {
     await db.doc('people/placeholder-character').update({ name: 'Pookie' });
     await rebuildSummaries();
     await page.goto('/?character=placeholder-character');
-    await expect(page.locator('.chip.is-active')).toHaveText([
-      'Character: Pookie',
-    ]);
+    await page.getByRole('button', { name: 'Characters' }).click();
+    await expect(
+      page.getByRole('link', { name: 'Pookie, 1 piece, selected' }),
+    ).toBeVisible();
     await expect(page.locator('.gallery .tile a')).toHaveCount(1);
   });
 

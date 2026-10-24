@@ -10,7 +10,8 @@ import {
   input,
   viewChild,
 } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Router, RouterLink, Scroll } from '@angular/router';
 import {
   galleryQueryFromParams,
   galleryQueryToParams,
@@ -18,6 +19,7 @@ import {
   type GalleryQuery,
 } from '@tigy/gallery';
 import { TIGY_ID } from '@tigy/models';
+import type { PickerPerson } from '../../api/types';
 import { CatalogService } from '../catalog/catalog.service';
 import { TopBar } from '../chrome/top-bar';
 import { GalleryPlaceService } from '../gallery/gallery-place.service';
@@ -31,8 +33,8 @@ import { monthRange, pieceCount } from '../shared/format';
 import { latest } from '../shared/resources';
 import { avatarUrl } from '../shared/urls';
 import { SocialLink } from '../social/social-link';
-import { activeFilters } from './filter-row/active-filters';
 import { FilterRow } from './filter-row/filter-row';
+import { pickerChoices } from './filter-row/picker-choices';
 import { injectGalleryPages } from './gallery-pages';
 import { TailTimeline } from './tail-timeline/tail-timeline';
 import { toTile } from './tiles/tile';
@@ -95,10 +97,15 @@ export class HomePage {
 
   private readonly homeResource = this.catalog.home(this.isNsfwShown);
   protected readonly home = latest(this.homeResource);
-  // Only needed to name person filters.
+  // Only for active people the choices leave out, such as one no piece matches.
   private readonly people = this.catalog.people(() => {
+    if (this.pages.isLoadingFirst()) return undefined;
     const { characterIds, artistIds } = this.query();
-    return characterIds.length || artistIds.length
+    const choices = this.pages.first()?.choices;
+    const isUnnamed = (ids: readonly string[], named?: PickerPerson[]) =>
+      ids.some((id) => !named?.some((person) => person.id === id));
+    return isUnnamed(characterIds, choices?.characters) ||
+      isUnnamed(artistIds, choices?.artists)
       ? this.isNsfwShown()
       : undefined;
   });
@@ -123,8 +130,10 @@ export class HomePage {
     return `${pieceCount(home.count)} · ${monthRange(home.oldest, home.newest)}`;
   });
 
-  protected readonly filters = computed(() =>
-    activeFilters(this.query(), (id) => this.personName(id)),
+  protected readonly choices = computed(() =>
+    pickerChoices(this.query(), this.pages.first()?.choices, (id) =>
+      this.personName(id),
+    ),
   );
   protected readonly otherSortParams = computed(() =>
     galleryQueryToParams({
@@ -143,6 +152,8 @@ export class HomePage {
   });
 
   private readonly sentinel = viewChild<ElementRef<HTMLElement>>('sentinel');
+  private readonly galleryStart =
+    viewChild<ElementRef<HTMLElement>>('galleryStart');
   private readonly tilesList = viewChild(Tiles);
   /** The piece the timeline asked for, until it is in view. Only DOM work reads it. */
   private travelTarget: number | undefined;
@@ -163,6 +174,19 @@ export class HomePage {
         queryParams: galleryQueryToParams(this.query()),
       });
       this.place.rememberAddress(this.router.serializeUrl(tree));
+    });
+
+    // A picker's choice skips the router's scroll to the top; show the result from its start.
+    // Back and Forward bring that state back too, but keep their restored position.
+    this.router.events.pipe(takeUntilDestroyed()).subscribe((event) => {
+      const navigation = this.router.lastSuccessfulNavigation();
+      if (
+        event instanceof Scroll &&
+        navigation?.trigger !== 'popstate' &&
+        navigation?.extras.state?.['keepGallery']
+      ) {
+        this.keepGalleryInView();
+      }
     });
 
     const destroyRef = inject(DestroyRef);
@@ -205,6 +229,16 @@ export class HomePage {
       this.travelTarget = undefined;
     } else {
       this.sentinel()?.nativeElement.scrollIntoView({ block: 'end' });
+    }
+  }
+
+  /** Scrolls back only when the visitor is past the gallery's start, never down to it. */
+  private keepGalleryInView(): void {
+    const start = this.galleryStart()?.nativeElement;
+    if (!start) return;
+    const stuckAt = parseFloat(getComputedStyle(start).scrollMarginTop);
+    if (start.getBoundingClientRect().top < stuckAt) {
+      start.scrollIntoView({ block: 'start', behavior: 'instant' });
     }
   }
 

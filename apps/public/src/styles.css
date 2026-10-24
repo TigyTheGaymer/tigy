@@ -164,8 +164,15 @@ html {
   scrollbar-color: var(--ink) var(--page-deep);
 }
 
-html:has(dialog[open]) {
+/* Filter dropdowns leave the page scrolling: hiding its scrollbar would shift the page under them. */
+html:has(dialog[open]:not(.picker)) {
   overflow: hidden;
+}
+
+@media (max-width: 720px) {
+  html:has(dialog.picker[open]) {
+    overflow: hidden;
+  }
 }
 
 body {
@@ -283,6 +290,35 @@ h2 {
 .round.is-on {
   background: var(--pink);
   color: var(--on-pink);
+}
+
+.chip {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  min-height: var(--control-chip);
+  padding: 6px 10px 6px 14px;
+  border: 2px solid color-mix(in srgb, var(--ink) 22%, transparent);
+  border-radius: var(--r-md);
+  background: var(--panel-2);
+  color: var(--ink);
+  font: inherit;
+  font-weight: 800;
+  font-size: var(--text-button);
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 0 2px 0 var(--page-deep);
+  transition: transform 260ms var(--ease-squish);
+}
+
+.chip:hover {
+  transform: translateY(-2px);
+}
+
+.chip .icon {
+  --ng-icon__size: 18px;
 }
 
 .container {

@@ -5,12 +5,12 @@ export const PAGE_SIZE = 24;
 
 export type GallerySort = 'newest' | 'oldest';
 
-/** What a gallery address carries. Every active filter must match; several people or tags must all match. */
+/** What a gallery address carries. Every active filter must match: all of several people or tags, any of several years. */
 export interface GalleryQuery {
   characterIds: readonly string[];
   artistIds: readonly string[];
   tags: readonly string[];
-  year?: number;
+  years: readonly number[];
   sort: GallerySort;
 }
 
@@ -31,6 +31,7 @@ export const UNFILTERED_QUERY: Readonly<GalleryQuery> = Object.freeze({
   characterIds: Object.freeze([]),
   artistIds: Object.freeze([]),
   tags: Object.freeze([]),
+  years: Object.freeze([]),
   sort: 'newest',
 });
 
@@ -61,7 +62,7 @@ export function matchesQuery(row: GalleryRow, query: GalleryQuery): boolean {
     query.characterIds.every((id) => row.characterIds.includes(id)) &&
     query.artistIds.every((id) => row.artistIds.includes(id)) &&
     query.tags.every((tag) => row.tags.includes(tag)) &&
-    (query.year === undefined || yearOf(row) === query.year)
+    (!query.years.length || query.years.includes(yearOf(row)))
   );
 }
 

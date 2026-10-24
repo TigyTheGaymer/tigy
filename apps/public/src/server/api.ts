@@ -1,4 +1,5 @@
 import {
+  filterChoices,
   galleryOverview,
   galleryQueryFromParams,
   matchesQuery,
@@ -6,6 +7,8 @@ import {
   parseCursor,
   queryGallery,
   type Choice,
+  type GalleryOverview,
+  type GalleryQuery,
 } from '@tigy/gallery';
 import {
   TIGY_ID,
@@ -22,6 +25,7 @@ import {
 import type {
   ArtworkResponse,
   CreditedPerson,
+  GalleryChoices,
   GalleryResponse,
   HomeResponse,
   NeighbourLink,
@@ -61,13 +65,17 @@ export function apiRouter(catalog: Catalog): Router {
         nsfw,
         ...(after && { after }),
       });
+      const matching = galleryOverview(
+        rows.filter((row) => matchesQuery(row, query)),
+        nsfw,
+      );
       const body: GalleryResponse = {
         ...page,
         overview: galleryOverview(rows, nsfw),
-        years: galleryOverview(
-          rows.filter((row) => matchesQuery(row, query)),
-          nsfw,
-        ).years,
+        years: matching.years,
+        ...(!after && {
+          choices: await choices(catalog, rows, query, nsfw, matching),
+        }),
       };
       res.json(body);
     }),
@@ -80,14 +88,7 @@ export function apiRouter(catalog: Catalog): Router {
         await catalog.summaries.gallery(),
         nsfwFlag(req),
       );
-      const names = new Map(
-        (await catalog.summaries.people()).map((entry) => [entry.id, entry]),
-      );
-      const pick = (choices: Choice[]): PickerPerson[] =>
-        choices.flatMap(({ value, count }) => {
-          const entry = names.get(value);
-          return entry ? [{ ...entry, count }] : [];
-        });
+      const pick = await pickPeople(catalog);
       const body: PeopleResponse = {
         characters: pick(overview.characters),
         artists: pick(overview.artists),
@@ -169,6 +170,37 @@ export function apiRouter(catalog: Catalog): Router {
   });
 
   return router;
+}
+
+async function choices(
+  catalog: Catalog,
+  rows: readonly GalleryRow[],
+  query: GalleryQuery,
+  includeNsfw: boolean,
+  matching: GalleryOverview,
+): Promise<GalleryChoices> {
+  const { characters, artists, tags, years } = filterChoices(
+    rows,
+    query,
+    includeNsfw,
+    matching,
+  );
+  const pick = await pickPeople(catalog);
+  return { characters: pick(characters), artists: pick(artists), tags, years };
+}
+
+/** Leaves out IDs missing from meta/people. */
+async function pickPeople(
+  catalog: Catalog,
+): Promise<(choices: Choice[]) => PickerPerson[]> {
+  const names = new Map(
+    (await catalog.summaries.people()).map((entry) => [entry.id, entry]),
+  );
+  return (choices) =>
+    choices.flatMap(({ value, count }) => {
+      const entry = names.get(value);
+      return entry ? [{ ...entry, count }] : [];
+    });
 }
 
 function nsfwFlag(req: Request): boolean {

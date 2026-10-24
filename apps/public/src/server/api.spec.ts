@@ -176,10 +176,51 @@ describe('GET /api/gallery', () => {
     });
   });
 
-  it('never reads meta/people for an unfiltered gallery', async () => {
+  it('reads each summary once, and later pages and filters read nothing more', async () => {
     await get('/api/gallery');
     await get('/api/gallery?after=2025-01-07_p07');
-    expect(summaryReads).toEqual(['meta/gallery']);
+    await get('/api/gallery?tag=comic');
+    expect([...summaryReads].sort()).toEqual(['meta/gallery', 'meta/people']);
+  });
+
+  it('carries the narrowed filter choices on the first page only', async () => {
+    const { body } = await get<GalleryResponse>('/api/gallery?year=2025');
+    expect(body.choices).toEqual({
+      characters: [
+        { id: 'tigy', name: 'Tigy', avatar: 'people/tigy.webp', count: 30 },
+      ],
+      artists: [{ id: 'ann', name: 'Ann', count: 30 }],
+      tags: [],
+      years: [{ year: 2025, count: 30 }],
+    });
+    const next = await get<GalleryResponse>(
+      '/api/gallery?year=2025&after=2025-01-07_p07',
+    );
+    expect(next.body.choices).toBeUndefined();
+  });
+
+  it('narrows the choices to the pieces matching the query', async () => {
+    const { body } = await get<GalleryResponse>(
+      '/api/gallery?character=secret&nsfw=1',
+    );
+    expect(body.choices?.characters.map((p) => p.id)).toEqual([
+      'secret',
+      'tigy',
+    ]);
+    expect(body.choices?.artists).toEqual([
+      { id: 'nsfw-artist', name: 'Night Artist', count: 1 },
+    ]);
+    expect(body.choices?.tags).toEqual([{ value: 'lewd', count: 1 }]);
+  });
+
+  it('leaves NSFW-only choices out without the flag', async () => {
+    const { body } = await get<GalleryResponse>('/api/gallery');
+    expect(body.choices?.characters.map((p) => p.id)).toEqual(['tigy']);
+    const withNsfw = await get<GalleryResponse>('/api/gallery?nsfw=1');
+    expect(withNsfw.body.choices?.characters.map((p) => p.id)).toEqual([
+      'tigy',
+      'secret',
+    ]);
   });
 
   it('Changing the sort after scrolling: starts again with the first 24 in the new order', async () => {
@@ -222,6 +263,16 @@ describe('GET /api/gallery', () => {
   it('applies filters to every piece', async () => {
     const { body } = await get<GalleryResponse>('/api/gallery?year=2024');
     expect(body).toMatchObject({ rows: [], hasMore: false });
+  });
+
+  it('Several years: lists the pieces from any of them', async () => {
+    const { body } = await get<GalleryResponse>(
+      '/api/gallery?year=2024&year=2025',
+    );
+    expect(body.rows).toHaveLength(24);
+    expect(body.hasMore).toBe(true);
+    expect(body.years).toEqual([{ year: 2025, count: 30 }]);
+    expect(body.choices?.years).toEqual([{ year: 2025, count: 30 }]);
   });
 
   it('counts the matching pieces per year, for the tail timeline', async () => {

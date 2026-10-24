@@ -12,8 +12,8 @@ export const ID_PATTERN = /^[A-Za-z0-9_-]{1,128}$/;
 const YEAR = /^\d{4}$/;
 
 /**
- * The gallery address's parameters: `character` and `artist` carry person IDs, `tag` the tag itself,
- * each repeated for several; `year`; and `sort=oldest`. The defaults are left out.
+ * The gallery address's parameters: `character` and `artist` carry person IDs, `tag` the tag itself and
+ * `year` the year, each repeated for several; and `sort=oldest`. The defaults are left out.
  * Hand the result to the router's `queryParams` or `HttpClient`'s `params`, which encode it.
  */
 export function galleryQueryToParams(
@@ -23,7 +23,8 @@ export function galleryQueryToParams(
   if (query.characterIds.length) params['character'] = [...query.characterIds];
   if (query.artistIds.length) params['artist'] = [...query.artistIds];
   if (query.tags.length) params['tag'] = [...query.tags];
-  if (query.year !== undefined) params['year'] = String(query.year);
+  // Newest first, so the order years were ticked in never makes another address.
+  if (query.years.length) params['year'] = newestFirst(query.years).map(String);
   if (query.sort !== 'newest') params['sort'] = query.sort;
   return params;
 }
@@ -33,7 +34,7 @@ export function galleryQueryToParams(
  * that parameter's default, so a broken link still opens the gallery.
  */
 export function galleryQueryFromParams(params: ParamsInput): GalleryQuery {
-  const query: GalleryQuery = {
+  return {
     characterIds: unique(
       values(params, 'character').filter((id) => ID_PATTERN.test(id)),
     ),
@@ -41,12 +42,14 @@ export function galleryQueryFromParams(params: ParamsInput): GalleryQuery {
       values(params, 'artist').filter((id) => ID_PATTERN.test(id)),
     ),
     tags: normaliseTags(values(params, 'tag')),
+    years: newestFirst(
+      unique(values(params, 'year').filter((year) => YEAR.test(year))).map(
+        Number,
+      ),
+    ),
     sort:
       values(params, 'sort')[0] === 'oldest' ? 'oldest' : UNFILTERED_QUERY.sort,
   };
-  const year = values(params, 'year').find((value) => YEAR.test(value));
-  if (year !== undefined) query.year = Number(year);
-  return query;
 }
 
 function values(params: ParamsInput, name: string): string[] {
@@ -58,4 +61,8 @@ function values(params: ParamsInput, name: string): string[] {
 
 function unique(list: string[]): string[] {
   return [...new Set(list)];
+}
+
+function newestFirst(years: readonly number[]): number[] {
+  return [...years].sort((a, b) => b - a);
 }

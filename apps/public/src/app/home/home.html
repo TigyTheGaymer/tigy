@@ -29,10 +29,13 @@
     <div class="container album-head">
       <h2 id="album-heading">All the art</h2>
     </div>
+    <div #galleryStart class="gallery-start"></div>
     <app-filter-row
-      [filters]="filters()"
       [sort]="query().sort"
+      [clearedParams]="cleared()"
       [otherSortParams]="otherSortParams()"
+      [choices]="choices()"
+      [isLoading]="pages.isLoadingFirst()"
     />
 
     <div class="container gallery">

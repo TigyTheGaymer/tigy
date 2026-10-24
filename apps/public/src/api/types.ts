@@ -1,4 +1,4 @@
-import type { GalleryOverview } from '@tigy/gallery';
+import type { Choice, GalleryOverview, YearMark } from '@tigy/gallery';
 import type { GalleryRow, ImageFile, SocialLink } from '@tigy/models';
 
 // The JSON the data endpoints return, shared by the Express server and the Angular services.
@@ -11,6 +11,16 @@ export interface GalleryResponse {
   overview: GalleryOverview;
   /** How many matching pieces each year has, newest first: the tail timeline's marks. */
   years: GalleryOverview['years'];
+  /** Only on the first page. */
+  choices?: GalleryChoices;
+}
+
+/** `FilterChoices` with the people named. */
+export interface GalleryChoices {
+  characters: PickerPerson[];
+  artists: PickerPerson[];
+  tags: Choice[];
+  years: YearMark[];
 }
 
 /** A person offered in a filter picker, with how many visible pieces credit them. */

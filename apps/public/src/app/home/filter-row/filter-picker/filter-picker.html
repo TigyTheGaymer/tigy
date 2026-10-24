@@ -1,0 +1,99 @@
+<button
+  #chip
+  type="button"
+  class="chip"
+  [class.is-active]="active() !== null"
+  aria-haspopup="dialog"
+  [attr.aria-expanded]="isOpen()"
+  [attr.aria-label]="
+    active() === null ? null : name() + ', ' + active() + ' selected'
+  "
+  (click)="open()"
+>
+  <ng-icon [name]="icon()" class="icon" />{{ name() }}
+  @if (active(); as active) {
+    <span class="active" aria-hidden="true">· {{ active }}</span>
+  }
+  <ng-icon name="lucideChevronDown" class="icon chev" />
+</button>
+
+@if (isOpen()) {
+  <!-- A press outside the panel closes it; keyboards have Escape and the close button. -->
+  <!-- eslint-disable-next-line @angular-eslint/template/click-events-have-key-events, @angular-eslint/template/interactive-supports-focus -->
+  <dialog
+    #dialog
+    class="picker"
+    [attr.aria-labelledby]="headingId()"
+    [style.--picker-top.px]="position()?.top"
+    [style.--picker-left.px]="position()?.left"
+    (click)="onDialogClick($event)"
+    (close)="onClosed()"
+  >
+    <div class="panel">
+      <div class="head">
+        <h3 [id]="headingId()">{{ name() }}</h3>
+        <button
+          type="button"
+          class="close"
+          aria-label="Close"
+          (click)="dialog.close()"
+        >
+          <ng-icon name="lucideX" class="icon" />
+        </button>
+      </div>
+
+      @if (isSearchable()) {
+        <label class="search">
+          <ng-icon name="lucideSearch" class="icon" />
+          <input
+            type="search"
+            autofocus
+            [attr.aria-label]="'Search ' + name().toLowerCase()"
+            [placeholder]="'Search ' + name().toLowerCase()"
+            [value]="search()"
+            (input)="search.set($any($event.target).value)"
+          />
+        </label>
+      }
+
+      <ul class="choices" [attr.aria-busy]="isLoading()">
+        @for (choice of shown(); track choice.key) {
+          <li>
+            <!-- No href, so an unavailable choice cannot be focused. -->
+            <a
+              class="choice"
+              [class.is-selected]="choice.isSelected"
+              [class.is-unavailable]="!choice.isAvailable"
+              [attr.href]="choice.isAvailable ? href(choice) : null"
+              [attr.aria-disabled]="choice.isAvailable ? null : 'true'"
+              [attr.data-key]="choice.key"
+              [attr.aria-label]="label(choice)"
+              (click)="pick($event, choice)"
+            >
+              <span class="check" aria-hidden="true">
+                @if (choice.isSelected) {
+                  <ng-icon name="lucideCheck" class="icon" />
+                }
+              </span>
+              @if (hasPeople()) {
+                <span class="dot" aria-hidden="true">
+                  @if (choice.avatar; as src) {
+                    <img [src]="src" alt="" width="28" height="28" />
+                  } @else {
+                    {{ choice.name.charAt(0) }}
+                  }
+                </span>
+              }
+              <span class="name">{{ choice.name }}</span>
+              <span class="count">{{ choice.count }}</span>
+            </a>
+          </li>
+        } @empty {
+          <li class="empty">
+            {{ search() ? 'No matches' : 'Nothing to pick in these pieces' }}
+          </li>
+        }
+      </ul>
+    </div>
+  </dialog>
+}

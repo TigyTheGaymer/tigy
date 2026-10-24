@@ -82,6 +82,7 @@ export function injectGalleryPages(options: {
     more: more.asReadonly(),
     rows,
     hasMore,
+    isLoadingFirst: firstPage.isLoading,
     isLoadingMore: nextPage.isLoading,
     hasLoadMoreFailed,
     hasFailed: computed(() => firstPage.error() !== undefined && !first()),

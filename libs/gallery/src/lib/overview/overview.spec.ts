@@ -1,4 +1,8 @@
-import { galleryOverview, neighbours } from './overview';
+import {
+  UNFILTERED_QUERY,
+  type GalleryQuery,
+} from '../gallery-query/gallery-query';
+import { filterChoices, galleryOverview, neighbours } from './overview';
 import { aRow } from '../../testing/builders';
 
 describe('galleryOverview', () => {
@@ -126,5 +130,77 @@ describe('neighbours', () => {
 
   it('is empty for a piece that is not in the gallery', () => {
     expect(neighbours(rows, 'unpublished', true)).toEqual({});
+  });
+});
+
+describe('filterChoices', () => {
+  const rows = [
+    aRow('a', '2026-04-08', {
+      tags: ['chibi', 'comic'],
+      characterIds: ['tigy', 'bramble'],
+      artistIds: ['ann'],
+    }),
+    aRow('b', '2025-12-03', {
+      tags: ['comic'],
+      characterIds: ['tigy'],
+      artistIds: ['bob'],
+    }),
+    aRow('c', '2024-06-01', {
+      tags: ['sticker'],
+      characterIds: ['bramble'],
+      artistIds: ['bob'],
+    }),
+    aRow('n', '2025-02-01', {
+      nsfw: true,
+      tags: ['comic', 'lewd'],
+      characterIds: ['tigy', 'secret'],
+      artistIds: ['ann'],
+    }),
+  ];
+  const query = (change: Partial<GalleryQuery>): GalleryQuery => ({
+    ...UNFILTERED_QUERY,
+    ...change,
+  });
+
+  it('Choices with a filter active: counts only the matching pieces', () => {
+    const choices = filterChoices(rows, query({ tags: ['comic'] }), false);
+    expect(choices.characters).toEqual([
+      { value: 'tigy', count: 2 },
+      { value: 'bramble', count: 1 },
+    ]);
+    expect(choices.artists).toEqual([
+      { value: 'ann', count: 1 },
+      { value: 'bob', count: 1 },
+    ]);
+  });
+
+  it('offers an active tag with the full match count', () => {
+    const choices = filterChoices(rows, query({ tags: ['comic'] }), false);
+    expect(choices.tags).toEqual([
+      { value: 'comic', count: 2 },
+      { value: 'chibi', count: 1 },
+    ]);
+  });
+
+  it('Adding a year: years ignore the active years but keep the other filters', () => {
+    const choices = filterChoices(
+      rows,
+      query({ characterIds: ['bramble'], years: [2026] }),
+      false,
+    );
+    expect(choices.years).toEqual([
+      { year: 2026, count: 1 },
+      { year: 2024, count: 1 },
+    ]);
+    expect(choices.tags.map((c) => c.value)).toEqual(['chibi', 'comic']);
+  });
+
+  it('NSFW only choice with the switch off: not offered', () => {
+    const off = filterChoices(rows, query({}), false);
+    expect(off.characters.map((c) => c.value)).not.toContain('secret');
+    expect(off.tags.map((c) => c.value)).not.toContain('lewd');
+    const on = filterChoices(rows, query({}), true);
+    expect(on.characters.map((c) => c.value)).toContain('secret');
+    expect(on.years.map((y) => y.year)).toEqual([2026, 2025, 2024]);
   });
 });

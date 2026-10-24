@@ -2,8 +2,10 @@ import type { GalleryRow } from '@tigy/models';
 import { compareText } from '../shared/compare';
 import {
   compareNewestFirst,
+  matchesQuery,
   visibleRows,
   yearOf,
+  type GalleryQuery,
 } from '../gallery-query/gallery-query';
 
 export interface Choice {
@@ -29,6 +31,15 @@ export interface GalleryOverview {
   tags: Choice[];
   characters: Choice[];
   artists: Choice[];
+}
+
+/** Only values that still leave a piece. */
+export interface FilterChoices {
+  characters: Choice[];
+  artists: Choice[];
+  tags: Choice[];
+  /** Newest first. */
+  years: YearMark[];
 }
 
 export interface Neighbours {
@@ -66,6 +77,27 @@ export function galleryOverview(
     overview.newest = visible[0].sortDate;
   }
   return overview;
+}
+
+/** Years ignore the active years, since picking another widens the gallery rather than narrowing it. */
+export function filterChoices(
+  rows: readonly GalleryRow[],
+  query: GalleryQuery,
+  includeNsfw: boolean,
+  /** Passed in when the caller already has it, to save a pass. */
+  matching = galleryOverview(
+    rows.filter((row) => matchesQuery(row, query)),
+    includeNsfw,
+  ),
+): FilterChoices {
+  const { characters, artists, tags } = matching;
+  const { years } = query.years.length
+    ? galleryOverview(
+        rows.filter((row) => matchesQuery(row, { ...query, years: [] })),
+        includeNsfw,
+      )
+    : matching;
+  return { characters, artists, tags, years };
 }
 
 /**

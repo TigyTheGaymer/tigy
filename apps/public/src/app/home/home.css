@@ -59,6 +59,10 @@ h1 app-mark {
   list-style: none;
 }
 
+.gallery-start {
+  scroll-margin-top: var(--bar-h);
+}
+
 .album-head h2 {
   margin: 0 0 18px;
   font-family: var(--font-display);

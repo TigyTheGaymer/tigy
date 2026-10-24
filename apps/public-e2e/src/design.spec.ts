@@ -207,17 +207,28 @@ test.describe('home', () => {
     await expect(tiles(page).last()).toHaveAttribute('href', '/i/happy-tigy');
   });
 
-  test('Pressing a picker: the gallery does not change, and the picker says filters are coming later', async ({
+  test('Pressing a picker: a dropdown opens under it with the tags and their counts, and the gallery does not change', async ({
     page,
   }) => {
     await page.goto('/');
     const tags = page.getByRole('button', { name: 'Tags' });
-    await expect(tags).toHaveAttribute('aria-disabled', 'true');
-    await expect(tags).toHaveAttribute('title', 'Filters are coming later');
-    // aria-disabled controls stay pressable, so force past Playwright's enabled check.
-    await tags.click({ force: true });
+    await tags.click();
+    const picker = page.getByRole('dialog', { name: 'Tags' });
+    await expect(picker).toBeVisible();
+    await expect(tags).toHaveAttribute('aria-expanded', 'true');
+    await expect(
+      picker.getByRole('link', { name: 'comic, 1 piece' }),
+    ).toBeVisible();
+
+    const chip = (await tags.boundingBox())!;
+    const panel = (await picker.locator('.panel').boundingBox())!;
+    expect(panel.y).toBeGreaterThanOrEqual(chip.y + chip.height);
+    expect(panel.y).toBeLessThan(chip.y + chip.height + 20);
+    // Hiding the page's scrollbar would shift the page under the dropdown.
+    await expect(page.locator('html')).not.toHaveCSS('overflow-y', 'hidden');
     await expect(page).toHaveURL(/\/$/);
     await expect(tiles(page)).toHaveCount(5);
+    await expect(page.getByText('coming later')).toHaveCount(0);
   });
 
   test('Filtered gallery: the timeline marks only the matching years', async ({
