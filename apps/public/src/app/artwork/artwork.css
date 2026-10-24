@@ -52,12 +52,13 @@
 }
 
 /* A video has no size until its metadata loads, so the piece's shape and width size it, as an
-   image's would. */
+   image's would. The height attribute would otherwise fix the box at the natural height. */
 .player {
   --max-w: calc(100% - 140px);
   --max-h: calc(100svh - 150px);
   display: block;
   width: min(var(--natural-w), var(--max-w), var(--max-h) * var(--ratio));
+  height: auto;
   aspect-ratio: var(--ratio);
   margin: 0 auto;
   border-radius: var(--r-md);
