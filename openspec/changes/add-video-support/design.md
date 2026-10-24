@@ -102,7 +102,7 @@ For a video, `artwork.html` renders `<video controls muted loop playsinline prel
 
 The NSFW confirm screen already keeps the piece out of the DOM until it is confirmed, so the video, its poster and its preview stay unloaded the same way the image does.
 
-The credits panel reads the new fields: the format name becomes "MP4 video", "MOV video" or "WebM video", and the panel adds the duration (`formatDuration` in `shared/format.ts`: "0:42", "2:05") and "With sound" or "Silent". Link previews keep `og:image` = `full.webp`.
+The credits panel reads the new fields: the format name becomes "MP4 video", "MOV video" or "WebM video", and the panel adds the duration (`formatDuration` in `shared/format.ts`: "0:42", "2:05") and "With sound" or "Silent". Link previews keep `og:image` = `full.webp` as the poster and add `og:video` (`full.mp4`, `video/mp4`, with its width and height) and `og:type` `video.other`, so embedders that play video play it. A GIF's preview links its original GIF instead of `full.webp`: embedders animate GIFs but show only the first frame of an animated WebP.
 
 ### D9. Admin
 

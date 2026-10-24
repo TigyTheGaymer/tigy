@@ -19,7 +19,7 @@ Much of Tigy's art is short animation, and today it can only go up as an animate
 - **Admin.** Upload rows and the editor show a video's duration; the editor plays the video instead of showing the image. Nothing else about editing changes.
 - **Summaries.** Gallery rows say whether a piece is a video, so the gallery can choose a tile without reading each artwork.
 
-Out of scope: trimming, cropping or choosing the poster frame in the admin; captions and subtitles; `og:video` link previews; HLS or adaptive streaming; videos longer than 3 minutes; transparent (alpha) video; turning an uploaded GIF into a video.
+Out of scope: trimming, cropping or choosing the poster frame in the admin; captions and subtitles; HLS or adaptive streaming; videos longer than 3 minutes; transparent (alpha) video; turning an uploaded GIF into a video.
 
 ## Capabilities
 
