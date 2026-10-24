@@ -97,8 +97,8 @@ describe('ArtworkPage', () => {
     expect(page().querySelector('.characters .links')).toBeNull();
     expect(hrefs('.tags a')).toEqual(['/?tag=comic', '/?tag=couple']);
     expect(text('.file')).toBe('PNG · 1620 × 2117 px · 3.7 MB');
-    expect(hrefs('.download')).toEqual(['/img/hey-pookie/original.png']);
-    expect(page().querySelector('.download')?.hasAttribute('download')).toBe(
+    expect(hrefs('a[download]')).toEqual(['/img/hey-pookie/original.png']);
+    expect(page().querySelector('a[download]')?.hasAttribute('download')).toBe(
       true,
     );
     expect(label('.nav.prev')).toBe('Previous: Tigy reference sheet');
@@ -158,7 +158,7 @@ describe('ArtworkPage', () => {
     expect(page().querySelector('img.piece, .piece img')).toBeNull();
     expect(text('.confirm')).toContain('Show this piece');
     expect(text('app-credits-panel h1')).toBe('Lewd');
-    expect(page().querySelector('.download')).toBeNull();
+    expect(page().querySelector('a[download]')).toBeNull();
     expect(text('app-credits-panel')).toContain('Copy safe link');
 
     // Confirming one piece: waits for the age check, then shows it without another request.
@@ -294,7 +294,7 @@ describe('ArtworkPage', () => {
       expect(video.getAttribute('aria-label')).toBe('Hey Pookie!');
       expect(play).toHaveBeenCalledTimes(1);
       expect(page().querySelector('.piece')).toBeNull();
-      expect(hrefs('.download')).toEqual(['/img/clip/original.mp4']);
+      expect(hrefs('a[download]')).toEqual(['/img/clip/original.mp4']);
     });
 
     it('Video full screen: offers no zooming full view', async () => {

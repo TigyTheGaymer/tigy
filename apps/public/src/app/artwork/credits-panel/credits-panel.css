@@ -121,14 +121,6 @@ h1.untitled {
   margin-top: 18px;
 }
 
-.download {
-  flex-basis: 100%;
-}
-
-.download app-paw {
-  font-size: 1rem;
-}
-
 @media (max-width: 1100px) {
   .info-head {
     display: none;

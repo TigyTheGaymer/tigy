@@ -3,7 +3,6 @@ import { RouterLink } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import {
   lucideCalendar,
-  lucideExpand,
   lucideImage,
   lucideLink,
   lucidePalette,
@@ -20,18 +19,16 @@ import {
 } from '@tigy/gallery';
 import { isVideoFile, TIGY_ID } from '@tigy/models';
 import type { ArtworkResponse, CreditedPerson } from '../../../api/types';
-import { Paw } from '../../markings/paw';
 import { PieceTitlePipe } from '../../shared/piece-title.pipe';
-import { avatarUrl, originalUrl } from '../../shared/urls';
+import { avatarUrl } from '../../shared/urls';
 import { SocialLink } from '../../social/social-link';
 
 @Component({
   selector: 'app-credits-panel',
-  imports: [RouterLink, NgIcon, Paw, SocialLink, PieceTitlePipe],
+  imports: [RouterLink, NgIcon, SocialLink, PieceTitlePipe],
   providers: [
     provideIcons({
       lucideCalendar,
-      lucideExpand,
       lucideImage,
       lucideLink,
       lucidePalette,
@@ -51,7 +48,6 @@ export class CreditsPanel {
   readonly closeRequested = output<void>();
   readonly shareRequested = output<void>();
   readonly safeLinkRequested = output<void>();
-  readonly fullViewRequested = output<void>();
 
   protected readonly artwork = computed(() => this.page().artwork);
   protected readonly title = computed(() => this.artwork().title);
@@ -72,12 +68,9 @@ export class CreditsPanel {
           file.hasAudio ? 'With sound' : 'Silent',
         ]
       : [formatName(file.mime) + (file.animated ? ' (animated)' : '')];
-    return {
-      href: originalUrl(this.artwork()),
-      summary: [...kind, `${file.w} × ${file.h} px`, fileSize(file.bytes)].join(
-        ' · ',
-      ),
-    };
+    return [...kind, `${file.w} × ${file.h} px`, fileSize(file.bytes)].join(
+      ' · ',
+    );
   });
   protected readonly sections = computed(() =>
     [

@@ -85,27 +85,15 @@
     <ng-icon name="lucideImage" class="icon" />
     <div>
       <span class="label">Original file</span>
-      <span class="file">{{ file().summary }}</span>
+      <span class="file">{{ file() }}</span>
     </div>
   </div>
 
   <div class="actions">
     @if (isPieceShown()) {
-      <a class="pad dark download" [href]="file().href" download
-        ><app-paw />Download original</a
-      >
       <button type="button" class="pad" (click)="shareRequested.emit()">
         <ng-icon name="lucideShare2" class="icon" />Share
       </button>
-      @if (!isVideo()) {
-        <button
-          type="button"
-          class="pad light"
-          (click)="fullViewRequested.emit()"
-        >
-          <ng-icon name="lucideExpand" class="icon" />Full view
-        </button>
-      }
     }
     @if (artwork().nsfw) {
       <button
