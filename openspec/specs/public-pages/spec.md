@@ -44,19 +44,19 @@ When more pieces follow, the home page SHALL load the next page as the visitor s
 - **THEN** the address carries only the filters and sort, and opens the gallery from its first piece
 
 ### Requirement: Filters from the address
-The home page SHALL apply the filters and sort the address carries. It SHALL name every active filter, people by name and a person who does not exist as "Unknown person", each with a link that removes it, and offer newest first and oldest first. When nothing matches, it SHALL say so and offer to clear the filters.
+The home page SHALL apply the filters and sort the address carries. Each filter picker SHALL show how many of its filters are active and SHALL list every active filter as selected so it can be removed: people by name, and a person who does not exist as "Unknown person". It SHALL offer newest first and oldest first. When nothing matches, it SHALL say so and offer to clear the filters.
 
 #### Scenario: Shared filtered link
 - **WHEN** a visitor opens a link filtered by a character and a tag, sorted oldest first
-- **THEN** the first HTML lists the oldest 24 matching pieces and names the character, the tag and the sort as active
+- **THEN** the first HTML lists the oldest 24 matching pieces, shows one active filter on the Characters and the Tags pickers, and shows the sort as oldest first
 
 #### Scenario: Removing a filter
-- **WHEN** the visitor follows the link on an active tag filter
+- **WHEN** the visitor opens the Tags picker and presses the selected tag
 - **THEN** the gallery shows the pieces matching the remaining filters, from the first piece
 
 #### Scenario: Unknown person
 - **WHEN** a visitor opens a gallery link filtered by a person ID that matches nobody
-- **THEN** the page names the filter "Unknown person" with a link that removes it, says nothing matches and offers to clear the filters
+- **THEN** the picker for that person shows one active filter and lists it as "Unknown person", selected, so it can be removed; the page says nothing matches and offers to clear the filters
 
 ### Requirement: Credits and tags lead to the gallery
 On an artwork page, every credited person except Tigy and every tag SHALL link to the home gallery filtered by that person or tag. Tigy's credit SHALL link to the home page.
