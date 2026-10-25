@@ -24,7 +24,7 @@ test('Download name: the original of "Hey Pookie!", a PNG, saves as hey-pookie.p
 }) => {
   await page.goto('/i/hey-pookie');
   const download = page.waitForEvent('download');
-  await page.locator('.download').click();
+  await page.getByRole('link', { name: 'Download original' }).click();
   expect((await download).suggestedFilename()).toBe('hey-pookie.png');
 });
 

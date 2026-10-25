@@ -22,7 +22,9 @@ test('Piece with every field: shows the image, details, credits, tags, file, nei
   ]);
   await expect(page.locator('.tags a')).toHaveText(['#comic', '#couple']);
   await expect(page.locator('.file')).toContainText('PNG · 1620 × 2117 px');
-  await expect(page.locator('.download')).toBeVisible();
+  await expect(
+    page.getByRole('link', { name: 'Download original' }),
+  ).toBeVisible();
   await expect(page.locator('.nav.prev')).toHaveAttribute(
     'href',
     '/i/ref-sheet',

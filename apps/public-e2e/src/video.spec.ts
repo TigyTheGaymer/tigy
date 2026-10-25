@@ -110,7 +110,7 @@ test('Video download: the original saves under the title with its extension', as
 }) => {
   await page.goto(`/i/${VIDEO}`);
   const download = page.waitForEvent('download');
-  await page.locator('.download').click();
+  await page.getByRole('link', { name: 'Download original' }).click();
   expect((await download).suggestedFilename()).toBe('happy-tigy-loop.mp4');
 });
 
