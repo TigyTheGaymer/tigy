@@ -1,0 +1,50 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+:host(.is-delayed) {
+  animation: appear 1ms 300ms backwards;
+}
+
+.bar {
+  display: block;
+  height: 14px;
+  border-radius: var(--r-sm);
+  background: color-mix(in srgb, currentColor 14%, transparent);
+  animation: pulse 900ms ease-in-out infinite alternate;
+}
+
+.title {
+  width: 70%;
+  height: 32px;
+}
+
+.short {
+  width: 55%;
+}
+
+.block {
+  width: min(70%, 520px);
+  height: min(70%, 600px);
+}
+
+@keyframes appear {
+  from {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+@keyframes pulse {
+  to {
+    opacity: 0.45;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bar {
+    animation: none;
+  }
+}

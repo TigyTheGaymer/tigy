@@ -1,5 +1,5 @@
 import { Pipe, type PipeTransform } from '@angular/core';
-import { pieceTitle } from './format';
+import { pieceTitle } from '../shared/format';
 
 @Pipe({ name: 'pieceTitle' })
 export class PieceTitlePipe implements PipeTransform {

@@ -29,6 +29,27 @@
   background: var(--stage);
 }
 
+.round:disabled,
+a.round:not([href]) {
+  opacity: 0.4;
+  background: transparent;
+  cursor: default;
+}
+
+/* Holds full view's place on a video, so the other controls stay put. */
+.spacer {
+  visibility: hidden;
+}
+
+app-skeleton {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  background: var(--stage);
+}
+
 .piece {
   border: 0;
   padding: 0;

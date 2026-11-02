@@ -30,7 +30,7 @@ import { Paw } from '../markings/paw';
 import { Stripes } from '../markings/stripes';
 import { NsfwSwitchService } from '../nsfw/nsfw-switch.service';
 import { monthRange, pieceCount } from '../shared/format';
-import { latest } from '../shared/resources';
+import { latest } from './resources';
 import { avatarUrl } from '../shared/urls';
 import { SocialLink } from '../social/social-link';
 import { FilterRow } from './filter-row/filter-row';

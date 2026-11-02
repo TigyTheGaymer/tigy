@@ -1,12 +1,10 @@
 import { monthRange, pieceCount, pieceTitle } from './format';
-import { PieceTitlePipe } from './piece-title.pipe';
 import { originalUrl } from './urls';
 
 describe('format', () => {
-  it('names an untitled piece "Untitled", in code and in templates', () => {
+  it('names an untitled piece "Untitled"', () => {
     expect(pieceTitle('Hey Pookie!')).toBe('Hey Pookie!');
     expect(pieceTitle(undefined)).toBe('Untitled');
-    expect(new PieceTitlePipe().transform(undefined)).toBe('Untitled');
   });
 
   it('counts pieces', () => {

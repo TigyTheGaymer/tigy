@@ -4,60 +4,64 @@
   <main class="photo">
     <div
       class="stage"
+      [attr.aria-busy]="isStageWaiting() || null"
       (touchstart)="onTouchStart($event)"
       (touchend)="onTouchEnd($event)"
     >
       <app-stage-bar>
-        @if (data() && isImageShown()) {
+        <button
+          type="button"
+          class="round"
+          aria-label="Share"
+          title="Share"
+          [disabled]="!isImageShown()"
+          (click)="share()"
+        >
+          <ng-icon name="lucideShare2" class="icon" />
+        </button>
+        @if (isVideo()) {
+          <span class="round spacer" aria-hidden="true"></span>
+        } @else {
           <button
             type="button"
             class="round"
-            aria-label="Share"
-            title="Share"
-            (click)="share()"
+            aria-label="Full view"
+            title="Full view"
+            [disabled]="!isImageShown()"
+            (click)="openFullView()"
           >
-            <ng-icon name="lucideShare2" class="icon" />
+            <ng-icon name="lucideExpand" class="icon" />
           </button>
-          @if (!isVideo()) {
-            <button
-              type="button"
-              class="round"
-              aria-label="Full view"
-              title="Full view"
-              (click)="isFullViewOpen.set(true)"
-            >
-              <ng-icon name="lucideExpand" class="icon" />
-            </button>
-          }
-          <button
-            type="button"
-            class="round info-toggle"
-            [class.is-on]="creditsPanel.isOpen()"
-            [attr.aria-pressed]="creditsPanel.isOpen()"
-            aria-label="Credits and info"
-            title="Credits and info"
-            (click)="toggleCredits()"
-          >
-            <ng-icon name="lucideInfo" class="icon" />
-          </button>
-          <a
-            class="round"
-            [href]="originalHref()"
-            download
-            aria-label="Download original"
-            title="Download original"
-            ><ng-icon name="lucideDownload" class="icon"
-          /></a>
         }
+        <button
+          type="button"
+          class="round info-toggle"
+          [class.is-on]="creditsPanel.isOpen()"
+          [attr.aria-pressed]="creditsPanel.isOpen()"
+          aria-label="Credits and info"
+          title="Credits and info"
+          (click)="toggleCredits()"
+        >
+          <ng-icon name="lucideInfo" class="icon" />
+        </button>
+        <a
+          class="round"
+          [attr.href]="isImageShown() ? originalHref() : null"
+          [attr.download]="isImageShown() ? '' : null"
+          aria-label="Download original"
+          title="Download original"
+          ><ng-icon name="lucideDownload" class="icon"
+        /></a>
       </app-stage-bar>
 
-      @if (data(); as page) {
+      @if (answered(); as page) {
         @if (isImageShown()) {
-          @if (page.previous; as previous) {
+          @if (data()?.previous; as previous) {
             <a
               class="nav prev"
-              [routerLink]="['/i', previous.id]"
+              [routerLink]="previousLink()"
               [replaceUrl]="true"
+              [attr.aria-disabled]="isMoving() || null"
               [attr.aria-label]="'Previous: ' + (previous.title | pieceTitle)"
               ><ng-icon name="lucideArrowLeft" class="icon"
             /></a>
@@ -88,21 +92,24 @@
               type="button"
               class="piece"
               [attr.aria-label]="'Full view of ' + title()"
-              (click)="isFullViewOpen.set(true)"
+              (click)="openFullView()"
             >
               <img
                 [src]="fullImage()"
                 [width]="page.artwork.file.w"
                 [height]="page.artwork.file.h"
                 [alt]="title()"
+                (load)="isImageWaiting.set(false)"
+                (error)="isImageWaiting.set(false)"
               />
             </button>
           }
-          @if (page.next; as next) {
+          @if (data()?.next; as next) {
             <a
               class="nav next"
-              [routerLink]="['/i', next.id]"
+              [routerLink]="nextLink()"
               [replaceUrl]="true"
+              [attr.aria-disabled]="isMoving() || null"
               [attr.aria-label]="'Next: ' + (next.title | pieceTitle)"
               ><ng-icon name="lucideArrowRight" class="icon"
             /></a>
@@ -130,19 +137,23 @@
           <p>Could not load this piece. Try again in a moment.</p>
         </section>
       }
+
+      @if (isStageWaiting()) {
+        <app-skeleton [isDelayed]="isStageDelayed()" />
+      }
     </div>
 
-    @if (data(); as page) {
-      <div class="info-wrap" id="credits">
-        <app-credits-panel
-          [page]="page"
-          [isPieceShown]="isImageShown()"
-          (closeRequested)="creditsPanel.set(false)"
-          (shareRequested)="share()"
-          (safeLinkRequested)="copySafeLink()"
-        />
-      </div>
-    }
+    <div #creditsWrap class="info-wrap" id="credits">
+      <app-credits-panel
+        [page]="data()"
+        [isPieceShown]="isImageShown()"
+        [isWaiting]="isCreditsWaiting()"
+        [isDelayed]="isCreditsDelayed()"
+        (closeRequested)="creditsPanel.set(false)"
+        (shareRequested)="share()"
+        (safeLinkRequested)="copySafeLink()"
+      />
+    </div>
   </main>
 
   <div class="toast" [class.is-on]="toast()" role="status">

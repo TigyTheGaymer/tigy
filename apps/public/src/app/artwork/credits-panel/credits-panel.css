@@ -3,10 +3,25 @@
   color: var(--ink);
 }
 
+.info {
+  position: relative;
+}
+
 .info-head {
+  position: relative;
+  z-index: 2;
   display: flex;
   justify-content: flex-end;
   margin: 0 -12px 10px 0;
+}
+
+/* The bleed also covers the buttons' shadows. */
+app-skeleton.is-over {
+  position: absolute;
+  inset: -6px;
+  z-index: 1;
+  padding: calc(var(--control) + 16px) 6px 0;
+  background: var(--panel);
 }
 
 h1 {
@@ -124,5 +139,9 @@ h1.untitled {
 @media (max-width: 1100px) {
   .info-head {
     display: none;
+  }
+
+  app-skeleton.is-over {
+    padding-top: 6px;
   }
 }

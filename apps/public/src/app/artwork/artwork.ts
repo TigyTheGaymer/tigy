@@ -8,7 +8,9 @@ import {
   ElementRef,
   inject,
   input,
+  linkedSignal,
   signal,
+  type Signal,
   untracked,
   viewChild,
 } from '@angular/core';
@@ -24,6 +26,7 @@ import {
 } from '@ng-icons/lucide';
 import { stopVideo } from '@tigy/gallery';
 import { isVideoFile } from '@tigy/models';
+import type { NeighbourLink } from '../../api/types';
 import { CatalogService, isNotFound } from '../catalog/catalog.service';
 import { StageBar } from '../chrome/stage-bar';
 import { HeadService } from '../head/head.service';
@@ -35,8 +38,6 @@ import { ConfirmedPiecesService } from '../nsfw/confirmed-pieces.service';
 import { NsfwSwitchService } from '../nsfw/nsfw-switch.service';
 import { pieceTitle } from '../shared/format';
 import { MotionPreferenceService } from '../shared/motion-preference.service';
-import { PieceTitlePipe } from '../shared/piece-title.pipe';
-import { latest } from '../shared/resources';
 import {
   artworkPath,
   fullImageUrl,
@@ -46,6 +47,9 @@ import {
 import { CreditsPanel } from './credits-panel/credits-panel';
 import { CreditsPanelService } from './credits-panel/credits-panel.service';
 import { FullView } from './full-view/full-view';
+import { PieceTitlePipe } from './piece-title.pipe';
+import { shownPiece } from './shown-piece';
+import { Skeleton } from './skeleton/skeleton';
 
 /** artwork.css's breakpoint: at this width and below, the credits sit under the stage. */
 const STACKED_WIDTH = 1100;
@@ -64,6 +68,7 @@ const PLAYER_CONTROLS_HEIGHT = 64;
     NotFoundPage,
     CreditsPanel,
     FullView,
+    Skeleton,
   ],
   providers: [
     provideIcons({
@@ -94,16 +99,34 @@ export class ArtworkPage {
   private readonly ageCheck = inject(AgeCheckService);
   protected readonly creditsPanel = inject(CreditsPanelService);
 
-  private readonly resource = this.catalog.artwork(() =>
+  private readonly hasNavigated = this.router.navigated;
+
+  private readonly request = computed(() =>
     this.id()
       ? { id: this.id(), includeNsfw: this.nsfwSwitch.isOn() }
       : undefined,
   );
+  private readonly resource = this.catalog.artwork(this.request);
 
-  /** Keeps this piece's details while the NSFW-inclusive neighbours load. */
-  protected readonly data = latest(
-    this.resource,
-    (previous) => previous.artwork.id === this.id(),
+  private readonly shown = shownPiece(this.resource.snapshot, this.request);
+  protected readonly data = this.shown.piece;
+  protected readonly answered = this.shown.answered;
+  private readonly answeredId = computed(() => this.answered()?.artwork.id);
+  private readonly shownId = computed(() => this.data()?.artwork.id);
+  /**
+   * False on the piece the visitor landed on: the server sent it finished, and its image can load
+   * before hydration could hear about it, so it never counts as waiting.
+   */
+  private readonly isPastLanding = linkedSignal<string | undefined, boolean>({
+    source: this.shownId,
+    computation: (_id, previous) =>
+      this.hasNavigated || !!previous?.source || !!previous?.value,
+  });
+  protected readonly isMoving = computed(
+    () => !!this.shownId() && this.shownId() !== this.id(),
+  );
+  private readonly isStagePending = computed(
+    () => !!this.answeredId() && this.answeredId() !== this.id(),
   );
 
   protected readonly isMissing = computed(
@@ -114,7 +137,7 @@ export class ArtworkPage {
   );
 
   protected readonly isImageShown = computed(() => {
-    const artwork = this.data()?.artwork;
+    const artwork = this.answered()?.artwork;
     return (
       !!artwork &&
       (!artwork.nsfw ||
@@ -126,16 +149,60 @@ export class ArtworkPage {
   protected readonly title = computed(() =>
     pieceTitle(this.data()?.artwork.title),
   );
-  protected readonly fullImage = computed(() => fullImageUrl(this.id()));
+  // From the server's answer, never id(): a file must not load before its piece's NSFW flag is known.
+  protected readonly fullImage = computed(() => {
+    const id = this.answeredId();
+    return id ? fullImageUrl(id) : '';
+  });
   protected readonly isVideo = computed(() => {
-    const artwork = this.data()?.artwork;
+    const artwork = this.answered()?.artwork;
     return !!artwork && isVideoFile(artwork.file);
   });
-  protected readonly video = computed(() => videoUrl(this.id()));
+  protected readonly video = computed(() => {
+    const id = this.answeredId();
+    return id ? videoUrl(id) : '';
+  });
   protected readonly originalHref = computed(() => {
-    const artwork = this.data()?.artwork;
+    const artwork = this.answered()?.artwork;
     return artwork ? originalUrl(artwork) : '';
   });
+
+  // Pointing at the address already open, an arrow does nothing while it keeps its focus.
+  protected readonly previousLink = computed(() =>
+    this.arrowLink(this.data()?.previous),
+  );
+  protected readonly nextLink = computed(() =>
+    this.arrowLink(this.data()?.next),
+  );
+
+  private readonly imageSrc = computed(() =>
+    this.isImageShown() && !this.isVideo() ? this.fullImage() : undefined,
+  );
+  protected readonly isImageWaiting = linkedSignal<string | undefined, boolean>(
+    {
+      source: this.imageSrc,
+      computation: (src) => !!src && this.isPastLanding(),
+    },
+  );
+
+  private readonly hasNothingYet = computed(
+    () => this.isPastLanding() && !this.data() && !this.resource.error(),
+  );
+  protected readonly isStageWaiting = computed(
+    () =>
+      this.hasNothingYet() || this.isStagePending() || this.isImageWaiting(),
+  );
+  protected readonly isCreditsWaiting = computed(
+    () => this.hasNothingYet() || this.isMoving(),
+  );
+  protected readonly isStageDelayed = isDelayedWait(
+    this.isStageWaiting,
+    this.data,
+  );
+  protected readonly isCreditsDelayed = isDelayedWait(
+    this.isCreditsWaiting,
+    this.data,
+  );
 
   protected readonly isFullViewOpen = signal(false);
   protected readonly toast = signal('');
@@ -144,10 +211,19 @@ export class ArtworkPage {
 
   private readonly stageBar = viewChild(StageBar);
   private readonly player = viewChild<ElementRef<HTMLVideoElement>>('player');
+  private readonly creditsWrap =
+    viewChild<ElementRef<HTMLElement>>('creditsWrap');
 
   constructor() {
     inject(DestroyRef).onDestroy(() => clearTimeout(this.toastTimer));
     this.playVideos();
+    afterRenderEffect({
+      write: () => {
+        this.shownId();
+        const wrap = this.creditsWrap()?.nativeElement;
+        if (wrap) wrap.scrollTop = 0;
+      },
+    });
     const response = injectServerResponse();
     effect(() => {
       if (this.hasFailed()) response.unavailable();
@@ -174,6 +250,10 @@ export class ArtworkPage {
     this.nsfwSwitch.set(true);
   }
 
+  protected openFullView(): void {
+    if (!this.isStagePending()) this.isFullViewOpen.set(true);
+  }
+
   protected toggleCredits(): void {
     const view = this.document.defaultView;
     if (view && view.innerWidth <= STACKED_WIDTH) {
@@ -189,7 +269,9 @@ export class ArtworkPage {
   }
 
   protected async share(): Promise<void> {
-    const url = this.head.url(artworkPath(this.id()));
+    const id = this.shownId();
+    if (!id) return;
+    const url = this.head.url(artworkPath(id));
     const navigator = this.document.defaultView?.navigator;
     if (navigator?.share) {
       try {
@@ -205,7 +287,9 @@ export class ArtworkPage {
   }
 
   protected async copySafeLink(): Promise<void> {
-    const url = this.head.url(`${artworkPath(this.id())}?safe`);
+    const id = this.shownId();
+    if (!id) return;
+    const url = this.head.url(`${artworkPath(id)}?safe`);
     this.showToast(
       (await this.copy(url)) ? 'Safe link copied!' : 'Couldn’t copy the link',
     );
@@ -253,24 +337,45 @@ export class ArtworkPage {
     const motion = inject(MotionPreferenceService);
     let current: HTMLVideoElement | undefined;
     let currentId: string | undefined;
-    afterRenderEffect(() => {
-      const video = this.player()?.nativeElement;
-      const id = this.id();
-      if (video === current && id === currentId) return;
-      if (video !== current) stopVideo(current);
-      current = video;
-      currentId = id;
-      if (video && !untracked(motion.isMotionReduced)) {
-        // Autoplay policies may refuse; the player then waits for a press.
-        video.play()?.catch(() => undefined);
-      }
+    afterRenderEffect({
+      write: () => {
+        // Only paused: emptying it could clear a source already bound for the next piece.
+        if (this.isStagePending()) {
+          untracked(this.player)?.nativeElement.pause();
+        }
+      },
+    });
+    afterRenderEffect({
+      write: () => {
+        const video = this.player()?.nativeElement;
+        const id = this.answeredId();
+        if (video === current && id === currentId) return;
+        if (video !== current) stopVideo(current);
+        // The muted binding never changes, so it won't undo a visitor's unmuting.
+        else if (video) video.muted = true;
+        current = video;
+        currentId = id;
+        if (video && !untracked(motion.isMotionReduced)) {
+          // Autoplay policies may refuse; the player then waits for a press.
+          video.play()?.catch(() => undefined);
+        }
+      },
     });
     inject(DestroyRef).onDestroy(() => stopVideo(current));
   }
 
+  private arrowLink(
+    neighbour: NeighbourLink | undefined,
+  ): string[] | undefined {
+    const id = this.isMoving() ? this.id() : neighbour?.id;
+    return id ? ['/i', id] : undefined;
+  }
+
   /** Moving between pieces replaces the history entry, so going back returns to the gallery. */
   private go(id: string | undefined): void {
-    if (id) void this.router.navigate(['/i', id], { replaceUrl: true });
+    if (id && !this.isMoving()) {
+      void this.router.navigate(['/i', id], { replaceUrl: true });
+    }
   }
 
   private showToast(text: string): void {
@@ -289,6 +394,17 @@ export class ArtworkPage {
       return false;
     }
   }
+}
+
+/** Decided when a wait starts: with a piece to hold, the skeleton shows only if the wait lasts. */
+function isDelayedWait(
+  isWaiting: Signal<boolean>,
+  piece: Signal<unknown>,
+): Signal<boolean> {
+  return linkedSignal({
+    source: isWaiting,
+    computation: (waiting) => waiting && !!untracked(piece),
+  });
 }
 
 /** Dragging along a player's position bar is seeking, not a swipe. */

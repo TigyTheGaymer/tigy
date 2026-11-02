@@ -19,13 +19,14 @@ import {
 } from '@tigy/gallery';
 import { isVideoFile, TIGY_ID } from '@tigy/models';
 import type { ArtworkResponse, CreditedPerson } from '../../../api/types';
-import { PieceTitlePipe } from '../../shared/piece-title.pipe';
 import { avatarUrl } from '../../shared/urls';
 import { SocialLink } from '../../social/social-link';
+import { PieceTitlePipe } from '../piece-title.pipe';
+import { Skeleton } from '../skeleton/skeleton';
 
 @Component({
   selector: 'app-credits-panel',
-  imports: [RouterLink, NgIcon, SocialLink, PieceTitlePipe],
+  imports: [RouterLink, NgIcon, SocialLink, PieceTitlePipe, Skeleton],
   providers: [
     provideIcons({
       lucideCalendar,
@@ -42,26 +43,29 @@ import { SocialLink } from '../../social/social-link';
   styleUrl: './credits-panel.css',
 })
 export class CreditsPanel {
-  readonly page = input.required<ArtworkResponse>();
+  readonly page = input<ArtworkResponse>();
   /** False while an NSFW piece waits behind the confirm screen: no actions yet. */
   readonly isPieceShown = input(true);
+  readonly isWaiting = input(false);
+  readonly isDelayed = input(false);
   readonly closeRequested = output<void>();
   readonly shareRequested = output<void>();
   readonly safeLinkRequested = output<void>();
 
-  protected readonly artwork = computed(() => this.page().artwork);
-  protected readonly title = computed(() => this.artwork().title);
+  protected readonly artwork = computed(() => this.page()?.artwork);
+  protected readonly title = computed(() => this.artwork()?.title);
   protected readonly date = computed(() => {
-    const { date, sortDate } = this.artwork();
-    return date
-      ? formatArtworkDate(date)
-      : `Added ${formatArtworkDate(sortDate)}`;
+    const artwork = this.artwork();
+    if (!artwork) return '';
+    return artwork.date
+      ? formatArtworkDate(artwork.date)
+      : `Added ${formatArtworkDate(artwork.sortDate)}`;
   });
-  protected readonly isVideo = computed(() => isVideoFile(this.artwork().file));
   protected readonly file = computed(() => {
-    const { file } = this.artwork();
+    const file = this.artwork()?.file;
+    if (!file) return '';
     const duration = fileDuration(file);
-    const kind = this.isVideo()
+    const kind = isVideoFile(file)
       ? [
           formatName(file.mime),
           ...(duration ? [duration] : []),
@@ -74,8 +78,8 @@ export class CreditsPanel {
   });
   protected readonly sections = computed(() =>
     [
-      creditSection('artist', 'Art by', this.page().artists),
-      creditSection('character', 'Characters', this.page().characters),
+      creditSection('artist', 'Art by', this.page()?.artists ?? []),
+      creditSection('character', 'Characters', this.page()?.characters ?? []),
     ].filter((section) => section.people.length),
   );
 }
