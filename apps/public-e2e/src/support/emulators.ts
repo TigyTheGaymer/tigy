@@ -40,7 +40,7 @@ if (!getApps().length) {
 export const db = getFirestore();
 export const bucket = getStorage().bucket();
 
-export async function seed(): Promise<void> {
+export function seed(): void {
   execFileSync(
     process.execPath,
     ['-r', '@swc-node/register', 'firebase/seed/seed.ts'],
@@ -50,7 +50,6 @@ export async function seed(): Promise<void> {
       stdio: 'inherit',
     },
   );
-  await cacheExpiry();
 }
 
 export async function rebuildSummaries(): Promise<void> {
@@ -74,7 +73,6 @@ export async function rebuildSummaries(): Promise<void> {
       .set({ items: buildPeopleItems(peopleList), updatedAt }),
     db.doc(META_TAGS_DOC).set({ counts: buildTagCounts(imageList), updatedAt }),
   ]);
-  await cacheExpiry();
 }
 
 /** Documents only, without files. */
@@ -126,15 +124,4 @@ export function bulkPieces(
       },
     };
   });
-}
-
-export const SUMMARY_MAX_AGE_MS = Number(
-  process.env['SUMMARY_MAX_AGE_MS'] ?? 1000,
-);
-
-/** So the next page reads the new summaries. */
-export function cacheExpiry(): Promise<void> {
-  return new Promise((resolve) =>
-    setTimeout(resolve, SUMMARY_MAX_AGE_MS + 100),
-  );
 }

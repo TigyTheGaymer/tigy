@@ -5,8 +5,8 @@ import { defineConfig, devices } from '@playwright/test';
 const PORT = process.env['E2E_PORT'] ?? '4300';
 const baseURL = `http://localhost:${PORT}`;
 
-// A short summary cache, so tests see their own edits. Production never sets it.
-process.env['SUMMARY_MAX_AGE_MS'] ??= '1000';
+// No summary cache, so tests see their own edits at once. Production never sets it.
+process.env['SUMMARY_MAX_AGE_MS'] ??= '0';
 
 export default defineConfig({
   ...nxE2EPreset(import.meta.dirname, { testDir: './src' }),
