@@ -38,6 +38,7 @@ import { ConfirmedPiecesService } from '../nsfw/confirmed-pieces.service';
 import { NsfwSwitchService } from '../nsfw/nsfw-switch.service';
 import { pieceTitle } from '../shared/format';
 import { MotionPreferenceService } from '../shared/motion-preference.service';
+import { shapeOf } from '../shared/shape';
 import {
   artworkPath,
   fullImageUrl,
@@ -184,6 +185,24 @@ export class ArtworkPage {
       computation: (src) => !!src && this.isPastLanding(),
     },
   );
+
+  protected readonly pieceShape = computed(() => {
+    const file = this.answered()?.artwork.file;
+    return file ? shapeOf(file) : 1;
+  });
+  /** An old image stays up until the new one loads, so its box keeps the old shape until then. */
+  protected readonly shownShape = linkedSignal<
+    { shape: number; isWaiting: boolean; hasImage: boolean },
+    number
+  >({
+    source: () => ({
+      shape: this.pieceShape(),
+      isWaiting: this.isImageWaiting(),
+      hasImage: !!this.imageSrc(),
+    }),
+    computation: ({ shape, isWaiting }, previous) =>
+      isWaiting && previous?.source.hasImage ? previous.value : shape,
+  }).asReadonly();
 
   private readonly hasNothingYet = computed(
     () => this.isPastLanding() && !this.data() && !this.resource.error(),

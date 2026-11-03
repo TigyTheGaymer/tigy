@@ -22,8 +22,14 @@
   position: sticky;
   top: 0;
   height: 100svh;
+  --arrow-column: calc(18px + var(--control-arrow));
   display: grid;
-  place-items: center;
+  /* The arrow columns keep their width without an arrow, so a piece doesn't jump at the ends. */
+  grid-template:
+    'bar bar bar' auto
+    'prev frame next' minmax(0, 1fr)
+    '. . .' 16px
+    / var(--arrow-column) minmax(0, 1fr) var(--arrow-column);
   overflow: hidden;
   color: var(--on-stage);
   background: var(--stage);
@@ -50,6 +56,19 @@ app-skeleton {
   background: var(--stage);
 }
 
+.stage-panel {
+  grid-area: frame;
+  place-self: center;
+}
+
+/* The size container isn't the button, so the empty space beside a piece doesn't open full view. */
+.frame {
+  grid-area: frame;
+  container-type: size;
+  display: grid;
+  place-items: center;
+}
+
 .piece {
   border: 0;
   padding: 0;
@@ -57,13 +76,12 @@ app-skeleton {
   cursor: zoom-in;
 }
 
-.piece img {
-  width: auto;
-  height: auto;
-  max-width: calc(100% - 140px);
-  max-height: calc(100svh - 150px);
-  margin: 0 auto;
+.piece img,
+.player {
   border-radius: var(--r-md);
+}
+
+.piece img {
   object-fit: contain;
   transition: transform 400ms var(--ease-squish);
 }
@@ -72,29 +90,17 @@ app-skeleton {
   transform: scale(1.01);
 }
 
-/* A video has no size until its metadata loads, so the piece's shape and width size it, as an
-   image's would. The height attribute would otherwise fix the box at the natural height. */
 .player {
-  --max-w: calc(100% - 140px);
-  --max-h: calc(100svh - 150px);
-  display: block;
-  width: min(var(--natural-w), var(--max-w), var(--max-h) * var(--ratio));
-  height: auto;
-  aspect-ratio: var(--ratio);
-  margin: 0 auto;
-  border-radius: var(--r-md);
   background: var(--stage);
 }
 
 .nav {
-  position: absolute;
-  top: 50%;
   z-index: var(--z-stage);
   display: grid;
   place-items: center;
+  align-self: center;
   width: var(--control-arrow);
   height: var(--control-arrow);
-  margin-top: calc(var(--control-arrow) / -2);
   border-radius: var(--r-md);
   background: var(--pink);
   color: var(--on-pink);
@@ -108,11 +114,13 @@ app-skeleton {
 }
 
 .nav.prev {
-  left: 18px;
+  grid-area: prev;
+  justify-self: end;
 }
 
 .nav.next {
-  right: 18px;
+  grid-area: next;
+  justify-self: start;
 }
 
 .info-wrap {
@@ -136,14 +144,6 @@ app-skeleton {
     height: 76svh;
   }
 
-  .piece img {
-    max-height: calc(76svh - 120px);
-  }
-
-  .player {
-    --max-h: calc(76svh - 120px);
-  }
-
   .info-wrap,
   :host-context([data-credits='closed']) .info-wrap {
     display: block;
@@ -160,19 +160,36 @@ app-skeleton {
 }
 
 @media (max-width: 720px) {
-  .piece img {
-    max-width: 100%;
+  .stage {
+    grid-template:
+      'bar bar' auto
+      'frame frame' minmax(0, 1fr)
+      'prev next' calc(var(--control-arrow) + 14px)
+      / 1fr 1fr;
+  }
+
+  .piece img,
+  .player {
     border-radius: 0;
   }
 
-  .player {
-    --max-w: 100%;
-    border-radius: 0;
+  /* A piece filling the width would be clipped by the stage. */
+  .piece:hover img {
+    transform: none;
   }
 
   .nav {
-    top: auto;
-    bottom: 10px;
-    margin-top: 0;
+    align-self: end;
+    margin-bottom: 10px;
+  }
+
+  .nav.prev {
+    justify-self: start;
+    margin-left: 18px;
+  }
+
+  .nav.next {
+    justify-self: end;
+    margin-right: 18px;
   }
 }

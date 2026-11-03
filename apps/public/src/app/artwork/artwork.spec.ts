@@ -124,6 +124,99 @@ describe('ArtworkPage', () => {
       expect(nodes()).toEqual(before);
     });
 
+    describe('the shape on the stage', () => {
+      const file = (w: number, h: number) => ({
+        ...artwork().artwork.file,
+        w,
+        h,
+      });
+      const WIDE = artwork({ id: 'a', file: file(2000, 1000) });
+      const TALL = artwork({ id: 'b', file: file(1000, 2000) });
+      const shapeOn = (selector: string) =>
+        page()
+          .querySelector<HTMLElement>(selector)
+          ?.style.getPropertyValue('--shape');
+      const shape = () => shapeOn('.stage');
+
+      async function onPiece(piece: ReturnType<typeof artwork>) {
+        (await open(`/i/${piece.artwork.id}`, piece.artwork.id)).flush(piece);
+        await settled();
+      }
+
+      async function movingFromWideToTall() {
+        await onPiece(WIDE);
+        imageEvent('load');
+        await settled();
+        await onPiece(TALL);
+        expect(src()).toBe('/img/b/full.webp');
+      }
+
+      it('From a wide piece to a vertical one: the old image keeps its shape until the new one has loaded', async () => {
+        await movingFromWideToTall();
+        expect(shape()).toBe('2');
+
+        imageEvent('load');
+        await settled();
+        expect(shape()).toBe('0.5');
+      });
+
+      it('The new image fails: the stage stops waiting and uses the new shape', async () => {
+        await movingFromWideToTall();
+        expect(shape()).toBe('2');
+
+        imageEvent('error');
+        await settled();
+        expect(shape()).toBe('0.5');
+        expect(stageBusy()).toBeNull();
+      });
+
+      it('A size that is not known: the piece is square', async () => {
+        await onPiece(artwork({ id: 'a', file: file(400, 0) }));
+        expect(shape()).toBe('1');
+      });
+
+      it('From a video to an image: with no old image to keep, the new shape applies at once', async () => {
+        await onPiece(
+          artwork({
+            id: 'a',
+            file: { ...file(2000, 1000), mime: 'video/mp4' },
+          }),
+        );
+        expect(shape()).toBe('2');
+
+        await onPiece(TALL);
+        expect(stageBusy()).toBe('true');
+        expect(shape()).toBe('0.5');
+      });
+
+      it('From the confirm screen to its image: with no old image to keep, the new shape applies at once', async () => {
+        await onPiece(WIDE);
+        imageEvent('load');
+        await settled();
+        await onPiece(artwork({ id: 'b', nsfw: true, file: file(1000, 2000) }));
+        expect(page().querySelector('.piece img')).toBeNull();
+
+        page().querySelector<HTMLElement>('.confirm .pad.dark')!.click();
+        TestBed.inject(AgeCheckService).pass();
+        await settled();
+        expect(stageBusy()).toBe('true');
+        expect(shape()).toBe('0.5');
+      });
+
+      it('Opening full view while the new image loads: it uses the new piece’s shape', async () => {
+        // jsdom has no showModal().
+        const { showModal } = HTMLDialogElement.prototype;
+        HTMLDialogElement.prototype.showModal = () => undefined;
+        await movingFromWideToTall();
+        expect(shape()).toBe('2');
+
+        page().querySelector<HTMLElement>('.piece')!.click();
+        await settled();
+        expect(shapeOn('app-full-view .stage')).toBe('0.5');
+        HTMLDialogElement.prototype.showModal = showModal;
+      });
+    });
+
     it('Moving to a deleted piece: renders the not-found page', async () => {
       await onPieceA();
       (await open('/i/b', 'b')).flush(

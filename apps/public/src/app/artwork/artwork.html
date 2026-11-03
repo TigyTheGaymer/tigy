@@ -4,11 +4,12 @@
   <main class="photo">
     <div
       class="stage"
+      [style.--shape]="shownShape()"
       [attr.aria-busy]="isStageWaiting() || null"
       (touchstart)="onTouchStart($event)"
       (touchend)="onTouchEnd($event)"
     >
-      <app-stage-bar>
+      <app-stage-bar [isDocked]="true">
         <button
           type="button"
           class="round"
@@ -66,44 +67,45 @@
               ><ng-icon name="lucideArrowLeft" class="icon"
             /></a>
           }
-          @if (isVideo()) {
-            <!-- No autoplay here: the server can't know about reduced motion. The muted
-                 binding covers a player made on the client, where the attribute isn't enough. -->
-            <video
-              #player
-              class="player"
-              controls
-              muted
-              [muted]="true"
-              [volume]="0.5"
-              loop
-              playsinline
-              preload="metadata"
-              [src]="video()"
-              [poster]="fullImage()"
-              [width]="page.artwork.file.w"
-              [height]="page.artwork.file.h"
-              [style.--ratio]="page.artwork.file.w / page.artwork.file.h"
-              [style.--natural-w]="page.artwork.file.w + 'px'"
-              [attr.aria-label]="title()"
-            ></video>
-          } @else {
-            <button
-              type="button"
-              class="piece"
-              [attr.aria-label]="'Full view of ' + title()"
-              (click)="openFullView()"
-            >
-              <img
-                [src]="fullImage()"
+          <div class="frame">
+            @if (isVideo()) {
+              <!-- No autoplay here: the server can't know about reduced motion. The muted
+                   binding covers a player made on the client, where the attribute isn't enough. -->
+              <video
+                #player
+                class="player fitted"
+                controls
+                muted
+                [muted]="true"
+                [volume]="0.5"
+                loop
+                playsinline
+                preload="metadata"
+                [src]="video()"
+                [poster]="fullImage()"
                 [width]="page.artwork.file.w"
                 [height]="page.artwork.file.h"
-                [alt]="title()"
-                (load)="isImageWaiting.set(false)"
-                (error)="isImageWaiting.set(false)"
-              />
-            </button>
-          }
+                [attr.aria-label]="title()"
+              ></video>
+            } @else {
+              <button
+                type="button"
+                class="piece"
+                [attr.aria-label]="'Full view of ' + title()"
+                (click)="openFullView()"
+              >
+                <img
+                  class="fitted"
+                  [src]="fullImage()"
+                  [width]="page.artwork.file.w"
+                  [height]="page.artwork.file.h"
+                  [alt]="title()"
+                  (load)="isImageWaiting.set(false)"
+                  (error)="isImageWaiting.set(false)"
+                />
+              </button>
+            }
+          </div>
           @if (data()?.next; as next) {
             <a
               class="nav next"
@@ -166,6 +168,7 @@
     <app-full-view
       [fullSrc]="fullImage()"
       [originalSrc]="originalHref()"
+      [shape]="pieceShape()"
       [alt]="title()"
       (closed)="isFullViewOpen.set(false)"
     />

@@ -35,6 +35,7 @@ export class FullView {
   /** The image the page already shows. */
   readonly fullSrc = input.required<string>();
   readonly originalSrc = input.required<string>();
+  readonly shape = input.required<number>();
   readonly alt = input('');
   readonly closed = output<void>();
 
@@ -58,8 +59,6 @@ export class FullView {
   private readonly dialog =
     viewChild.required<ElementRef<HTMLDialogElement>>('dialog');
   private readonly stage = viewChild.required<ElementRef<HTMLElement>>('stage');
-  private readonly image =
-    viewChild.required<ElementRef<HTMLImageElement>>('image');
 
   private readonly pointers = new Map<number, { x: number; y: number }>();
   private last: { x: number; y: number } | undefined;
@@ -175,16 +174,12 @@ export class FullView {
 
   /** Keeps the zoomed piece covering the screen it can cover. */
   private apply(isAnimated: boolean): void {
-    const image = this.image().nativeElement;
-    const stage = this.stage().nativeElement;
-    const maxX = Math.max(
-      0,
-      (image.offsetWidth * this.scale() - stage.clientWidth) / 2,
-    );
-    const maxY = Math.max(
-      0,
-      (image.offsetHeight * this.scale() - stage.clientHeight) / 2,
-    );
+    const { clientWidth, clientHeight } = this.stage().nativeElement;
+    // The fit's own sum: the image's offsetWidth rounds, and zooming would multiply the error.
+    const width = Math.min(clientWidth, clientHeight * this.shape());
+    const height = width / this.shape();
+    const maxX = Math.max(0, (width * this.scale() - clientWidth) / 2);
+    const maxY = Math.max(0, (height * this.scale() - clientHeight) / 2);
     this.x.set(Math.min(maxX, Math.max(-maxX, this.x())));
     this.y.set(Math.min(maxY, Math.max(-maxY, this.y())));
     this.isAnimated.set(isAnimated);

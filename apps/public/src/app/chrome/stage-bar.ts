@@ -1,5 +1,5 @@
 import { Location } from '@angular/common';
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, input } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideArrowLeft } from '@ng-icons/lucide';
@@ -12,6 +12,7 @@ import { ThemeButton } from '../theme/theme-button';
   selector: 'app-stage-bar',
   imports: [RouterLink, NgIcon, Mark, NsfwSwitch, ThemeButton],
   providers: [provideIcons({ lucideArrowLeft })],
+  host: { '[class.is-docked]': 'isDocked()' },
   styleUrl: './stage-bar.css',
   template: `
     <div class="stage-top">
@@ -35,6 +36,9 @@ import { ThemeButton } from '../theme/theme-button';
   `,
 })
 export class StageBar {
+  /** Takes a row of the stage's grid instead of floating over it. */
+  readonly isDocked = input(false);
+
   private readonly router = inject(Router);
   private readonly location = inject(Location);
   private readonly place = inject(GalleryPlaceService);

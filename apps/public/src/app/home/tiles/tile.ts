@@ -1,5 +1,6 @@
 import type { GalleryRow } from '@tigy/models';
 import { pieceTitle } from '../../shared/format';
+import { shapeOf } from '../../shared/shape';
 import { previewUrl, thumbnailUrl } from '../../shared/urls';
 
 export interface Tile {
@@ -21,13 +22,12 @@ const NARROWEST = 0.5;
 const WIDEST = 2.4;
 
 export function toTile(row: GalleryRow): Tile {
-  const shape = row.h > 0 ? row.w / row.h : 1;
   return {
     id: row.id,
     src: thumbnailUrl(row.id),
     width: row.w,
     height: row.h,
-    shape: Math.min(WIDEST, Math.max(NARROWEST, shape)),
+    shape: Math.min(WIDEST, Math.max(NARROWEST, shapeOf(row))),
     title: row.title,
     name: pieceTitle(row.title),
     isNsfw: row.nsfw,

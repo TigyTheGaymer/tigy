@@ -1,16 +1,12 @@
 import { expect, test, type Page } from '@playwright/test';
 import { addImages, bulkPieces, seed } from './support/emulators';
+import { withoutAppScripts } from './support/without-app-scripts';
 
 const tiles = (page: Page) => page.locator('.gallery .tile a');
 const background = (page: Page) =>
   page.evaluate(() => getComputedStyle(document.body).backgroundColor);
 const FUR = 'rgb(245, 167, 66)';
 const NIGHT = 'rgb(42, 13, 14)';
-
-/** Lets only the page's own inline script run, as before the app loads. */
-async function withoutAppScripts(page: Page): Promise<void> {
-  await page.route(/\.(m?js)(\?|$)/, (route) => route.abort());
-}
 
 test.describe('foundations', () => {
   test('fonts are self-hosted, and the alternates are never downloaded', async ({
