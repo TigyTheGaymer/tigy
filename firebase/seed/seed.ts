@@ -23,11 +23,14 @@ import {
 import { initializeApp } from 'firebase-admin/app';
 import { FieldValue, getFirestore, Timestamp } from 'firebase-admin/firestore';
 import { getStorage } from 'firebase-admin/storage';
-import { readFile } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
+import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
 import { extname, resolve } from 'node:path';
 
 const PROJECT_ID = 'demo-tigy';
 const ASSETS = resolve(__dirname, '../../design/mockups/assets');
+const CACHE = resolve(__dirname, '../../node_modules/.cache/tigy-seed');
+const WEBP = { quality: 82 };
 const HUB = process.env['FIREBASE_EMULATOR_HUB'] ?? '127.0.0.1:4400';
 
 // Never touch a real project: both emulators must be named.
@@ -193,20 +196,30 @@ async function main(): Promise<void> {
   // triggers firing for every write would add tag differences on top of them.
   const triggersOff = await setBackgroundTriggers(false);
   try {
+    // Most resets follow tests that changed only documents.
+    const withFiles = !(await filesUnchanged(bucket));
     await clearFirestore();
-    await bucket.deleteFiles({ force: true });
+    if (withFiles) {
+      await bucket.deleteFiles({ force: true });
 
-    // Tigy's avatar: a 512 px square from the top of the portrait.
-    const portrait = await readFile(resolve(ASSETS, 'tigy-portrait.gif'));
-    await bucket
-      .file(personPaths.avatar(TIGY_ID))
-      .save(
-        await sharp(portrait)
-          .resize({ width: 512, height: 512, fit: 'cover', position: 'top' })
-          .webp({ quality: 82 })
-          .toBuffer(),
-        { contentType: 'image/webp', resumable: false },
-      );
+      // Tigy's avatar: a 512 px square from the top of the portrait.
+      const portrait = await readFile(resolve(ASSETS, 'tigy-portrait.gif'));
+      const avatar = {
+        width: 512,
+        height: 512,
+        fit: 'cover',
+        position: 'top',
+      } as const;
+      await bucket
+        .file(personPaths.avatar(TIGY_ID))
+        .save(
+          await cachedWebp(
+            [digest(portrait), avatar, WEBP, sharp.versions],
+            () => sharp(portrait).resize(avatar).webp(WEBP).toBuffer(),
+          ),
+          { contentType: 'image/webp', resumable: false },
+        );
+    }
 
     const people: WithId<Person>[] = [];
     for (const [id, fields] of Object.entries(PEOPLE)) {
@@ -224,22 +237,28 @@ async function main(): Promise<void> {
       const animated = ext === '.gif';
       const meta = await sharp(original, { animated }).metadata();
       const height = meta.pageHeight ?? meta.height;
-      const webp = (size: number) =>
-        sharp(original, { animated })
-          .resize({
-            width: size,
-            height: size,
-            fit: 'inside',
-            withoutEnlargement: true,
-          })
-          .webp({ quality: 82 })
-          .toBuffer();
+      const source = digest(original);
+      const webp = (size: number) => {
+        const resize = {
+          width: size,
+          height: size,
+          fit: 'inside',
+          withoutEnlargement: true,
+        } as const;
+        return cachedWebp(
+          [source, animated, resize, WEBP, sharp.versions],
+          () =>
+            sharp(original, { animated }).resize(resize).webp(WEBP).toBuffer(),
+        );
+      };
 
       const save = (path: string, data: Buffer, contentType: string) =>
         bucket.file(path).save(data, { contentType, resumable: false });
-      await save(imagePaths.original(id, ext.slice(1)), original, mime);
-      await save(imagePaths.full(id), await webp(2048), 'image/webp');
-      await save(imagePaths.thumb(id), await webp(720), 'image/webp');
+      if (withFiles) {
+        await save(imagePaths.original(id, ext.slice(1)), original, mime);
+        await save(imagePaths.full(id), await webp(2048), 'image/webp');
+        await save(imagePaths.thumb(id), await webp(720), 'image/webp');
+      }
 
       const added = new Date(`${piece.added}T12:00:00Z`);
       const image: Image = {
@@ -272,11 +291,13 @@ async function main(): Promise<void> {
         bucket
           .file(path)
           .save(await sample(name), { contentType, resumable: false });
-      await save(imagePaths.original(id, 'mp4'), 'original.mp4', 'video/mp4');
-      await save(imagePaths.video(id), 'full.mp4', 'video/mp4');
-      await save(imagePaths.preview(id), 'preview.mp4', 'video/mp4');
-      await save(imagePaths.full(id), 'full.webp', 'image/webp');
-      await save(imagePaths.thumb(id), 'thumb.webp', 'image/webp');
+      if (withFiles) {
+        await save(imagePaths.original(id, 'mp4'), 'original.mp4', 'video/mp4');
+        await save(imagePaths.video(id), 'full.mp4', 'video/mp4');
+        await save(imagePaths.preview(id), 'preview.mp4', 'video/mp4');
+        await save(imagePaths.full(id), 'full.webp', 'image/webp');
+        await save(imagePaths.thumb(id), 'thumb.webp', 'image/webp');
+      }
 
       const added = new Date(`${piece.added}T12:00:00Z`);
       const image: Image = {
@@ -308,12 +329,79 @@ async function main(): Promise<void> {
       .doc(META_PEOPLE_DOC)
       .set({ items: buildPeopleItems(people), updatedAt });
     await db.doc(META_TAGS_DOC).set({ counts, updatedAt });
+    if (withFiles) await recordFiles(bucket);
     console.log(
-      `Seeded ${people.length} people and ${images.length} images with ${Object.keys(counts).length} tags into ${PROJECT_ID}.`,
+      `Seeded ${people.length} people and ${images.length} images with ${Object.keys(counts).length} tags into ${PROJECT_ID}${withFiles ? '' : ', keeping its files'}.`,
     );
   } finally {
     if (triggersOff) await setBackgroundTriggers(true);
   }
+}
+
+const digest = (data: Buffer) =>
+  createHash('sha256').update(data).digest('hex');
+
+/**
+ * Encoding the web versions is most of a seed's time, and the e2e tests reseed often.
+ * The key names everything that shapes the output, so a stale entry is never read.
+ */
+async function cachedWebp(
+  key: unknown[],
+  encode: () => Promise<Buffer>,
+): Promise<Buffer> {
+  const name = createHash('sha256').update(JSON.stringify(key)).digest('hex');
+  const path = resolve(CACHE, `${name}.webp`);
+  try {
+    return await readFile(path);
+  } catch {
+    // Not encoded yet.
+  }
+  const data = await encode();
+  await mkdir(CACHE, { recursive: true });
+  // Renamed into place, so a seed that crashes mid-write leaves no entry.
+  const partial = `${path}.${process.pid}.partial`;
+  await writeFile(partial, data);
+  await rename(partial, path);
+  return data;
+}
+
+type Bucket = ReturnType<ReturnType<typeof getStorage>['bucket']>;
+
+// What the last full seed left in Storage.
+const RECORD = resolve(CACHE, 'storage.json');
+
+/** Each file's MD5 by name; null for a file without one, so it never matches. */
+async function storageFiles(
+  bucket: Bucket,
+): Promise<Record<string, string | null>> {
+  const [files] = await bucket.getFiles();
+  return Object.fromEntries(
+    files.map((file) => [file.name, file.metadata.md5Hash ?? null]),
+  );
+}
+
+/** Fresh emulators start with no files, so their first seed is always a full one. */
+async function filesUnchanged(bucket: Bucket): Promise<boolean> {
+  let record: Record<string, string | null>;
+  try {
+    record = JSON.parse(await readFile(RECORD, 'utf8'));
+  } catch {
+    return false;
+  }
+  const current = await storageFiles(bucket);
+  const names = Object.keys(current);
+  return (
+    names.length > 0 &&
+    names.length === Object.keys(record).length &&
+    names.every(
+      (name) => current[name] !== null && current[name] === record[name],
+    )
+  );
+}
+
+async function recordFiles(bucket: Bucket): Promise<void> {
+  await mkdir(CACHE, { recursive: true });
+  await writeFile(RECORD, JSON.stringify(await storageFiles(bucket)));
 }
 
 async function clearFirestore(): Promise<void> {
