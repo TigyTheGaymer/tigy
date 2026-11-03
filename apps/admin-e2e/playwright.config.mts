@@ -1,6 +1,7 @@
 import { workspaceRoot } from '@nx/devkit';
 import { nxE2EPreset } from '@nx/playwright/preset';
 import { defineConfig, devices } from '@playwright/test';
+import { OWNER_STATE } from './src/support/sign-in';
 
 const PORT = process.env['E2E_PORT'] ?? '4201';
 const baseURL = `http://localhost:${PORT}`;
@@ -26,14 +27,25 @@ export default defineConfig({
     cwd: workspaceRoot,
   },
   projects: [
+    // Signs in once for the run. The popup sometimes hangs, so it gets retries.
     {
-      name: 'desktop',
+      name: 'setup',
+      testMatch: /owner\.setup\.ts/,
+      retries: 2,
       use: { ...devices['Desktop Chrome'] },
     },
     {
+      name: 'desktop',
+      dependencies: ['setup'],
+      // Filtered here rather than skipped in the test, which would still run its reset.
+      grepInvert: /@phone-only/,
+      use: { ...devices['Desktop Chrome'], storageState: OWNER_STATE },
+    },
+    {
       name: 'phone',
+      dependencies: ['setup'],
       grep: /@phone/,
-      use: { ...devices['Pixel 7'] },
+      use: { ...devices['Pixel 7'], storageState: OWNER_STATE },
     },
   ],
 });

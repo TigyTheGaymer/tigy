@@ -2,7 +2,7 @@ import { expect, test, type Page } from '@playwright/test';
 import { execFileSync } from 'node:child_process';
 import ffmpegPath from 'ffmpeg-static';
 import { readDoc, seed } from './support/emulators';
-import { signInAsOwner } from './support/sign-in';
+import { openAsOwner } from './support/sign-in';
 
 test.afterEach(() => seed());
 
@@ -44,7 +44,7 @@ test('Uploading a video: it becomes ready, the editor plays it with its duration
 }, testInfo) => {
   test.slow();
   const clip = makeMp4(testInfo.outputPath('clip.mp4'));
-  await signInAsOwner(page, '/artworks?view=unpublished');
+  await openAsOwner(page, '/artworks?view=unpublished');
   await page.locator('input[type=file]').setInputFiles(clip);
 
   await expect(tiles(page)).toHaveCount(1, { timeout: 120_000 });

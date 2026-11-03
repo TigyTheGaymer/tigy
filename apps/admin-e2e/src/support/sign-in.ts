@@ -1,6 +1,14 @@
+import { workspaceRoot } from '@nx/devkit';
 import { expect, type Page } from '@playwright/test';
+import { join } from 'node:path';
 
 export const OWNER_EMAIL = 'owner@tigy.test';
+
+/** The owner's session, saved once a run by owner.setup.ts. Outside test-output, which Playwright empties. */
+export const OWNER_STATE = join(
+  workspaceRoot,
+  'dist/.playwright/apps/admin-e2e/.auth/owner.json',
+);
 
 /**
  * Signs in through the Auth emulator's Google popup, adding the account the
@@ -49,4 +57,16 @@ export async function signInAsOwner(page: Page, path = '/artworks') {
       if (attempt === 2) throw error;
     }
   }
+}
+
+/**
+ * Opens a page in the saved owner session. It never opens the popup, so a
+ * session that didn't load fails here at once rather than hanging there.
+ */
+export async function openAsOwner(page: Page, path = '/artworks') {
+  await page.goto(path);
+  await expect(
+    page.getByRole('button', { name: 'Account' }),
+    'The saved owner session did not load',
+  ).toBeVisible();
 }

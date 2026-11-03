@@ -1,6 +1,9 @@
 import { expect, test } from '@playwright/test';
 import { signIn, signInAsOwner } from './support/sign-in';
 
+// Signing in is what these test, so they start without the saved session.
+test.use({ storageState: { cookies: [], origins: [] } });
+
 test('Owner signs in: the admin opens the Artworks page', async ({ page }) => {
   await signInAsOwner(page);
   await expect(page).toHaveURL(/\/artworks$/);

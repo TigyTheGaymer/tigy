@@ -3,7 +3,7 @@ import { personPaths } from '@tigy/models';
 import sharp from 'sharp';
 import { bucket, db, readDoc, seed } from './support/emulators';
 import { expectNoSidewaysScroll } from './support/layout';
-import { signInAsOwner } from './support/sign-in';
+import { openAsOwner } from './support/sign-in';
 
 test.afterEach(() => seed());
 
@@ -44,7 +44,7 @@ test('A person from creation to deletion: links, an avatar from a photo, and ref
   page,
 }) => {
   test.slow();
-  await signInAsOwner(page, '/people');
+  await openAsOwner(page, '/people');
   const id = await createPerson(page, ' Bramble ');
   await expect(page.getByRole('heading', { name: 'Bramble' })).toBeVisible();
 
@@ -128,7 +128,7 @@ test('A person from creation to deletion: links, an avatar from a photo, and ref
 });
 
 test('Tigy cannot be deleted', async ({ page }) => {
-  await signInAsOwner(page, '/people/tigy');
+  await openAsOwner(page, '/people/tigy');
   await expect(page.getByText("The site's own person")).toBeVisible();
   await expect(page.getByRole('button', { name: 'Delete' })).toBeHidden();
 });
@@ -136,7 +136,7 @@ test('Tigy cannot be deleted', async ({ page }) => {
 test('Creating an artist from the picker and adding a link in the panel before saving the artwork', async ({
   page,
 }) => {
-  await signInAsOwner(page, '/artworks/chibi-tigy');
+  await openAsOwner(page, '/artworks/chibi-tigy');
   await page.getByLabel('Title', { exact: true }).fill('Chibi Tigy');
   await page.getByRole('combobox', { name: 'Add to Artists' }).fill('Bramble');
   await page.getByRole('option', { name: 'Create “Bramble”' }).click();
@@ -174,12 +174,10 @@ test('Creating an artist from the picker and adding a link in the panel before s
     );
 });
 
-test('Cropping on a phone: one finger moves the crop and two fingers zoom it @phone', async ({
+test('Cropping on a phone: one finger moves the crop and two fingers zoom it @phone-only', async ({
   page,
-  isMobile,
 }) => {
-  test.skip(!isMobile, 'Touch');
-  await signInAsOwner(page, '/people');
+  await openAsOwner(page, '/people');
   const id = await createPerson(page, 'Pinch');
   await page.locator('input[type=file]').setInputFiles({
     name: 'photo.jpg',

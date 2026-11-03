@@ -2,7 +2,7 @@ import { expect, test, type Locator, type Page } from '@playwright/test';
 import { addImages, batchPieces, db, readDoc, seed } from './support/emulators';
 import { dropFiles } from './support/files';
 import { expectNoSidewaysScroll } from './support/layout';
-import { signInAsOwner } from './support/sign-in';
+import { openAsOwner } from './support/sign-in';
 
 test.afterEach(() => seed());
 
@@ -17,7 +17,7 @@ test('Publishing a new upload, marking it NSFW, then deleting it from the editor
   page,
 }) => {
   test.slow();
-  await signInAsOwner(page, '/artworks?view=unpublished');
+  await openAsOwner(page, '/artworks?view=unpublished');
   await dropFiles(page, ['tigy-hearts.png']);
   await expect(tiles(page)).toHaveCount(1, { timeout: 60_000 });
   await tiles(page).getByRole('link').first().click();
@@ -86,7 +86,7 @@ test('Publishing a new upload, marking it NSFW, then deleting it from the editor
 
 test('Save and next through three unpublished pieces', async ({ page }) => {
   await addImages(batchPieces(3));
-  await signInAsOwner(page, '/artworks?view=unpublished');
+  await openAsOwner(page, '/artworks?view=unpublished');
   await tiles(page).first().getByRole('link').first().click();
   for (const n of [1, 2]) {
     await expect(
@@ -116,7 +116,7 @@ test('Ctrl+Enter and Alt+arrows through Needs work until a piece leaves it', asy
     { id: 'undated', fields: { title: 'Undated', sortDate: '2026-06-20' } },
     { id: 'untitled', fields: { date: '2026-06', sortDate: '2026-06-10' } },
   ]);
-  await signInAsOwner(page, '/artworks?view=needs-work');
+  await openAsOwner(page, '/artworks?view=needs-work');
   const needsWork = page.getByRole('tab', { name: /Needs work/ });
   await expect(needsWork).toHaveText(/3/);
   await tiles(page).first().getByRole('link').first().click();
@@ -141,7 +141,7 @@ test('Ctrl+Enter and Alt+arrows through Needs work until a piece leaves it', asy
 test('Leaving with unsaved edits asks, and staying keeps the edit', async ({
   page,
 }) => {
-  await signInAsOwner(page, '/artworks/happy-tigy');
+  await openAsOwner(page, '/artworks/happy-tigy');
   await page.getByLabel('Title', { exact: true }).fill('Happier Tigy');
   await page.getByRole('link', { name: 'People' }).first().click();
   const dialog = page.getByRole('alertdialog');
@@ -156,7 +156,7 @@ test('Leaving with unsaved edits asks, and staying keeps the edit', async ({
 test('Saving on the way out: Save and leave stores the edit and opens People', async ({
   page,
 }) => {
-  await signInAsOwner(page, '/artworks/happy-tigy');
+  await openAsOwner(page, '/artworks/happy-tigy');
   await page.getByLabel('Title', { exact: true }).fill('Happier Tigy');
   await page.getByRole('link', { name: 'People' }).first().click();
   const dialog = page.getByRole('alertdialog');
@@ -168,12 +168,10 @@ test('Saving on the way out: Save and leave stores the edit and opens People', a
     .toBe('Happier Tigy');
 });
 
-test('The leave question on a phone puts Save and leave on top and focuses Stay @phone', async ({
+test('The leave question on a phone puts Save and leave on top and focuses Stay @phone-only', async ({
   page,
-  isMobile,
 }) => {
-  test.skip(!isMobile, 'A phone layout');
-  await signInAsOwner(page, '/artworks/happy-tigy');
+  await openAsOwner(page, '/artworks/happy-tigy');
   await page.getByLabel('Title', { exact: true }).fill('Happier Tigy');
   await page.getByRole('link', { name: 'Back to the artworks' }).click();
   const dialog = page.getByRole('alertdialog');
@@ -186,12 +184,10 @@ test('The leave question on a phone puts Save and leave on top and focuses Stay 
   await expect(page).toHaveURL(/\/artworks\/happy-tigy$/);
 });
 
-test('Editing on a phone: the image is above the form and nothing scrolls sideways @phone', async ({
+test('Editing on a phone: the image is above the form and nothing scrolls sideways @phone-only', async ({
   page,
-  isMobile,
 }) => {
-  test.skip(!isMobile, 'A phone layout');
-  await signInAsOwner(page, '/artworks/happy-tigy');
+  await openAsOwner(page, '/artworks/happy-tigy');
   const image = await page
     .getByRole('img', { name: 'Happy Tigy' })
     .boundingBox();

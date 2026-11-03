@@ -10,7 +10,7 @@ import {
 } from './support/emulators';
 import { ASSETS, dropFiles } from './support/files';
 import { expectNoSidewaysScroll } from './support/layout';
-import { signInAsOwner } from './support/sign-in';
+import { openAsOwner } from './support/sign-in';
 
 test.afterEach(() => seed());
 
@@ -31,7 +31,7 @@ test('Publishing a batch: all five are published and the counts change by five @
   page,
 }) => {
   await addImages(batchPieces(5));
-  await signInAsOwner(page, '/artworks?view=unpublished');
+  await openAsOwner(page, '/artworks?view=unpublished');
   await expect(counts(page)).toContainText('5 unpublished');
   await expect(tiles(page)).toHaveCount(5);
   await expectNoSidewaysScroll(page);
@@ -61,7 +61,7 @@ test('Publishing a batch with uncredited pieces: asks, and confirming publishes 
       },
     })),
   );
-  await signInAsOwner(page, '/artworks?view=unpublished');
+  await openAsOwner(page, '/artworks?view=unpublished');
   await page.getByRole('checkbox', { name: 'Select all', exact: true }).click();
   await page
     .getByRole('toolbar', { name: 'Selected artworks' })
@@ -79,7 +79,7 @@ test('Deleting a batch: asks to confirm deleting 3 artworks, then deletes them',
   page,
 }) => {
   await addImages(batchPieces(4));
-  await signInAsOwner(page, '/artworks?view=unpublished');
+  await openAsOwner(page, '/artworks?view=unpublished');
   for (const n of [1, 2, 3]) {
     await page.getByRole('checkbox', { name: `Select Batch ${n}` }).click();
   }
@@ -100,7 +100,7 @@ test('Uploading from the Artworks page, editing the fresh upload, then deleting 
   page,
 }) => {
   test.slow();
-  await signInAsOwner(page, '/artworks?view=unpublished');
+  await openAsOwner(page, '/artworks?view=unpublished');
   await expect(page.getByText('No artworks yet')).toBeHidden();
   await dropFiles(page, ['tigy-chibi.png']);
 
@@ -148,7 +148,7 @@ test('Uploading from a phone: both photos upload with their tiles at the top @ph
   page,
 }) => {
   test.slow();
-  await signInAsOwner(page, '/artworks?view=sfw');
+  await openAsOwner(page, '/artworks?view=sfw');
   await page
     .locator('input[type=file]')
     .setInputFiles([
